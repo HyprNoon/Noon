@@ -4,7 +4,7 @@ import qs.store
 import qs.common
 import qs.common.widgets
 import QtQuick.Layouts
-import "widgets"
+import qs.modules.main.desktop.widgets
 
 Item {
     id: root
@@ -139,7 +139,7 @@ Item {
                     id: loader
                     active: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) !== -1
                     visible: active
-                    source: active ? `widgets/${modelData.component}.qml` : ""
+                    source: active ? `${Directories.shellDir}/modules/main/desktop/widgets/${modelData.component}.qml` : ""
 
                     property int gX: 0
                     property int gY: 0

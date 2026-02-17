@@ -12,7 +12,7 @@ StyledRect {
     id: root
     color: "transparent"
 
-    readonly property string widgetsPath: "../../sidebar/components/widgets/widgets/"
+    readonly property string widgetsPath: "../widgets/"
     readonly property var mem: Mem.states.sidebar.widgets
     readonly property var desktop: mem.desktop
     readonly property var widgetObjects: desktop.map(widgetId => {
