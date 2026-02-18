@@ -13,14 +13,6 @@ Item {
 
     property var selectedFiles: []
 
-    QtObject {
-        id: incomingTransfer
-        property bool pending: false
-        property string sender: ""
-        property var files: []
-        property int totalBytes: 0
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.small
@@ -45,6 +37,7 @@ Item {
                 text: ""
                 visible: text.length > 0
                 Layout.fillWidth: true
+                color: Colors.colSubtext
                 font.pixelSize: Fonts.sizes.small
             }
         }
@@ -73,11 +66,8 @@ Item {
             }
         }
 
-        // ── Receive-info card ────────────────────────────────────────────────
-        // Appears once the backend is advertising and receiveInfo is valid.
-        // Shows ip:port, endpoint name, optional PIN, and a QR canvas.
         StyledRect {
-            visible: QuickShareService.receiving && QuickShareService.receiveInfo.valid
+            visible: QuickShareService.receiving && QuickShareService.receiveInfo.valid && !QuickShareService.pendingTransfer.active
             color: Colors.colLayer1
             radius: Rounding.large
             Layout.fillWidth: true
@@ -93,7 +83,6 @@ Item {
                 }
                 spacing: Padding.large
 
-                // QR-code box
                 StyledRect {
                     implicitWidth: 120
                     implicitHeight: 120
@@ -107,7 +96,6 @@ Item {
                     }
                 }
 
-                // Endpoint details
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: Padding.verysmall
@@ -126,81 +114,10 @@ Item {
                         color: Colors.colSubtext
                     }
 
-                    // PIN badge – only shown when the backend supplies one
-                    StyledRect {
-                        visible: QuickShareService.receiveInfo.authToken !== ""
-                        color: Colors.colSecondaryContainer
-                        radius: Rounding.small
-                        implicitHeight: 28
-                        implicitWidth: pinLabel.implicitWidth + Padding.large * 2
-
-                        StyledText {
-                            id: pinLabel
-                            anchors.centerIn: parent
-                            text: "PIN: " + QuickShareService.receiveInfo.authToken
-                            font.pixelSize: Fonts.sizes.normal
-                            font.weight: 700
-                            color: Colors.colOnSecondaryContainer
-                        }
-                    }
-
                     StyledText {
                         text: "Waiting for sender…"
                         font.pixelSize: Fonts.sizes.small
                         color: Colors.colSubtext
-                    }
-                }
-            }
-        }
-
-        // ── Incoming-transfer banner ─────────────────────────────────────────
-        StyledRect {
-            visible: incomingTransfer.pending
-            color: Colors.colSecondaryContainer
-            radius: Rounding.large
-            Layout.fillWidth: true
-            implicitHeight: 84
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Padding.large
-                spacing: Padding.small
-
-                StyledText {
-                    Layout.fillWidth: true
-                    text: `Incoming from ${incomingTransfer.sender}: ${incomingTransfer.files.join(", ")}`
-                    font.pixelSize: Fonts.sizes.normal
-                    color: Colors.colOnSecondaryContainer
-                    elide: Text.ElideRight
-                }
-
-                RLayout {
-                    Layout.fillWidth: true
-                    Spacer {}
-                    RippleButtonWithIcon {
-                        materialIcon: "check"
-                        colBackground: Colors.colPrimary
-                        colBackgroundHover: Colors.colPrimaryHover
-                        iconColor: Colors.colOnPrimary
-                        buttonRadius: Rounding.massive
-                        releaseAction: () => {
-                            QuickShareService.startReceiving();
-                            incomingTransfer.pending = false;
-                            setStatus("Accepting transfer…");
-                        }
-                    }
-
-                    RippleButtonWithIcon {
-                        materialIcon: "close"
-                        colBackground: Colors.colError
-                        colBackgroundHover: Colors.colErrorHover
-                        iconColor: Colors.colOnError
-                        buttonRadius: Rounding.massive
-                        releaseAction: () => {
-                            incomingTransfer.pending = false;
-                            QuickShareService.stopReceiving();
-                            setStatus("Transfer declined.");
-                        }
                     }
                 }
             }
@@ -232,7 +149,18 @@ Item {
                     width: deviceList.width
                     buttonRadius: Rounding.large
                     title: modelData.name
-                    materialIcon: "devices"
+                    materialIcon: {
+                        switch (modelData.category) {
+                        case "phone":
+                            return "smartphone";
+                        case "tablet":
+                            return "tablet";
+                        case "laptop":
+                            return "laptop";
+                        default:
+                            return "devices";
+                        }
+                    }
                     releaseAction: () => {
                         if (root.selectedFiles.length === 0) {
                             setStatus("Select files first.");
@@ -301,8 +229,7 @@ Item {
                         colBackgroundHover: "transparent"
                         colRipple: Colors.colPrimaryContainerActive
                         releaseAction: () => {
-                            if (!toggled)
-                                filePicker.open();
+                            filePicker.open();
                         }
                     }
 
@@ -393,34 +320,30 @@ Item {
             setStatus("Advertising: " + info.endpointName + " @ " + info.ip + ":" + info.port);
         }
 
-        function onTransferRequest(sender, files, totalBytes) {
-            incomingTransfer.sender = sender;
-            incomingTransfer.files = files;
-            incomingTransfer.totalBytes = totalBytes;
-            incomingTransfer.pending = true;
-            setStatus(`Transfer request from ${sender}`);
+        // Signal is now: transferRequest(pin)
+        function onTransferRequest(pin) {
+            setStatus("Incoming transfer — verify PIN: " + pin);
         }
 
         function onTransferComplete(files, outputDir) {
-            incomingTransfer.pending = false;
-            setStatus(`Saved ${files.length} file(s) to ${outputDir}`);
+            setStatus("Saved " + files.length + " file(s) to " + outputDir);
+        }
+
+        function onTransferRejected() {
+            setStatus("Transfer rejected.");
         }
 
         function onSendComplete(fileName) {
-            setStatus(`Sent: ${fileName.split("/").pop()}`);
+            setStatus("Sent: " + fileName.split("/").pop());
             root.selectedFiles = [];
         }
 
-        function onDeviceFound(index, name) {
-            setStatus(`Found: ${name}`);
-        }
-
         function onDiscoverDone(total) {
-            setStatus(total > 0 ? `${total} device(s) found` : "No devices found");
+            setStatus(total > 0 ? total + " device(s) found" : "No devices found");
         }
 
         function onError(message) {
-            setStatus(`Error: ${message}`, true);
+            setStatus("Error: " + message, true);
         }
     }
 
@@ -439,30 +362,8 @@ Item {
         }
     }
 
-    component OptionButton: GroupButton {
-        id: optBtn
-        property string label
-        property string materialIcon
-        buttonRadius: Rounding.massive
-        buttonRadiusPressed: Rounding.small
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        buttonTextPadding: Padding.huge
-        baseHeight: 42
-        contentItem: RLayout {
-            spacing: 4
-            Symbol {
-                color: optBtn.toggled ? Colors.colOnPrimary : Colors.colOnLayer1
-                Layout.leftMargin: Padding.massive
-                text: optBtn.materialIcon
-                fill: optBtn.toggled ? 1 : 0
-                font.pixelSize: 20
-            }
-            StyledText {
-                text: optBtn.label
-                color: optBtn.toggled ? Colors.colOnPrimary : Colors.colOnLayer1
-                font.pixelSize: Fonts.sizes.large
-            }
-        }
+    RecieveDialog {
+        z: 999
+        show: QuickShareService.pendingTransfer.active
     }
 }

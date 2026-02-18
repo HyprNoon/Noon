@@ -17,7 +17,6 @@ BarProgressIndicator {
         function onBrightnessChanged() {
             if (root.brightnessMonitor && root.brightnessMonitor.ready) {
                 root.expanded = true;
-                timeout.restart();
             }
         }
     }
@@ -34,5 +33,4 @@ BarProgressIndicator {
             root.expanded = true;
         }
     }
-
 }

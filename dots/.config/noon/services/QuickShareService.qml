@@ -12,17 +12,9 @@ Singleton {
     readonly property bool receiving: _s.receiving
     readonly property string lastError: _s.lastError
     readonly property var discoveredDevices: _s.discoveredDevices
-    readonly property real sendProgress: _s.sendProgress
     readonly property real receiveProgress: _s.receiveProgress
 
     // Populated once the backend starts advertising.
-    // Fields:
-    //   endpointName  – human-readable local device name
-    //   ip            – IP address others should connect to
-    //   port          – port number
-    //   qrData        – raw string to encode in a QR code
-    //                   (typically "nearby://<ip>:<port>?name=<endpointName>")
-    //   authToken     – optional short auth token / PIN shown to both sides
     readonly property QtObject receiveInfo: _receiveInfo
 
     QtObject {
@@ -33,18 +25,27 @@ Singleton {
         property string qrData: ""
         property string authToken: ""
 
-        // Convenience: true once we have at least an ip+port
         readonly property bool valid: ip !== "" && port > 0
     }
 
+    // Populated when an incoming transfer request arrives and cleared on accept/reject.
+    readonly property QtObject pendingTransfer: _pendingTransfer
+
+    QtObject {
+        id: _pendingTransfer
+        property string pin: ""
+        // true while we are waiting for user to accept or reject
+        readonly property bool active: pin !== ""
+    }
+
     // ── Signals ──────────────────────────────────────────────────────────────
-    signal transferRequest(string sender, var files, int totalBytes)
+    signal transferRequest(string pin)
     signal transferComplete(var files, string outputDir)
+    signal transferRejected
     signal sendComplete(string fileName)
-    signal deviceFound(int index, string name)
+    signal deviceFound(int index, string name, string category)
     signal discoverDone(int total)
     signal error(string message)
-    // Emitted when receiveInfo is freshly populated so the UI can react
     signal receiveInfoReady
 
     // ── Public API ───────────────────────────────────────────────────────────
@@ -59,6 +60,20 @@ Singleton {
         _clearReceiveInfo();
         _cmd({
             cmd: "stopReceiving"
+        });
+    }
+
+    function acceptTransfer() {
+        _pendingTransfer.pin = "";
+        _cmd({
+            cmd: "acceptTransfer"
+        });
+    }
+
+    function rejectTransfer() {
+        _pendingTransfer.pin = "";
+        _cmd({
+            cmd: "rejectTransfer"
         });
     }
 
@@ -112,16 +127,12 @@ Singleton {
         case "ready":
             _s.backendReady = true;
             break;
-
-        // Backend started advertising – carries the endpoint advertisement so
-        // the UI can render a QR code for the sender to scan.
         case "receiving":
             _s.receiving = true;
             _receiveInfo.endpointName = o.endpointName || "";
             _receiveInfo.ip = o.ip || "";
             _receiveInfo.port = o.port || 0;
             _receiveInfo.authToken = o.authToken || "";
-            // Build the qrData string if the backend didn't supply one
             if (o.qrData) {
                 _receiveInfo.qrData = o.qrData;
             } else if (_receiveInfo.ip && _receiveInfo.port) {
@@ -133,32 +144,32 @@ Singleton {
             break;
         case "stopped":
             _s.receiving = false;
+            _pendingTransfer.pin = "";
             _clearReceiveInfo();
             break;
         case "transferRequest":
-            root.transferRequest(o.sender || "", o.files || [], o.totalBytes || 0);
+            _pendingTransfer.pin = o.pin || "";
+            root.transferRequest(o.pin || "");
             break;
         case "transferComplete":
+            _s.receiveProgress = 1.0;
             root.transferComplete(o.files || [], o.outputDir || "");
             break;
-        case "sendComplete":
-            _s.sendProgress = -1;
-            root.sendComplete(o.fileName || "");
-            break;
-        case "sendProgress":
-            _s.sendProgress = o.progress || 0;
+        case "transferRejected":
+            root.transferRejected();
             break;
         case "receiveProgress":
-            _s.receiveProgress = o.progress || 0;
+            _s.receiveProgress = o.progress !== undefined ? o.progress : -1;
             break;
         case "deviceFound":
             var devs = _s.discoveredDevices.slice();
             devs.push({
                 index: o.index,
-                name: o.name
+                name: o.name,
+                category: o.category || "unknown"
             });
             _s.discoveredDevices = devs;
-            root.deviceFound(o.index, o.name || "");
+            root.deviceFound(o.index, o.name || "", o.category || "unknown");
             break;
         case "discoverDone":
             root.discoverDone(o.total || 0);
@@ -182,7 +193,6 @@ Singleton {
         property bool receiving: false
         property string lastError: ""
         property var discoveredDevices: []
-        property real sendProgress: -1
         property real receiveProgress: -1
     }
 
@@ -205,6 +215,7 @@ Singleton {
         onExited: code => {
             _s.backendReady = false;
             _s.receiving = false;
+            _pendingTransfer.pin = "";
             _clearReceiveInfo();
             if (code !== 0)
                 _restart.restart();
@@ -214,8 +225,6 @@ Singleton {
     Timer {
         id: _restart
         interval: 3000
-        onTriggered: {
-            _proc.running = true;
-        }
+        onTriggered: _proc.running = true
     }
 }
