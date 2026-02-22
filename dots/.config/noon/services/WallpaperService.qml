@@ -78,7 +78,6 @@ Singleton {
             return fileUrl;
 
         const cacheKey = `${fileUrl}`;
-
         if (_thumbnailCache[cacheKey])
             return _thumbnailCache[cacheKey];
 
@@ -86,11 +85,16 @@ Singleton {
         if (!cleanPath.startsWith("/"))
             cleanPath = "/" + cleanPath;
 
-        const hash = Qt.md5(`file://${cleanPath}`);
-        // Thumbnail path matches GnomeDesktop standard location based on size
-        // Script uses: normal, large, x-large, xx-large
-        // Standard uses: normal (128x128), large (256x256), x-large (512x512), xx-large (1024x1024)
-        const sizeDir = thumbnailSize === "normal" ? "normal" : "large"; // Map to standard dirs
+        const encodedUri = `file://${encodeURI(cleanPath)}`;
+        const hash = Qt.md5(encodedUri);
+
+        const sizeDirMap = {
+            "normal": "normal",
+            "large": "large",
+            "x-large": "x-large",
+            "xx-large": "xx-large"
+        };
+        const sizeDir = sizeDirMap[thumbnailSize];
         const thumbnailPath = `${FileUtils.trimFileProtocol(Directories.standard.home)}/.cache/thumbnails/${sizeDir}/${hash}.png`;
 
         _thumbnailCache[cacheKey] = `file://${thumbnailPath}`;

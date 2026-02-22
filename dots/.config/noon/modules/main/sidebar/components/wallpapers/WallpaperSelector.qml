@@ -128,12 +128,14 @@ StyledRect {
         model: filteredModel
         currentIndex: filteredModel.values.indexOf(WallpaperService.currentWallpaper)
         highlightFollowsCurrentItem: true
-        highlightMoveDuration: 250
+        highlightMoveDuration: 300
+
         // onCurrentIndexChanged: {
         //     if (currentIndex >= 0) {
         //         WallpaperService.applyWallpaper(filteredModel.values[currentIndex].fileUrl.toString());
         //     }
         // }
+
         delegate: Item {
             id: loader
             z: 9999
@@ -157,7 +159,9 @@ StyledRect {
         }
 
         Keys.onPressed: event => {
-            if (event.key === Qt.Key_Up) {
+            if (event.key === Qt.Key_Slash && root.focus) {
+                root.searchFocusRequested();
+            } else if (event.key === Qt.Key_Up) {
                 if (currentIndex <= 0) {
                     currentIndex = -1;
                     root.searchFocusRequested();
