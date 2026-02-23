@@ -17,7 +17,7 @@ Item {
     property alias iconSize: shapeWidget.iconSize
     property alias colBackground: shapeWidget.color
     property alias colOnBackground: shapeWidget.colSymbol
-
+    property int spacing: Padding.large
     opacity: shown ? 1 : 0
     visible: opacity > 0
 
@@ -29,7 +29,7 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        spacing: Padding.large
+        spacing: root.spacing
 
         MaterialShapeWrappedMaterialSymbol {
             id: shapeWidget

@@ -26,6 +26,7 @@ StyledPanel {
     readonly property int sidebarWidth: SidebarData.currentSize(hoverMode, root.expanded, selectedCategory) + auxWidth
     readonly property int auxWidth: sidebarContent.auxVisible && !hoverMode ? SidebarData.currentSize(false, false, sidebarContent.auxCategory) : 0
     readonly property int hoverArea: 2
+    readonly property Component detachedWindow: DetachedSidebarWindow {}
 
     function hide() {
         if (pinned)
@@ -38,6 +39,18 @@ StyledPanel {
             reset_reveal_conditions();
     }
 
+    function detach() {
+        let states = GlobalStates.main;
+        if (!SidebarData.isDetachable(root.selectedCategory) || isDetached())
+            return;
+        detachedWindow.createObject(this, {
+            category: root.selectedCategory
+        });
+        hide();
+    }
+    function isDetached() {
+        return SidebarData.detachedContent.includes(root.selectedCategory);
+    }
     function reveal_content() {
         hoverMode = false;
         sidebarContent.forceActiveFocus();

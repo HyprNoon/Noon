@@ -2,6 +2,7 @@ import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import qs.store
 import qs.common
 import qs.common.widgets
 import qs.services
@@ -234,7 +235,14 @@ Item {
                 visible: GlobalStates.main.sidebar.auxWidth > 0
                 releaseAction: () => GlobalStates.main.sidebar.close_aux()
             }
-
+            RippleButtonWithIcon {
+                colors: root.colors
+                toggled: SidebarData.detachedContent.includes(GlobalStates.main.sidebar.selectedCategory)
+                enabled: !toggled
+                visible: SidebarData.isDetachable(GlobalStates.main.sidebar.selectedCategory)
+                materialIcon: "ad"
+                releaseAction: () => GlobalStates.main.sidebar.detach()
+            }
             RippleButtonWithIcon {
                 colors: root.colors
                 materialIcon: "push_pin"

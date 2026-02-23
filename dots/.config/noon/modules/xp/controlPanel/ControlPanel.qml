@@ -7,7 +7,7 @@ import qs.common.utils
 import qs.common.widgets
 import qs.modules.main.sidebar.components.settings
 
-FloatingWindow {
+AppWindow {
     id: root
 
     /*

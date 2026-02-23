@@ -399,15 +399,15 @@ JsonAdapter {
         property int batteryLowThreshold: 20
         property string layout: "VDynamic"
         property JsonObject vMap: JsonObject {
-            property int spacing: 8
+            property int spacing: 6
             property list<string> topArea: ["materialStatusIcons", "battery", "weather", "sysTray"]
             property list<string> centerArea: []
-            property list<string> bottomArea: ["media", "resources", "separator", "volume", "brightness", "separator", "workspaces", "separator", "clock", "separator", "keyboard", "separator", "power"]
+            property list<string> bottomArea: ["media", "resources", "separator", "volume", "brightness", "separator", "progressWs", "separator", "clock", "separator", "keyboard", "separator", "power"]
         }
         property JsonObject hMap: JsonObject {
-            property int spacing: 4
+            property int spacing: 6
             property list<string> leftArea: ["power", "separator", "title"]
-            property list<string> centerArea: ["resources", "separator", "media", "separator", "workspaces", "separator", "clock", "separator", "utilButtons", "separator", "battery"]
+            property list<string> centerArea: ["resources", "separator", "media", "separator", "progressWs", "separator", "clock", "separator", "utilButtons", "separator", "battery"]
             property list<string> rightArea: ["sysTray", "weather", "materialStatusIcons"]
         }
         property list<string> bars: ["Dynamic", "HyDe", "NovelKnocks", "Sleek", "VDynamic"]

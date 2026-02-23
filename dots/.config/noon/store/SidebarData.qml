@@ -12,6 +12,7 @@ Singleton {
     id: root
 
     property int sidebarWidth
+    property var detachedContent: []
     readonly property QtObject sizePresets: Sizes.sidebar
     readonly property var enabledCategories: Object.keys(registry).filter(key => (registry[key].enabled ?? true) && !registry[key].stealth && (registry[key].shell === undefined || registry[key].shell === Mem.options.desktop.shell.mode))
     readonly property var registry: {
@@ -22,7 +23,7 @@ Singleton {
             componentPath: "etc/Apps",
             searchable: true,
             expandSize: sizePresets.quarter,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.apps,
             async: true
         },
@@ -31,6 +32,8 @@ Singleton {
             activeIcon: "cognition_2",
             componentPath: "apis/Apis",
             expandable: true,
+            detachable: true,
+            shape: "PixelCircle",
             enabled: Mem.options.sidebar.content.apis
         },
         "Web": {
@@ -41,7 +44,8 @@ Singleton {
             async: true,
             on_accepted_only: true,
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            detachable: true,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.web
         },
         "Notifs": {
@@ -58,7 +62,7 @@ Singleton {
             componentPath: "wallpapers/WallpaperSelector",
             async: true,
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.wallpapers
         },
         "Tasks": {
@@ -66,6 +70,8 @@ Singleton {
             activeIcon: "add_task",
             componentPath: "tasks/Kanban",
             expandable: true,
+            detachable: true,
+            shape: "Clover4Leaf",
             enabled: Mem.options.sidebar.content.tasks
         },
         "Notes": {
@@ -73,6 +79,8 @@ Singleton {
             activeIcon: "stylus_note",
             componentPath: "etc/Notes",
             expandable: true,
+            detachable: true,
+            shape: "Slanted",
             enabled: Mem.options.sidebar.content.notes
         },
         "View": {
@@ -89,6 +97,8 @@ Singleton {
             activeIcon: "music_note_add",
             shell: "main",
             componentPath: "beats/Beats",
+            detachable: true,
+            shape: "Bun",
             enabled: Mem.options.sidebar.content.beats,
             colors: BeatsService.colors
         },
@@ -98,7 +108,7 @@ Singleton {
             shell: "main",
             componentPath: "etc/History",
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.history
         },
         "Games": {
@@ -107,9 +117,10 @@ Singleton {
             componentPath: "games/Games",
             expandable: true,
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             expandSize: sizePresets.half - 80,
             colors: GameLauncherService.colors,
+            detachable: true,
             enabled: Mem.options.sidebar.content.games
         },
         "Tweaks": {
@@ -120,7 +131,7 @@ Singleton {
             expandable: true,
             searchable: true,
             expandSize: sizePresets.threeQuarter,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.tweaks
         },
         "Bookmarks": {
@@ -128,14 +139,14 @@ Singleton {
             activeIcon: "bookmark_heart",
             componentPath: "etc/Bookmarks",
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.bookmarks
         },
         "Emojis": {
             icon: "sentiment_calm",
             componentPath: "etc/Emojis",
             searchable: true,
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.emojis
         },
         "Shelf": {
@@ -152,22 +163,29 @@ Singleton {
         "Sounds": {
             icon: "graphic_eq",
             componentPath: "sounds/Sounds",
+            detachable: true,
+            shape: "Gem",
             enabled: Mem.options.sidebar.content.sounds
         },
         "Timers": {
             icon: "timer",
             componentPath: "timers/Timers",
+            detachable: true,
+            shape: "Cookie4Sided",
             enabled: Mem.options.sidebar.content.timers
         },
         "Share": {
             icon: "share",
             componentPath: "share/Share",
+            shape: "Ghostish",
             enabled: Mem.options.sidebar.content.share
         },
         "Deen": {
             icon: "mosque",
             expandable: true,
             componentPath: "deen/Deen",
+            detachable: true,
+            shape: "Cookie9Sided",
             enabled: Mem.options.sidebar.content.islam
         },
         "Session": {
@@ -183,7 +201,7 @@ Singleton {
         },
         "Bars": {
             componentPath: "etc/BarSwitcher",
-            shape: MaterialShape.Shape.Ghostish,
+            shape: "Ghostish",
             searchable: true,
             shell: "main",
             stealth: true
@@ -204,7 +222,7 @@ Singleton {
         return _get(id);
     }
     function getShape(id) {
-        return _get(id)?.shape || "";
+        return MaterialShape.Shape[_get(id)?.shape || ""];
     }
     function getIcon(id, active = false) {
         return active ? _get(id)?.activeIcon : _get(id)?.icon;
@@ -215,6 +233,9 @@ Singleton {
     }
     function isSearchable(id) {
         return !!_get(id)?.searchable;
+    }
+    function isDetachable(id) {
+        return !!_get(id)?.detachable;
     }
     function isAsync(id) {
         return !!_get(id)?.async;

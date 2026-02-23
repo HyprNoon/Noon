@@ -7,7 +7,7 @@ import qs.common
 import qs.common.functions
 import qs.services
 
-FloatingWindow {
+AppWindow {
     id: root
     visible: true
     maximumSize: Qt.size(640, 480)

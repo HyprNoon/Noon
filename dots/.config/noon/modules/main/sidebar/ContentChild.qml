@@ -10,23 +10,21 @@ import "components/web"
 Item {
     id: panel
     visible: category.length > 0
-    Layout.fillHeight: true
-    Layout.fillWidth: true
-    Layout.margins: Padding.normal
+    anchors.fill: parent
+    anchors.margins: Padding.huge
 
     required property string category
     readonly property bool effectiveSearchable: SidebarData.isSearchable(category)
 
     property string previousCategory: ""
     property bool _aux: false
-    property alias contentOpacity: content_loader.opacity
+    property alias contentOpacity: contentLoader.opacity
     property alias searchInput: searchBar.searchInput
     property real contentYOffset: 0
 
-    readonly property var parentRoot: GlobalStates.main.sidebar
+    property var parentRoot: GlobalStates.main.sidebar
     readonly property QtObject colors: parentRoot.colors || Colors
-    readonly property var contentItem: if (content_loader.item && content_loader.item !== null)
-        content_loader.item
+    readonly property var contentItem: contentLoader._item
 
     signal contentFocusRequested
     signal searchFocusRequested
@@ -91,8 +89,8 @@ Item {
             when: Mem.options.sidebar.content.web && web_loader.item !== null
         }
 
-        Loader {
-            id: content_loader
+        StyledLoader {
+            id: contentLoader
             Layout.fillWidth: true
             Layout.fillHeight: true
             opacity: contentOpacity

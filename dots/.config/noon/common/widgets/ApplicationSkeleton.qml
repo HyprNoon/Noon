@@ -4,7 +4,7 @@ import Quickshell
 import qs.common
 import qs.common.utils
 
-FloatingWindow {
+AppWindow {
     id: root
     visible: true
     maximumSize: Qt.size(1600, 900)

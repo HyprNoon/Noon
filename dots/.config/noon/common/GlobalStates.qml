@@ -24,7 +24,7 @@ Singleton {
     CustomShortcut {
         id: superHeldShortcut
         name: "superHeld"
-        // onPressed: GlobalStates.superPressed = !GlobalStates.superPressed
+        onPressed: GlobalStates.superPressed = !GlobalStates.superPressed
     }
     function handle_init(mode) {
         KeyringStorage.reload();
@@ -74,10 +74,7 @@ Singleton {
         property bool showOsdValues: false
         property bool showBeam: false
         property bool showScreenshot: false
-        // property QtObject systemDialog: QtObject {
-        //     property bool show: false
-        //     property string currentContentName: ""
-        // }
+
         property QtObject dmenu: QtObject {
             property var items
             property var action
@@ -89,9 +86,6 @@ Singleton {
 
         property QtObject dialogs: QtObject {
             property string current: ""
-            onCurrentChanged: {
-                console.log(current);
-            }
         }
     }
     xp: QtObject {

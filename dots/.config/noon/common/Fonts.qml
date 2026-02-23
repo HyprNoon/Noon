@@ -55,7 +55,7 @@ Singleton {
             "wght": 650
         }
         readonly property var longNumbers: {
-            "wght": 500,
+            "wght": 600,
             "ytfi": 788,
             "opsz": 144,
             "wdth": 50

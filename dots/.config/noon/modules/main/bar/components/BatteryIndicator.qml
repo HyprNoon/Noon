@@ -7,8 +7,10 @@ import qs.services
 BarGroup {
     id: root
 
-    implicitWidth: 80
     implicitHeight: 80
+    implicitWidth: 80
+
+    visible: BatteryService.available
 
     MouseArea {
         id: mouseArea
@@ -24,14 +26,14 @@ BarGroup {
 
     ClippedProgressBar {
         id: batteryProgress
-        anchors.margins: Padding.small
+        anchors.margins: Padding.verysmall
         anchors.fill: parent
         vertical: root.verticalMode
 
         value: BatteryService.percentage
         trackColor: Colors.colLayer3
         highlightColor: (BatteryService.percentage <= Mem.options.battery.low / 100 && !BatteryService.isCharging) ? Colors.m3.m3error : Colors.colPrimary
-
+        showEndPoint: vertical
         Item {
             anchors.centerIn: parent
             width: batteryProgress.valueBarWidth

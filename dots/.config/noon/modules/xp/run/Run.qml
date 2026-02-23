@@ -10,7 +10,7 @@ import qs.common
 import QtQuick.Effects
 import qs.common.widgets
 
-FloatingWindow {
+AppWindow {
     id: root
     title: "run"
     visible: GlobalStates.xp.showRun

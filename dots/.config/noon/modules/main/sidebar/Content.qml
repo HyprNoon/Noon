@@ -34,8 +34,8 @@ Item {
     property string auxSearchText: ""
 
     function focusMainSearchInput() {
-        if (main_child && main_child.searchInput && effectiveSearchable)
-            main_child.searchInput.forceActiveFocus();
+        if (mainLoader._item && mainLoader._item.searchInput && effectiveSearchable)
+            mainLoader._item.searchInput.forceActiveFocus();
     }
 
     function changeContent(newCategoryKey) {
@@ -131,15 +131,9 @@ Item {
     }
 
     RowLayout {
-
         anchors.fill: parent
-        anchors.topMargin: Padding.large
-        anchors.bottomMargin: Padding.large
-        anchors.rightMargin: panelWindow.rightMode ? 0 : Padding.large
-        anchors.leftMargin: !panelWindow.rightMode ? 0 : Padding.large
-
         layoutDirection: !panelWindow.rightMode ? Qt.LeftToRight : Qt.RightToLeft
-        spacing: Padding.large
+        spacing: Padding.normal
 
         SidebarNavigationRail {
             content: root
@@ -147,41 +141,47 @@ Item {
             color: panelWindow.appearanceMode !== 2 ? colors.colLayer2 : "transparent"
             colors: root.colors
             radius: panelWindow.appearanceMode > 0 ? panelWindow.rounding : 0
-            Layout.topMargin: -Padding.large
-            Layout.bottomMargin: -Padding.large
         }
 
-        ContentChild {
-            id: main_child
+        StyledLoader {
+            id: mainLoader
 
-            _aux: false
-            category: root.selectedCategory
-            Layout.maximumWidth: root.auxVisible ? SidebarData.currentSize(false, false, category) : Sizes.infinity
+            asynchronous: SidebarData.isAsync(root.selectedCategory)
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.maximumWidth: root.auxVisible ? SidebarData.currentSize(false, false, root.selectedCategory) : Sizes.infinity
+
+            sourceComponent: SidebarData.detachedContent.includes(root.selectedCategory) ? placeholder : content
+
+            property Component content: ContentChild {
+                category: root.selectedCategory
+            }
+            property Component placeholder: PagePlaceholder {
+                shape: SidebarData.getShape(root.selectedCategory)
+                icon: SidebarData.getIcon(root.selectedCategory)
+                iconSize: 80
+                title: "This Content is Detached"
+                description: "close it so u can access it here"
+            }
         }
 
         VerticalSeparator {
             visible: root.auxVisible
         }
 
-        Loader {
-            id: aux_loader
+        StyledLoader {
+            id: auxLoader
             asynchronous: true
-            visible: root.auxVisible
+            visible: active
             active: root.auxVisible
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.maximumWidth: SidebarData.currentSize(false, false, root.selectedCategory)
+            Layout.maximumWidth: SidebarData.currentSize(false, false, root.auxCategory)
 
             sourceComponent: ContentChild {
-                anchors.fill: parent
                 _aux: true
                 category: auxCategory
-            }
-
-            onLoaded: if (item && ("category" in item)) {
-                item.category = Qt.binding(() => {
-                    return root.auxCategory;
-                });
             }
         }
     }
