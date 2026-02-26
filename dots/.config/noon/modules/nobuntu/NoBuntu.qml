@@ -24,9 +24,7 @@ Scope {
         GDock {}
     }
     WidgetLoader {
-        Sidebar {
-            rightMode: true
-        }
+        Sidebar {}
     }
     WidgetLoader {
         enabled: Mem.options.osd.enabled

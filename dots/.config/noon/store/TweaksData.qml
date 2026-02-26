@@ -122,6 +122,13 @@ Singleton {
                     "type": "combobox",
                     "comboBoxValues": ["master", "dwindle", "scrolling"],
                     "key": "desktop.hyprland.tilingLayout"
+                },
+                {
+                    "icon": "monitor",
+                    "name": "External Monitor Profile",
+                    "type": "combobox",
+                    "comboBoxValues": Mem.options.desktop.hyprland.externalMonitorProfiles,
+                    "key": "desktop.hyprland.externalMonitorProfile"
                 }
             ]
         },

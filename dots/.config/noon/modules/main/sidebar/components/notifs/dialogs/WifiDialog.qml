@@ -11,14 +11,6 @@ BottomDialog {
     collapsedHeight: parent.height * 0.65
     property bool isScanning: false
 
-    onShowChanged: {
-        if (show && NetworkService.wifiEnabled) {
-            isScanning = true;
-            NetworkService.rescanWifi();
-            scanTimer.restart();
-        }
-    }
-
     Timer {
         id: scanTimer
         interval: 3000

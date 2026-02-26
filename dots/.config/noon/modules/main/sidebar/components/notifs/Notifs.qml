@@ -21,12 +21,14 @@ Item {
     }
 
     StyledLoader {
+        id: dialogLoader
         anchors.fill: parent
+        visible: true
         active: GlobalStates.main.dialogs.current.length > 0
-        source: sanitizeSource("dialogs/", GlobalStates.main.dialogs.current.trim() + "Dialog")
-        onSourceChanged: {
-            console.log(source);
+        source: Qt.resolvedUrl("dialogs/" + GlobalStates.main.dialogs.current + "Dialog.qml")
+        onLoaded: {
+            _item.show = true;
+            _item.finishAction = () => GlobalStates.main.dialogs.current = "";
         }
-        asynchronous: true
     }
 }

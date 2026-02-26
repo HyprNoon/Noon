@@ -1,3 +1,4 @@
+import QtQuick.Controls.Material
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -9,6 +10,7 @@ ComboBox {
     id: root
     Layout.preferredHeight: 45
     Layout.preferredWidth: 210
+    Material.theme: Material.System
 
     delegate: ItemDelegate {
         id: delegated

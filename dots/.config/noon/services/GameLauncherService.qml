@@ -126,7 +126,8 @@ Singleton {
 
     FileView {
         id: gameFileView
-        path: Directories.shellConfigs + "/games.json"
+        // Todo: Urgent
+        // path: Directories.standard.config + "/heroic/sideload_apps/library.json"
 
         onLoaded: {
             try {

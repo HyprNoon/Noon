@@ -5,7 +5,7 @@ import qs.common.widgets
 import qs.services
 
 MaterialShapeWrappedMaterialSymbol {
-    visible: BatteryService.available
+    // visible: BatteryService.available
     fill: 1
     readonly property var aMap: [
         {

@@ -10,6 +10,7 @@ Singleton {
 
     // misc directories
     readonly property string venv: FileUtils.trimFileProtocol(standard.state + "/.venv")
+    readonly property string records: FileUtils.trimFileProtocol(standard.videos + "/records")
     readonly property string sounds: FileUtils.trimFileProtocol(assets + "/sounds/")
     readonly property string assets: FileUtils.trimFileProtocol(standard.config + "/noon/assets")
     readonly property string gallery: FileUtils.trimFileProtocol(standard.pictures + "/Gallary/")
@@ -63,7 +64,7 @@ Singleton {
             // standard
             standard.state, standard.cache,
             // misc
-            venv, assets, gallery, sounds, scriptsDir, shellConfigs, favicons,
+            venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
             services.notifications, services.latex, services.aiChats, services.m3path,
             // wallpapers

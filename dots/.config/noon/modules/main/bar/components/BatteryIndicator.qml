@@ -10,7 +10,7 @@ BarGroup {
     implicitHeight: 80
     implicitWidth: 80
 
-    visible: BatteryService.available
+    // visible: BatteryService.available
 
     MouseArea {
         id: mouseArea

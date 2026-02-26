@@ -11,7 +11,7 @@ Scope {
     property string currentMode: GlobalStates.main.sysDialogs.mode
 
     Variants {
-        model: [MonitorsInfo.focused]
+        model: MonitorsInfo.focused
 
         StyledPanel {
             id: panel

@@ -1,12 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Widgets
 import qs.common
 import qs.common.widgets
 import qs.common.functions
 import qs.services
-import Qt.labs.folderlistmodel
 
 StyledRect {
     id: root
@@ -43,7 +40,7 @@ StyledRect {
     color: colors.colLayer2
     colors: parent.colors
     Component.onCompleted: updateFilteredTracks()
-
+    clip: true
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.huge

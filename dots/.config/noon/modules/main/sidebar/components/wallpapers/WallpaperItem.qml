@@ -1,5 +1,5 @@
-import QtQuick
 import QtQuick.Controls.Material
+import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import qs.common

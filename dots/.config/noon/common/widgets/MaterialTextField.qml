@@ -1,6 +1,6 @@
+import QtQuick.Controls.Material
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 import qs.common
 
 TextField {
@@ -29,5 +29,4 @@ TextField {
         hoverEnabled: true
         cursorShape: Qt.IBeamCursor
     }
-
 }

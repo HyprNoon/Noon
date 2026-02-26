@@ -235,6 +235,9 @@ Singleton {
         target: Mem.options.desktop.hyprland
         readonly property QtObject conf: Mem.options.desktop.hyprland
 
+        function onExternalMonitorProfileChanged() {
+            NoonUtils.setHyprKey("external_monitor_mode", conf.externalMonitorProfile);
+        }
         function onShadowsPowerChanged() {
             NoonUtils.setHyprKey("shadows_power", conf.shadowsPower);
         }

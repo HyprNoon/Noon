@@ -13,7 +13,7 @@ StyledRect {
     id: root
     z: 1
     clip: true
-    color:"transparent"
+    color: "transparent"
     radius: Rounding.verylarge
     property int rowHeight: 30
     property int padding: Padding.normal
@@ -29,9 +29,7 @@ StyledRect {
     }
 
     property string searchQuery: ""
-    property bool expanded:  false
-    Layout.fillWidth: true
-    Layout.fillHeight: true
+    property bool expanded: false
 
     signal expandToggled
 
@@ -79,98 +77,92 @@ StyledRect {
     }
 
     PagePlaceholder {
-        anchors.centerIn:parent
+        anchors.centerIn: parent
         visible: !root.hasAnyVisibleSettingsItem
-        icon:  "block"
-        shape:MaterialShape.Clover4Leaf
-        title:  "Nothing found"
+        icon: "block"
+        shape: MaterialShape.Clover4Leaf
+        title: "Nothing found"
     }
 
-    ColumnLayout {
+    StyledFlickable {
         anchors.fill: parent
-        spacing: 5
+        contentHeight: contentColumn.height
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
 
-        StyledFlickable {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            contentHeight: contentColumn.height
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
+        ColumnLayout {
+            id: contentColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: 7
 
-            ColumnLayout {
-                id: contentColumn
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: 7
+            Repeater {
+                model: settingsData
 
-                Repeater {
-                    model: settingsData
+                delegate: Column {
+                    Layout.fillWidth: true
 
-                    delegate: Column {
-                        Layout.fillWidth: true
-
-                        property bool hasVisibleItems: {
-                            if (!modelData.items)
-                                return false;
-                            for (var i = 0; i < modelData.items.length; i++) {
-                                if (shouldShowItem(modelData.items[i])) {
-                                    return true;
-                                }
-                            }
+                    property bool hasVisibleItems: {
+                        if (!modelData.items)
                             return false;
+                        for (var i = 0; i < modelData.items.length; i++) {
+                            if (shouldShowItem(modelData.items[i])) {
+                                return true;
+                            }
                         }
+                        return false;
+                    }
 
-                        visible: hasVisibleItems
+                    visible: hasVisibleItems
 
-                        StyledText {
-                            text: modelData?.section ?? ""
-                            width: parent.width
-                            leftPadding: 15
-                            bottomPadding: 5
-                            topPadding: index > 0 ? 10 : 0
-                            color: root.colors.colSubtext
-                            font.pixelSize: Fonts.sizes.small
-                            font.weight: 600
-                            visible: parent.hasVisibleItems
-                        }
+                    StyledText {
+                        text: modelData?.section ?? ""
+                        width: parent.width
+                        leftPadding: 15
+                        bottomPadding: 5
+                        topPadding: index > 0 ? 10 : 0
+                        color: root.colors.colSubtext
+                        font.pixelSize: Fonts.sizes.small
+                        font.weight: 600
+                        visible: parent.hasVisibleItems
+                    }
 
-                        GridLayout {
-                            width: parent.width
-                            columns: root.columnNumber
-                            columnSpacing: Padding.verysmall
-                            rowSpacing: Padding.verysmall
+                    GridLayout {
+                        width: parent.width
+                        columns: root.columnNumber
+                        columnSpacing: Padding.verysmall
+                        rowSpacing: Padding.verysmall
 
-                            Repeater {
-                                id:itemsRepeater
-                                model: modelData.items
+                        Repeater {
+                            id: itemsRepeater
+                            model: modelData.items
 
-                                delegate: SettingsItem {
-                                    required property var modelData
-                                    required property int index
+                            delegate: SettingsItem {
+                                required property var modelData
+                                required property int index
 
-                                    topRadius:index === 0 ? Rounding.huge : Rounding.tiny
-                                    bottomRadius: index === itemsRepeater.model.length -1 ? Rounding.huge : Rounding.tiny
+                                topRadius: index === 0 ? Rounding.huge : Rounding.tiny
+                                bottomRadius: index === itemsRepeater.model.length - 1 ? Rounding.huge : Rounding.tiny
 
-                                    icon: modelData?.icon ?? "settings"
-                                    name: modelData?.name ?? ""
-                                    key: modelData?.key ?? ""
-                                    type: modelData?.type ?? "switch"
-                                    hint: modelData?.hint ?? ""
-                                    useStates:modelData?.state ?? false
-                                    enableTooltip:modelData?.enableTooltip ?? true
-                                    sliderMinValue: modelData?.sliderMinValue ?? 0.0
-                                    sliderMaxValue: modelData?.sliderMaxValue ?? 100.0
-                                    realValue: modelData?.sliderValue ?? 0.5
-                                    reloadOnChange:modelData?.reloadOnChange ?? false
-                                    customItemHeight:modelData?.customItemHeight ?? 65
-                                    actionName: modelData?.actionName ?? ""
-                                    comboBoxValues: modelData?.comboBoxValues ?? []
-                                    fillHeight:modelData?.fillHeight ?? false
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    visible: (modelData?.visible ?? true) && shouldShowItem(modelData)
-                                    colors:root.colors
-                                }
+                                icon: modelData?.icon ?? "settings"
+                                name: modelData?.name ?? ""
+                                key: modelData?.key ?? ""
+                                type: modelData?.type ?? "switch"
+                                hint: modelData?.hint ?? ""
+                                useStates: modelData?.state ?? false
+                                enableTooltip: modelData?.enableTooltip ?? true
+                                sliderMinValue: modelData?.sliderMinValue ?? 0.0
+                                sliderMaxValue: modelData?.sliderMaxValue ?? 100.0
+                                realValue: modelData?.sliderValue ?? 0.5
+                                reloadOnChange: modelData?.reloadOnChange ?? false
+                                customItemHeight: modelData?.customItemHeight ?? 65
+                                actionName: modelData?.actionName ?? ""
+                                comboBoxValues: modelData?.comboBoxValues ?? []
+                                fillHeight: modelData?.fillHeight ?? false
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                visible: (modelData?.visible ?? true) && shouldShowItem(modelData)
+                                colors: root.colors
                             }
                         }
                     }

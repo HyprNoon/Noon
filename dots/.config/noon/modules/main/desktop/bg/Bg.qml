@@ -16,7 +16,7 @@ import qs.store
 Scope {
     id: background
     Variants {
-        model: Quickshell.screens
+        model: MonitorsInfo.all
         StyledPanel {
             id: backgroundPanel
             property ShellScreen modelData

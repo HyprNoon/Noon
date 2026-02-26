@@ -6,6 +6,13 @@ import qs.common
 import qs.services
 
 Singleton {
+    property QtObject hyprland
+    property QtObject sidebar
+    property QtObject osd
+    property QtObject screenshot
+    property QtObject editor
+    property QtObject mediaPlayer
+
     readonly property real infinity: Number.POSITIVE_INFINITY
     readonly property real barElevation: hyprland.gapsOut / 2
     readonly property real osdWidth: 220
@@ -17,12 +24,6 @@ Singleton {
     readonly property size beamSize: Qt.size(540, 65)
     readonly property size beamSizeExpanded: Qt.size(1000, 100)
     readonly property size gameLauncherItemSize: Qt.size(225, 360)
-    property QtObject hyprland
-    property QtObject sidebar
-    property QtObject osd
-    property QtObject screenshot
-    property QtObject editor
-    property QtObject mediaPlayer
 
     editor: QtObject {
         property size statusIsland: Qt.size(120, 40)
@@ -45,7 +46,7 @@ Singleton {
     }
 
     sidebar: QtObject {
-        readonly property real bar: 70
+        readonly property real bar: 65
         readonly property real contentQuarter: Math.round(Screen.width * 0.235) - bar
         readonly property real half: Math.round(Screen.width * 0.457)
         readonly property real quarter: Math.round(Screen.width * 0.246)

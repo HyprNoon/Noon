@@ -368,6 +368,8 @@ JsonAdapter {
         icons: JsonObject {}
 
         hyprland: JsonObject {
+            property list<string> externalMonitorProfiles: ["1680x1050@68", "1920x1080@60", "1920x1080@72"]
+            property string externalMonitorProfile: "1680x1050@68"
             property string tilingLayout: "dwindle"
             property int blurPasses: 1
             property bool shadows: true
