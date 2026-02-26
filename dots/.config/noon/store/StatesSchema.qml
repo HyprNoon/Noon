@@ -5,14 +5,14 @@ JsonAdapter {
         property JsonObject settings: JsonObject {
             property string cat: ""
             property bool sidebar_expanded: false
-            property bool sidebar_pinned: false
-            property int appearance_mode: 0
+            property bool sidebar_pinned: true
+            property int appearance_mode: 2
         }
         property JsonObject reader: JsonObject {
             property string currentFile: ""
             property bool sidebar_expanded: false
-            property bool sidebar_pinned: false
-            property int appearance_mode: 0
+            property bool sidebar_pinned: true
+            property int appearance_mode: 2
         }
     }
     property JsonObject desktop: JsonObject {

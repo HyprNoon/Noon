@@ -7,7 +7,7 @@ import qs.common.widgets
 Scope {
     id: root
     Variants {
-        model: MonitorsInfo.focused
+        model: [MonitorsInfo.focused]
         StyledPanel {
             id: panel
             property var modelData

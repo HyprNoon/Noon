@@ -155,7 +155,7 @@ JsonAdapter {
         property JsonObject nightLight
         property JsonObject ambientSounds
         property JsonObject games
-        property string backlightDevice: ""
+        property string backlightDevice: "dell::kbd_backlight"
         property bool easyEffects: false
         property string location: "Cairo"
 

@@ -12,7 +12,7 @@ Singleton {
     id: root
     readonly property var monitors: Quickshell.screens
     readonly property Toplevel topLevel: ToplevelManager?.activeToplevel ?? null
-    readonly property var focused: [monitors?.find(monitor => monitor.name === Hyprland?.focusedMonitor?.name)]
+    readonly property var focused: monitors?.find(monitor => monitor.name === Hyprland?.focusedMonitor?.name)
     readonly property var all: monitors
     readonly property var main: [monitors[0]]
     readonly property var secondary: monitors.length > 1 ? [monitors.slice(1)] : []
