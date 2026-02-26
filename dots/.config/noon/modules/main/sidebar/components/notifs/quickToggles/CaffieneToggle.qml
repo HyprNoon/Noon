@@ -7,7 +7,7 @@ import qs.services
 QuickToggleButton {
     id: root
 
-    dialogName: "Caffiene"
+    dialogName: "Caffaine"
     toggled: IdleService.inhibited
     buttonIcon: "coffee"
     buttonName: toggled ? "Awake" : "Sleepy"
