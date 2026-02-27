@@ -11,7 +11,7 @@ Scope {
     property string currentMode: GlobalStates.main.sysDialogs.mode
 
     Variants {
-        model: [MonitorsInfo.focused]
+        model: [MonitorsInfo.focused] ?? MonitorsInfo.all
 
         StyledPanel {
             id: panel
@@ -89,7 +89,7 @@ Scope {
                         active: root.currentMode.length > 0
                         anchors.fill: parent
                         asynchronous: true
-                        source: sanitizeSource("content/", currentItem.comp)
+                        source: sanitizeSource("content/", currentItem?.comp) ?? null
                         onLoaded: if (ready) {
                             if (currentItem.preload in item)
                                 item[currentItem.preload] = GlobalStates.main.sysDialogs.pendingData;

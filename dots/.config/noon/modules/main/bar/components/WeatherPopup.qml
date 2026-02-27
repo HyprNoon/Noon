@@ -10,7 +10,7 @@ StyledPopup {
     ColumnLayout {
         id: columnLayout
         anchors.centerIn: parent
-        width: parent.width * 0.9
+        width: parent ? parent.width * 0.9 : 0
         spacing: 12
 
         ColumnLayout {
@@ -53,18 +53,32 @@ StyledPopup {
         }
 
         Rectangle {
-            Layout.fillWidth: true; height: 1
-            color: Colors.m3.m3outlineVariant; opacity: 0.2
+            Layout.fillWidth: true
+            height: 1
+            color: Colors.m3.m3outlineVariant
+            opacity: 0.2
             Layout.topMargin: 4
             Layout.bottomMargin: 4
         }
 
         Repeater {
             model: [
-                { label: "Feels like", value: WeatherService.weatherData.feelsLike },
-                { label: "Humidity",   value: WeatherService.weatherData.humidity },
-                { label: "Wind",       value: WeatherService.weatherData.windSpeed },
-                { label: "Visibility", value: WeatherService.weatherData.visibility }
+                {
+                    label: "Feels like",
+                    value: WeatherService.weatherData.feelsLike
+                },
+                {
+                    label: "Humidity",
+                    value: WeatherService.weatherData.humidity
+                },
+                {
+                    label: "Wind",
+                    value: WeatherService.weatherData.windSpeed
+                },
+                {
+                    label: "Visibility",
+                    value: WeatherService.weatherData.visibility
+                }
             ]
 
             delegate: RowLayout {

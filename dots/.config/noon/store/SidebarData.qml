@@ -250,7 +250,9 @@ Singleton {
     function isStealth(id) {
         return !!_get(id)?.stealth;
     }
-
+    function isDetached(id) {
+        return SidebarData.detachedContent.includes(id);
+    }
     function currentSize(barMode, expanded, id) {
         const content = registry[id];
         if (barMode || !content)

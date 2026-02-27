@@ -98,7 +98,7 @@ Singleton {
     }
 
     function _stop() {
-        recorderProcess.signal(2); // SIGINT — lets wf-recorder finalize the file
+        recorderProcess.running = false; //.signal(2); // SIGINT — lets wf-recorder finalize the file
     }
 
     Process {

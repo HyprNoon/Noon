@@ -14,14 +14,13 @@ BarGroup {
 
     MouseArea {
         id: mouseArea
+        z: 99
         anchors.fill: parent
         hoverEnabled: true
-
-        BatteryPopup {
-            id: batteryPopup
-            active: mouseArea.containsMouse
-            hoverTarget: mouseArea
-        }
+    }
+    BatteryPopup {
+        id: batteryPopup
+        hoverTarget: mouseArea
     }
 
     ClippedProgressBar {

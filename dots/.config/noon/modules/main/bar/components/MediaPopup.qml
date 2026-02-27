@@ -7,7 +7,7 @@ import qs.services
 
 StyledPopup {
     id: root
-    extraVisibilityCondition: BeatsService.title.length > 0
+    extraVisibilityCondition: BeatsService?.title?.length > 0 ?? false
 
     StyledRect {
         id: bg

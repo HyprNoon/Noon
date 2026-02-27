@@ -61,8 +61,21 @@ Item {
                 highlightColorHover: root.colors.colSecondaryContainerHover
                 highlightColorActive: root.colors.colSecondaryContainerActive
                 itemColorActive: root.colors.colOnLayer2
-
                 onClicked: content.changeContent(modelData)
+
+                StyledToolTip {
+                    content: modelData
+                    extraVisibleCondition: selectedCategory !== ""
+                }
+
+                DragHandler {
+                    acceptedButtons: Qt.LeftButton
+                    xAxis.enabled: true
+                    yAxis.enabled: false
+                    onActiveChanged: if (SidebarData.isDetachable(modelData) && !SidebarData.isDetached(modelData)) {
+                        GlobalStates.main.sidebar.detach(modelData);
+                    }
+                }
             }
         }
     }

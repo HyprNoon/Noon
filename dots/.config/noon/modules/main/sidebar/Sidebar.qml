@@ -39,10 +39,10 @@ StyledPanel {
             reset_reveal_conditions();
     }
 
-    function detach() {
-        if (SidebarData.isDetachable(root.selectedCategory) || !isDetached()) {
-            detachedWindow.createObject(this, {
-                category: selectedCategory
+    function detach(cat = selectedCategory) {
+        if (SidebarData.isDetachable(cat) || !isDetached()) {
+            detachedWindow.createObject(root, {
+                category: cat
             });
         }
         hide();
