@@ -11,7 +11,7 @@ import qs.services
 import qs.store
 
 Variants {
-    model: [MonitorsInfo.focused] ?? MonitorsInfo.main
+    model: MonitorsInfo?.focused ? [MonitorsInfo.focused] : MonitorsInfo.main
 
     StyledPanel {
         id: root

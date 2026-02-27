@@ -13,17 +13,23 @@
 ### Install
 
 ```bash
-  # Install noon-main from the aur 
-  noon-main install
-  # for new nvidia patches
-  install noon-nvidia package 
+  yay -S noon-main && noon-setup
+
+```
+### Nvidia Patches 
+```bash
+  yay -S noon-nvidia 
   # for legacy nvidia
-  install noon-nvidia-legacy package
+  yay -S noon-nvidia-legacy
+
 ```
+
 checkout more noon packages at 
+
+```bash
+  yay noon-
 ```
-yay noon-
-```
+
 ## Some Screenshots
 
 ![Beam, Clipboard](./.github/screenshots/1.png) 

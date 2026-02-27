@@ -13,7 +13,7 @@ StyledPopup {
         id: bg
 
         z: 0
-        anchors.fill: parent
+        anchors.fill: parent ?? null
         implicitWidth: 420
         implicitHeight: 120
         enableBorders: true
@@ -66,7 +66,7 @@ StyledPopup {
 
                 StyledText {
                     font.pixelSize: Fonts.sizes.huge
-                    font.variableAxes: Fonts.variableAxes.subTitle
+                    font.variableAxes: Fonts.variableAxes.main
                     color: Colors.colOnLayer0
                     text: BeatsService.title.charAt(0).toUpperCase() + BeatsService.title.slice(1) || "No Media Playing"
                     truncate: true
