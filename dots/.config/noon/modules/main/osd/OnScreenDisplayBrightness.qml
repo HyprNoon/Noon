@@ -67,7 +67,7 @@ Scope {
 
     OsdValueIndicator {
         id: osdIndicator
-        active: showOsdValues
+        active: showOsdValues && GlobalStates.main.canNotify
 
         value: root.brightnessMonitor?.brightness ?? 50
         icon: BrightnessService.iconMaterial

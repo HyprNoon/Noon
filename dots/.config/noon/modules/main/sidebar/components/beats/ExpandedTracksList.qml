@@ -45,7 +45,7 @@ StyledRect {
                 target: search.searchInput
                 function onAccepted() {
                     if (root.filteredTracks.length > 0)
-                        BeatsService.playTrack(root.filteredTracks[0].filepath);
+                        BeatsService.playTrack(root.filteredTracks[0].playlist_index);
                 }
             }
             Timer {
@@ -93,7 +93,7 @@ StyledRect {
                 colBackgroundHover: colors.colLayer3Hover
                 colors: root.colors
 
-                releaseAction: () => BeatsService.playTrack(index)
+                releaseAction: () => BeatsService.playTrack(modelData.playlist_index)
                 altAction: () => trackContextMenu.popup()
 
                 TrackContextMenu {

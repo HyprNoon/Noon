@@ -26,7 +26,9 @@ BottomDialog {
             title: "Connect to Wi-Fi"
         }
 
-        BottomDialogSeparator {}
+        BottomDialogSeparator {
+            visible: !root.isScanning
+        }
 
         StyledIndeterminateProgressBar {
             visible: root.isScanning

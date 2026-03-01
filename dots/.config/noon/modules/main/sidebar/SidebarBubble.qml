@@ -154,18 +154,19 @@ Item {
             "cat": "Beats",
             "bubbles": [
                 {
+                    "icon": "restart_alt",
+                    "extraVisibleCondition": BeatsService.isCurrentPlayer(),
+                    "action": () => BeatsService.startConnection()
+                },
+                {
                     "icon": "download",
                     "extraVisibleCondition": !BeatsService.isCurrentPlayer(),
-                    "action": () => {
-                        BeatsService.downloadCurrentSong();
-                    }
+                    "action": () => BeatsService.downloadCurrentSong()
                 },
                 {
                     "icon": "close",
                     "extraVisibleCondition": BeatsService.isCurrentPlayer(),
-                    "action": () => {
-                        BeatsService.stopPlayer();
-                    }
+                    "action": () => BeatsService.stopPlayer()
                 }
             ]
         }

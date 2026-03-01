@@ -73,11 +73,11 @@ Singleton {
         property var sidebar
         property var lock
         property bool locked: false
-        property bool oskOpen: false
         property bool exposeView: false
         property bool showOsdValues: false
         property bool showBeam: false
         property bool showScreenshot: false
+        property bool canNotify: sidebar?.hoverMode ?? true
 
         property QtObject dmenu: QtObject {
             property var items

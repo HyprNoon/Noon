@@ -9,8 +9,6 @@ import qs.services
 
 Item {
     id: root
-    anchors.fill: parent
-
     property var selectedFiles: []
 
     ColumnLayout {

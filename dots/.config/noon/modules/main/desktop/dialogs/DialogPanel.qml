@@ -11,15 +11,18 @@ Scope {
     property string currentMode: GlobalStates.main.sysDialogs.mode
 
     Variants {
-        model: MonitorsInfo.main
+        model: Quickshell.screens
 
         StyledPanel {
             id: panel
             visible: currentMode.length > 0 || bg.anchors.bottomMargin < 0
 
             required property var modelData
+            screen: modelData
+
             name: "systemDialog"
             shell: "noon"
+
             WlrLayershell.layer: WlrLayer.Overlay
             anchors {
                 top: true
@@ -40,6 +43,7 @@ Scope {
 
                 StyledRect {
                     id: bg
+
                     anchors {
                         bottom: parent.bottom
                         horizontalCenter: parent.horizontalCenter

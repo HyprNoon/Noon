@@ -24,7 +24,6 @@ StyledPanel {
         bottom: true
         right: true
     }
-    // Main container
 
     Item {
         id: container
@@ -98,8 +97,6 @@ StyledPanel {
             }
         }
     }
-    // Mask configuration for border effect
-
     mask: Region {
         item: container
         intersection: Intersection.Xor

@@ -269,6 +269,10 @@ Singleton {
         return i > 0 ? v[(i + step + v.length) % v.length] : v[0];
     }
 
+    function getCategoryDirection(oldCat, newCat) {
+        return enabledCategories.indexOf(newCat) > enabledCategories.indexOf(oldCat) ? -1 : 1;
+    }
+
     function getNextEnabledCategory(id) {
         return _navigate(id, 1);
     }

@@ -658,7 +658,7 @@ class WallpaperSwitcher:
                 cmd = f"matugen color hex {color_val} --mode {shell_mode}"
                 print(f"Generating from color: #{color_val}")
             else:
-                cmd = f"matugen image --mode {shell_mode} {shlex.quote(source_str)}"
+                cmd = f"matugen image --source-color-index 0 --mode {shell_mode} {shlex.quote(source_str)}"
                 print(f"Generating from: {Path(source_str).name}")
 
             # Add type (scheme) if available

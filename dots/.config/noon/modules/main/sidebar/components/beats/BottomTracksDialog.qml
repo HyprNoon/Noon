@@ -77,7 +77,7 @@ BottomDialog {
                 colBackground: colors.colLayer3
                 colBackgroundHover: colors.colLayer3Hover
                 colors: root.colors
-                releaseAction: () => BeatsService.playTrack(absPath)
+                releaseAction: () => BeatsService.playTrack(modelData.playlist_index)
                 altAction: () => trackContextMenu.popup()
 
                 TrackContextMenu {

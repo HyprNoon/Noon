@@ -167,6 +167,35 @@ def process_file(filename, directory, coverarts_dir):
     }
 
 
+def write_m3u(hashmap, directory, m3u_path):
+    """
+    Write an #EXTM3U playlist sorted alphabetically by filename.
+    Each entry gets:
+        #EXTINF:<duration>,<artist> - <title>
+        <absolute filepath>
+
+    Returns an ordered list of hash keys matching the playlist order,
+    so callers can stamp playlist_index onto each entry.
+    """
+    # Sort entries by filename (case-insensitive) — same order as music_files
+    ordered = sorted(hashmap.values(), key=lambda e: e["filename"].lower())
+
+    lines = ["#EXTM3U", ""]
+    for entry in ordered:
+        duration = int(entry.get("duration_seconds") or -1)
+        artist = entry.get("artist") or "Unknown Artist"
+        title = entry.get("title") or os.path.splitext(entry["filename"])[0]
+        lines.append(f"#EXTINF:{duration},{artist} - {title}")
+        lines.append(entry["filepath"])
+        lines.append("")
+
+    with open(m3u_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+    # Return hash keys in playlist order so we can assign playlist_index
+    return [entry["hash"] for entry in ordered]
+
+
 def build_metadata(directory, force=False):
     directory = os.path.abspath(directory)
 
@@ -226,6 +255,8 @@ def build_metadata(directory, force=False):
 
     if not to_process:
         print("  Nothing changed — .metadata is already up to date.")
+        # Re-generate the playlist anyway so it stays in sync with current files
+        _finalize(hashmap, directory, meta_path)
         return
 
     t0 = time.perf_counter()
@@ -248,13 +279,31 @@ def build_metadata(directory, force=False):
 
     elapsed = time.perf_counter() - t0
 
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump(hashmap, f, indent=2, ensure_ascii=False, default=str)
+    _finalize(hashmap, directory, meta_path)
 
     rate = len(to_process) / elapsed if elapsed > 0 else float("inf")
     print(f"\n  Done in {elapsed:.2f}s  ({rate:.0f} files/sec)")
     print(f"  Wrote {len(hashmap)} total entries  →  {meta_path}")
-    print(f"  Cover arts                        →  {coverarts_dir}")
+    print(
+        f"  Cover arts                        →  {os.path.join(directory, '.coverarts')}"
+    )
+
+
+def _finalize(hashmap, directory, meta_path):
+    """Write .m3u playlist, stamp playlist_index onto every entry, save .metadata."""
+    m3u_path = os.path.join(directory, ".playlist.m3u")
+
+    ordered_keys = write_m3u(hashmap, directory, m3u_path)
+
+    # Stamp playlist_index (0-based) onto each entry
+    for idx, key in enumerate(ordered_keys):
+        if key in hashmap:
+            hashmap[key]["playlist_index"] = idx
+
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(hashmap, f, indent=2, ensure_ascii=False, default=str)
+
+    print(f"  Playlist                          →  {m3u_path}")
 
 
 if __name__ == "__main__":

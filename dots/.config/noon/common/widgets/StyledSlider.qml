@@ -31,7 +31,7 @@ Slider {
     property string tooltipContent: `${Math.round(value * 100)}%`
     // Wheel handler properties
     property real wheelStepSize: 0.05
-
+    property bool showBackgroundDot: true
     Layout.fillWidth: true
     from: 0
     to: 1
@@ -93,6 +93,7 @@ Slider {
 
         // Dot at the end
         Rectangle {
+            visible: root.showBackgroundDot
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: root.backgroundDotMargins

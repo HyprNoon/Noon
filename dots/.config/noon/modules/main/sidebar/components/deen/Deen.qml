@@ -10,7 +10,6 @@ import "pages"
 StyledRect {
     id: root
 
-    anchors.fill: parent
     color: Colors.colLayer1
     radius: Rounding.verylarge
 

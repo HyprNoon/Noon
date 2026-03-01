@@ -18,6 +18,7 @@ Singleton {
     readonly property real osdWidth: 220
     readonly property real osdHeight: 45
     readonly property real notificationPopupWidth: 420
+    readonly property real toastWidth: 385
     readonly property real elevationValue: Padding.verylarge
     readonly property real frameThickness: Mem.options.desktop.bg.borderMultiplier * (hyprland.gapsOut - Padding.normal)
     readonly property real elevationMargin: frameThickness + elevationValue

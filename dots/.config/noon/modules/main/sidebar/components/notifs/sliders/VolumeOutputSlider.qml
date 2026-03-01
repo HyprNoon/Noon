@@ -16,18 +16,13 @@ Item {
 
     Symbol {
         z: 2
-        text: {
-            if (volumeSlider.value <= 0.01)
-                return "volume_off";
-            if (volumeSlider.value < 0.5)
-                return "volume_down";
-            return "volume_up";
-        }
-        color: Colors.m3.m3onPrimary
-        font.pixelSize: Fonts.sizes.huge - 4
+        text: volumeSlider.value <= 0.01 ? "volume_off" : "volume_up"
+        color: Colors.colOnPrimary
+        font.pixelSize: 18
+        fill: 1
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: volumeSlider.left
-        anchors.leftMargin: 10
+        anchors.leftMargin: Padding.verylarge
         animateChange: true
     }
 

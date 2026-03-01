@@ -15,11 +15,10 @@ StyledRect {
     visible: root.effectiveSearchable && root.category !== ""
     property alias searchText: searchInput.text
     property alias searchInput: searchInput
-
+    property int contentY
     radius: Rounding.verylarge
     enableBorders: searchInput.focus
     color: searchBar.colors.colLayer1
-    opacity: root.effectiveSearchable ? contentOpacity : 0
     Layout.preferredHeight: root.effectiveSearchable ? 50 : 0
     Layout.fillWidth: true
     signal contentFocusRequested
@@ -103,7 +102,7 @@ StyledRect {
     }
 
     transform: Translate {
-        y: contentYOffset
+        y: contentY
     }
     Behavior on Layout.preferredHeight {
         Anim {}

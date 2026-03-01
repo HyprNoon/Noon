@@ -25,20 +25,22 @@ ColumnLayout {
 
         Revealer {
             reveal: root.showCover
-            Layout.maximumWidth: 75
-            Layout.maximumHeight: 75
+            Layout.preferredWidth: 75
+            Layout.preferredHeight: 75
 
-            CroppedImage {
-                visible: parent.reveal
-                anchors.centerIn: parent
-                z: 99
-                source: BeatsService.artUrl
-                sourceSize: Qt.size(width, height)
-                mipmap: true
-                radius: Rounding.large
-                tint: true
-                tintLevel: 0.8
-                tintColor: root.trackColors.colSecondaryContainer
+            Item {
+                anchors.fill: parent
+
+                CroppedImage {
+                    visible: parent.reveal
+                    anchors.centerIn: parent
+                    radius: Rounding.large
+                    source: BeatsService.artUrl
+                    implicitSize: 75
+                    tint: true
+                    tintLevel: 0.8
+                    tintColor: root.trackColors.colSecondaryContainer
+                }
             }
         }
 

@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import Quickshell
 import qs.common
 import qs.common.widgets
 import qs.services
 import qs.store
-import "components/web"
 
 Item {
     id: panel
@@ -18,38 +18,24 @@ Item {
     property string previousCategory: ""
     property bool _detached: false
     property bool _aux: false
-    property alias contentOpacity: contentLoader.opacity
     property alias searchInput: searchBar.searchInput
-    property real contentYOffset: 0
 
     property var parentRoot: GlobalStates.main.sidebar
     readonly property QtObject colors: parentRoot.colors || Colors
-    readonly property var contentItem: contentLoader._item
+    readonly property var contentItem: contentStack.currentItem
 
     signal contentFocusRequested
     signal searchFocusRequested
 
-    function getCategoryDirection(oldCat, newCat) {
-        if (!oldCat || !newCat || oldCat === newCat)
-            return 1;
-
-        const categories = SidebarData.enabledCategories || [];
-        const oldIndex = categories.indexOf(oldCat);
-        const newIndex = categories.indexOf(newCat);
-
-        if (oldIndex !== -1 && newIndex !== -1)
-            return newIndex > oldIndex ? -1 : 1;
-
-        return 1;
-    }
-
     onCategoryChanged: {
-        if (category) {
-            const direction = getCategoryDirection(previousCategory, category);
-            contentYOffset = direction * 100;
-            contentOpacity = 0;
-            resetAnimation.restart();
+        if (!category) {
+            contentStack.clear();
+            previousCategory = category;
+            return;
         }
+        contentStack.slideDirection = SidebarData.getCategoryDirection(previousCategory, category);
+        contentStack.replace(null, SidebarData.getComponentPath(category));
+
         previousCategory = category;
     }
 
@@ -58,81 +44,110 @@ Item {
         clip: true
         anchors.fill: parent
 
-        ParallelAnimation {
-            id: resetAnimation
-            Anim {
-                target: panel
-                property: "contentYOffset"
-                to: 0
-            }
-            Anim {
-                target: panel
-                property: "contentOpacity"
-                to: 1
-            }
-        }
-
-        Loader {
-            id: web_loader
-            visible: active && selectedCategory === "Web"
-            active: Mem.options.sidebar.content.web
+        StackView {
+            id: contentStack
             Layout.fillWidth: true
             Layout.fillHeight: true
-            asynchronous: true
-            sourceComponent: WebBrowser {}
-        }
+            clip: true
 
-        Binding {
-            target: GlobalStates
-            property: "web_session"
-            value: web_loader.item && web_loader.item !== null ? web_loader.item.web_view : null
-            when: Mem.options.sidebar.content.web && web_loader.item !== null
-        }
+            property int slideDirection: 1
 
-        StyledLoader {
-            id: contentLoader
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            opacity: contentOpacity
-            focus: active
-            visible: active
-            active: selectedCategory !== "Web"
-            source: SidebarData.getComponentPath(category)
-            onLoaded: if (item) {
+            replaceEnter: Transition {
+                ParallelAnimation {
+                    PropertyAnimation {
+                        property: "y"
+                        from: -contentStack.slideDirection * contentStack.height
+                        to: 0
+                        duration: Animations.durations.verylarge
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasizedDecel
+                    }
+                    PropertyAnimation {
+                        property: "scale"
+                        from: 0.75
+                        to: 1
+                        duration: Animations.durations.verylarge
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasized
+                    }
+                    PropertyAnimation {
+                        property: "opacity"
+                        from: 0
+                        to: 1
+                        duration: Animations.durations.small
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasized
+                    }
+                }
+            }
+            replaceExit: Transition {
+                ParallelAnimation {
+                    PropertyAnimation {
+                        property: "y"
+                        from: 0
+                        to: contentStack.slideDirection * contentStack.height
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasizedAccel
+                        duration: Animations.durations.verylarge
+                    }
+                    PropertyAnimation {
+                        property: "scale"
+                        from: 1
+                        to: 0.75
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasized
+                        duration: Animations.durations.verylarge
+                    }
+                    PropertyAnimation {
+                        property: "opacity"
+                        from: 1
+                        to: 0
+                        duration: Animations.durations.small
+                        easing.type: Easing.BezierSpline
+                        easing.bezierCurve: Animations.curves.emphasized
+                    }
+                }
+            }
+
+            onCurrentItemChanged: {
+                const item = currentItem;
+                if (!item)
+                    return;
+
+                if ("web_view" in item)
+                    GlobalStates.web_session = Qt.binding(() => item.web_view);
+
                 if ("searchQuery" in item)
                     item.searchQuery = Qt.binding(() => searchBar.searchText);
                 if ("detached" in item)
                     item.detached = Qt.binding(() => _detached);
                 if ("expanded" in item && !_aux)
                     item.expanded = Qt.binding(() => parentRoot.expanded);
-
                 if ("panelWindow" in item)
                     item.panelWindow = Qt.binding(() => parentRoot);
 
-                if (item.searchFocusRequested) {
+                if (item.searchFocusRequested)
                     item.searchFocusRequested.connect(() => {
                         if (!_aux && searchBar.searchInput && panel.effectiveSearchable)
                             searchBar.searchInput.forceActiveFocus();
                     });
-                }
 
-                if (item.dismiss) {
+                if (item.dismiss)
                     item.dismiss.connect(parentRoot.hide);
-                }
-            }
-
-            transform: Translate {
-                y: contentYOffset
             }
         }
 
         SearchBar {
             id: searchBar
             root: panel
-            onContentFocusRequested: if (panel.contentItem && "contentFocusRequested" in panel.contentItem)
-                panel.contentItem.contentFocusRequested()
+            contentY: contentStack.y
+            onContentFocusRequested: {
+                if (panel.contentItem && "contentFocusRequested" in panel.contentItem)
+                    panel.contentItem.contentFocusRequested();
+            }
         }
     }
+
     Behavior on Layout.preferredWidth {
         Anim {}
     }

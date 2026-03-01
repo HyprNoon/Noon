@@ -29,19 +29,14 @@ Scope {
     }
 
     WidgetLoader {
-        enabled: GlobalStates.main.showScreenshot
-        Screenshot {}
-    }
-    WidgetLoader {
         enabled: true
         reloadOn: Mem.options.bar.behavior.position
         Sidebar {}
     }
 
-    WidgetLoader {
-        enabled: true
-        NotificationPopup {}
-    }
+    // WidgetLoader {
+    //     NotificationPopup {}
+    // }
 
     WidgetLoader {
         DialogPanel {}
@@ -88,6 +83,10 @@ Scope {
     WidgetLoader {
         Toasts {}
     }
+    // WidgetLoader {
+    //     enabled: GlobalStates.main.showScreenshot
+    //     Screenshot {}
+    // }
 
     NIPC {}
 }

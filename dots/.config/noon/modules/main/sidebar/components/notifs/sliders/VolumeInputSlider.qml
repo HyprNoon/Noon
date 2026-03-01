@@ -16,20 +16,14 @@ Item {
 
     Symbol {
         z: 2
-        visible: volumeSlider.value >= 0.05
-        text: {
-            if (volumeSlider.value <= 0.01)
-                return "mic_off";
-            if (volumeSlider.value < 0.5)
-                return "mic";
-            return "mic";
-        }
+        text: volumeSlider.value <= 0.01 ? "mic_off" : "mic"
         animateChange: true
+        fill: 1
         color: Colors.m3.m3onPrimary
-        font.pixelSize: Fonts.sizes.huge - 4
+        font.pixelSize: 18
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: volumeSlider.left
-        anchors.leftMargin: 10
+        anchors.leftMargin: Padding.verylarge
     }
 
     StyledSlider {

@@ -25,11 +25,12 @@ Singleton {
     readonly property string artUrl: player ? StringUtils.cleanMusicTitle(player.trackArtUrl) : ""
     readonly property string title: player ? StringUtils.cleanMusicTitle(player.trackTitle) : "No Title"
     readonly property string artist: player ? StringUtils.cleanMusicTitle(player.trackArtist) : "No Artist"
-    property bool hasMetadata: false
     readonly property string _tracksDir: Qt.resolvedUrl(Mem.states.mediaPlayer?.currentTrackPath ?? Directories.beats.tracks)
     readonly property string _metadataPath: _tracksDir + "/.metadata"
     readonly property string _playlistPath: _tracksDir + "/.playlist.m3u"
-
+    Component.onCompleted: {
+        startConnection();
+    }
     readonly property var tracksInfo: {
         const map = {};
         for (const key in root.tracksMetadata) {
@@ -80,13 +81,8 @@ Singleton {
     }
 
     function rebuildMetadata() {
-        let cmd = ["python3", Directories.scriptsDir + "/build_metadata.py", FileUtils.trimFileProtocol(_tracksDir)];
-        rebuildMetaProc.command = cmd;
         rebuildMetaProc.running = false;
         rebuildMetaProc.running = true;
-
-        createPlaylistProc.running = false;
-        createPlaylistProc.running = true;
     }
 
     function getTrackMeta(fileName) {
@@ -99,12 +95,13 @@ Singleton {
         return "file://" + root._tracksDir + "/" + entry.cover_art.replace(/^\.\//, "");
     }
 
-    function initPlaylist() {
-        NoonUtils.execDetached(`cvlc --one-instance --rc-fake-tty "${FileUtils.trimFileProtocol(root._playlistPath)}"`, true);
+    function startConnection() {
+        vlcSocket.reload();
+        NoonUtils.execDetached(`cvlc "${FileUtils.trimFileProtocol(root._playlistPath)}" "-I" "oldrc" "${vlcSocket.path}"`);
     }
 
     function playTrack(index) {
-        vlcSocket.send("goto " + index);
+        vlcSocket.add("goto " + index);
     }
 
     function currentTrackProgressRatio() {
@@ -168,12 +165,8 @@ Singleton {
     }
 
     Process {
-        id: rebuildPlaylistProc
-        command: ["bash", "-c", Directories.scriptsDir + `/create_playlist.sh ${FileUtils.trimFileProtocol(root._tracksDir)}`]
-    }
-
-    Process {
         id: rebuildMetaProc
+        command: ["python3", Directories.scriptsDir + "/build_metadata.py", FileUtils.trimFileProtocol(_tracksDir)]
         // onStarted: NoonUtils.toast("Started rebuilding metadata", "music_note")
         // onExited: exitCode => {
         //     exitCode === 0 ? NoonUtils.toast("Metadata rebuilt", "check", "success") : NoonUtils.toast("Metadata rebuild failed", "close", "error");
@@ -185,7 +178,6 @@ Singleton {
         path: root._metadataPath
         blockWrites: false
         onTextChanged: root.tracksMetadata = JSON.parse(metadataFile.text())
-        onLoaded: root.hasMetadata = true
         onLoadFailed: err => {
             if (err === FileViewError.FileNotFound) {
                 rebuildMetadata();
@@ -193,25 +185,9 @@ Singleton {
         }
     }
 
-    Socket {
+    UnixSocket {
         id: vlcSocket
         path: "/tmp/vlc.sock"
-        connected: false
-
-        parser: SplitParser {
-            onRead: msg => console.log("vlc:", msg)
-        }
-
-        function send(cmd) {
-            vlcSocket.write(cmd + "\n");
-        }
-    }
-
-    Timer {
-        interval: 500
-        running: true
-        repeat: false
-        onTriggered: vlcSocket.connected = true
     }
 
     FolderListModel {

@@ -70,13 +70,9 @@ Singleton {
             icon: materialIcon,
             status: state
         });
-    // const sounds = {
-    //     "error": "event_invalid",
-    //     "warn": "power_low",
-    //     "success": "device_added",
-    //     "": "device_added"
-    // };
-    // playSound(sounds[state]);
+        while (GlobalStates.toasts.data.length > 5) {
+            GlobalStates.toasts.data.remove(0);
+        }
     }
 
     function notify(content: string, title: string) {

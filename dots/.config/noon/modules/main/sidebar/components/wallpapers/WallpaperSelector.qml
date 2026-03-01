@@ -19,8 +19,6 @@ StyledRect {
     signal contentFocusRequested
     signal dismiss
 
-    anchors.fill: parent
-
     onSearchQueryChanged: debounceTimer.restart()
     Component.onCompleted: load_timer.restart()
 

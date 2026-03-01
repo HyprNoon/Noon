@@ -20,8 +20,6 @@ StyledRect {
     signal contentFocusRequested
     signal dismiss
 
-    anchors.fill: parent
-
     function first_action() {
         filteredModel.values[0].execute();
     }

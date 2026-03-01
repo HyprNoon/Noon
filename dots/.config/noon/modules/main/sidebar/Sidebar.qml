@@ -17,12 +17,12 @@ StyledPanel {
     property bool expanded: false
     property bool reveal: revealCondition
     property bool rightMode: barPosition === "left" || barPosition === "bottom"
+    property alias selectedCategory: sidebarContent.selectedCategory
     readonly property bool show: !hoverMode
     readonly property bool revealCondition: (mouseArea.containsMouse && hoverMode) || PolkitService.flow !== null
     readonly property int rounding: Rounding.verylarge
     readonly property int appearanceMode: Mem.options.sidebar.appearance.mode
     readonly property string barPosition: Mem.options.bar.behavior.position
-    property alias selectedCategory: sidebarContent.selectedCategory
     readonly property int sidebarWidth: SidebarData.currentSize(hoverMode, root.expanded, selectedCategory) + auxWidth
     readonly property int auxWidth: sidebarContent.auxVisible && !hoverMode ? SidebarData.currentSize(false, false, sidebarContent.auxCategory) : 0
     readonly property int hoverArea: 2
@@ -313,6 +313,7 @@ StyledPanel {
         target: "sidebar"
         function reveal_aux(cat: string) {
             sidebarContent.toggleAux(cat);
+            GlobalStates.main.holdNotif(cat);
         }
 
         function reveal(cat: string) {

@@ -146,11 +146,11 @@ Singleton {
         isLoading = false;
     }
 
-    function loadWeather(retryLocation) {
+    function loadWeather(retryLocation = weatherLocation) {
         if (isLoading) return;
 
         isLoading = true;
-        const location = retryLocation || weatherLocation;
+        const location = retryLocation;
         const url = `https://wttr.in/${encodeURIComponent(location)}?format=j1`;
         const xhr = new XMLHttpRequest();
 

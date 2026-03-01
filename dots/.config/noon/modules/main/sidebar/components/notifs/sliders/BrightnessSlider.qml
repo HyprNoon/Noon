@@ -19,6 +19,7 @@ Item {
         to: 1
         stepSize: 0.01
         scale: 1.05
+        showBackgroundDot: false
         value: brightnessMonitor.brightness
         onValueChanged: if (brightnessMonitor) {
             brightnessMonitor.setBrightness(value);
@@ -36,14 +37,13 @@ Item {
     }
 
     Symbol {
-        z: 2
-        visible: brightnessSlider.value >= 0.05
-        text: brightnessSlider.value > 0.5 ? "light_mode" : "dark_mode"
-        color: Colors.m3.m3onPrimary
+        text: "light_mode"
+        z: 0
+        color: Colors.colOnPrimary
+        fill: 1
         font.pixelSize: 18
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: brightnessSlider.left
-        anchors.leftMargin: Padding.normal
-        animateChange: true
+        anchors.leftMargin: Padding.verylarge
     }
 }

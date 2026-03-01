@@ -1,4 +1,5 @@
 import qs.common
+import qs.common.functions
 import qs.common.widgets
 import qs.services
 import QtQuick
@@ -11,8 +12,22 @@ Item {
     id: root
     required property var modelData
     height: Math.max(75, contentColumn.implicitHeight + Padding.massive * 2)
-    Component.onCompleted: timeout.restart()
-
+    property string sound: "eventAccepted"
+    Component.onCompleted: {
+        timeout.restart();
+        let sound = "info";
+        switch (root.state) {
+        case "error":
+            sound = "event_invalid";
+        case "success":
+            sound = "task_completed";
+        case "warning":
+            sound = "power_low";
+        default:
+            sound = "device_added";
+        }
+        NoonUtils.playSound(sound);
+    }
     states: [
         State {
             name: "error"
@@ -27,6 +42,10 @@ Item {
                 target: bg
                 color: Colors.colError
             }
+            PropertyChanges {
+                target: title
+                color: Colors.colErrorContainer
+            }
         },
         State {
             name: "success"
@@ -40,6 +59,10 @@ Item {
             PropertyChanges {
                 target: bg
                 color: Colors.colSuccess
+            }
+            PropertyChanges {
+                target: title
+                color: Colors.colSuccessContainer
             }
         },
         State {
@@ -99,19 +122,19 @@ Item {
                 Layout.alignment: Qt.AlignLeft
                 spacing: Padding.tiny
                 StyledText {
+                    id: title
+                    text: modelData.message
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    text: modelData.title
-                    color: shape.colSymbol
                     truncate: true
                     font.pixelSize: Fonts.sizes.normal
                     font.variableAxes: Fonts.variableAxes.title
                 }
                 StyledText {
+                    text: modelData.title
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    text: modelData.message
-                    color: Colors.colSubtext
+                    color: root.state === "normal" ? Colors.colSubtext : ColorUtils.adaptToAccent(Colors.colSurfaceContainer, title.color)
                     font.pixelSize: Fonts.sizes.normal
                     font.variableAxes: Fonts.variableAxes.main
                 }
@@ -120,7 +143,7 @@ Item {
     }
     Timer {
         id: timeout
-        interval: root.state === "error"  ? 3500 :2500
+        interval: root.state === "error" ? 3500 : 2500
         onTriggered: dismiss()
     }
     function dismiss() {

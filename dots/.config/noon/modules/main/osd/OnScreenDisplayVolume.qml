@@ -74,7 +74,7 @@ Scope {
 
     OsdValueIndicator {
         id: osdIndicator
-        active: showOsdValues
+        active: showOsdValues && GlobalStates.main.canNotify
 
         value: AudioService.sink?.audio.volume ?? 0
         icon: AudioService.sink?.audio.muted ? "volume_off" : "volume_up"

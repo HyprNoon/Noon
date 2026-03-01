@@ -20,8 +20,6 @@ StyledRect {
     signal contentFocusRequested
     signal dismiss
 
-    anchors.fill: parent
-
     ScriptModel {
         id: filteredModel
         values: {
