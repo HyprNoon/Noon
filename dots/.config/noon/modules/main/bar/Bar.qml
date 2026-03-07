@@ -20,7 +20,7 @@ Scope {
             required property var modelData
             readonly property string mode: settings.layout
             readonly property bool vertical: mode.startsWith("V")
-            readonly property string path: vertical ? "layouts/vertical/" : "layouts/horizontal/"
+            readonly property string path: Qt.resolvedUrl(vertical ? "layouts/vertical/" : "layouts/horizontal/")
             shown: Mem.options.bar.enabled
             source: `${path}${mode}.qml`
             onLoaded: _item.screen = loader.modelData

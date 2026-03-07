@@ -20,7 +20,7 @@ Singleton {
     }
 
     function fetchTodaysAyah() {
-        const date = DateTimeService.clockVar.date;
+        const date = DateTimeService.clock.date;
         const start = new Date(date.getFullYear(), 0, 0);
         const dayOfYear = Math.floor((date - start) / 86400000);
         const ayahNumber = (dayOfYear % 6236) + 1;

@@ -6,28 +6,29 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import org.kde.iconthemes
 
 Item {
     id: root
     required property var modelData
-    height: Math.max(75, contentColumn.implicitHeight + Padding.massive * 2)
-    property string sound: "eventAccepted"
+    implicitHeight: Math.max(75, contentColumn.implicitHeight + Padding.massive * 2)
+
     Component.onCompleted: {
         timeout.restart();
-        let sound = "info";
-        switch (root.state) {
-        case "error":
-            sound = "event_invalid";
-        case "success":
-            sound = "task_completed";
-        case "warning":
-            sound = "power_low";
-        default:
-            sound = "device_added";
-        }
+        let sound = () => {
+            switch (root.state) {
+            case "error":
+                return "event_invalid";
+            case "success":
+                return "task_completed";
+            case "warning":
+                return "power_low";
+            default:
+                return "device_added";
+            }
+        };
         NoonUtils.playSound(sound);
     }
+
     states: [
         State {
             name: "error"
@@ -126,7 +127,6 @@ Item {
                     text: modelData.message
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    truncate: true
                     font.pixelSize: Fonts.sizes.normal
                     font.variableAxes: Fonts.variableAxes.title
                 }
@@ -143,7 +143,7 @@ Item {
     }
     Timer {
         id: timeout
-        interval: root.state === "error" ? 3500 : 2500
+        interval: root.state === "error" ? 4000 : 2500
         onTriggered: dismiss()
     }
     function dismiss() {

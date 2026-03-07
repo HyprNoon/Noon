@@ -13,7 +13,6 @@ import qs.common.widgets
 
 Singleton {
     id: root
-    property string errStr: ""
     readonly property var avilableSystemCommands: Mem.store.misc.systemCommands
     readonly property var avilableIpcCommands: Mem.store.misc.ipcCommands
     property bool ipcReady: false
@@ -278,19 +277,12 @@ Singleton {
         }
     }
 
-    // WidgetLoader {
-    //     id: popupLoader
-    //     active:false
-    //     ReloadPopup {
-    //         description:root.errStr
-    //     }
-    // }
-    // Connections {
-    // 	target: Quickshell
-    //     function onReloadFailed(error: string) {
-    //         popupLoader.active = true;
-    //         root.errStr = error;
-    //     }
-    // }
-
+    Connections {
+        target: Quickshell
+        function onReloadFailed(error) {
+            let lines = error.split('\n');
+            let lastLine = lines[lines.length - 1];
+            root.toast(lastLine, "close", "error", "Quickshell");
+        }
+    }
 }

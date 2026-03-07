@@ -13,6 +13,7 @@ import qs.services
 BarGroup {
     id: root
 
+    property int iconSize: Fonts.sizes.verylarge
     property bool verticalMode: false
     readonly property var content: [
         {
@@ -61,7 +62,7 @@ BarGroup {
             delegate: Symbol {
                 text: modelData.icon || ""
                 color: Colors.colSecondary
-                font.pixelSize: Fonts.sizes.verylarge
+                font.pixelSize: root.iconSize
                 fill: 0
                 MouseArea {
                     id: hoverArea

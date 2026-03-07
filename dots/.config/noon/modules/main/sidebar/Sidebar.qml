@@ -116,13 +116,14 @@ StyledPanel {
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
             anchors.fill: parent
-
-            DropArea {
-                id: dropArea
-                anchors.fill: parent
-                keys: ["text/uri-list"]
-                onEntered: NoonUtils.callIpc("sidebar reveal Shelf")
-            }
+            // Fix
+            // DropArea {
+            //     id: dropArea
+            //     anchors.fill: parent
+            //     keys: ["text/uri-list"]
+            //      onEntered: NoonUtils.callIpc("sidebar reveal Shelf")
+            // onExited: NoonUtils.callIpc("sidebar reveal Shelf")
+            // }
         }
         StyledRectangularShadow {
             target: visualContainer

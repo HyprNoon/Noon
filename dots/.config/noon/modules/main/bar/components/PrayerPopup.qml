@@ -19,7 +19,7 @@ StyledPopup {
             spacing: 2
 
             StyledText {
-                text: PrayerService.currentCity
+                text: Qt.formatDateTime(DateTimeService.clock.date, "dddd") + " , " + DateTimeService.arabicDayName
                 color: Colors.m3.m3onSurface
                 font.pixelSize: Fonts.sizes.large
                 font.weight: Font.Bold

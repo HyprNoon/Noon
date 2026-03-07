@@ -58,15 +58,15 @@ Item {
                         property: "y"
                         from: -contentStack.slideDirection * contentStack.height
                         to: 0
-                        duration: Animations.durations.verylarge
+                        duration: Animations.durations.large
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Animations.curves.emphasizedDecel
                     }
                     PropertyAnimation {
                         property: "scale"
-                        from: 0.75
+                        from: 0.65
                         to: 1
-                        duration: Animations.durations.verylarge
+                        duration: Animations.durations.huge
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Animations.curves.emphasized
                     }
@@ -88,15 +88,15 @@ Item {
                         to: contentStack.slideDirection * contentStack.height
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Animations.curves.emphasizedAccel
-                        duration: Animations.durations.verylarge
+                        duration: Animations.durations.large
                     }
                     PropertyAnimation {
                         property: "scale"
                         from: 1
-                        to: 0.75
+                        to: 0.65
                         easing.type: Easing.BezierSpline
                         easing.bezierCurve: Animations.curves.emphasized
-                        duration: Animations.durations.verylarge
+                        duration: Animations.durations.huge
                     }
                     PropertyAnimation {
                         property: "opacity"
@@ -146,9 +146,5 @@ Item {
                     panel.contentItem.contentFocusRequested();
             }
         }
-    }
-
-    Behavior on Layout.preferredWidth {
-        Anim {}
     }
 }

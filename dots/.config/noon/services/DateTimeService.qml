@@ -9,37 +9,17 @@ import Quickshell
  * A nice wrapper for date and time strings.
  */
 Singleton {
-    property alias clock: clock
-
-    property string time: {
-        if (Mem.options.services.time.use12HourFormat) {
-            return Qt.formatDateTime(clock.date, "hh:mm ap");
-        } else {
-            return Qt.formatDateTime(clock.date, "HH:mm");
-        }
-    }
-
+    readonly property alias clock: clock
+    readonly property bool twelveHour: Mem.options.services.time.use12HourFormat
+    property string time: twelveHour ? Qt.formatDateTime(clock.date, "hh:mm ap") : Qt.formatDateTime(clock.date, "HH:mm")
     property string date: Qt.formatDateTime(clock.date, "dddd, dd/MM")
     property string day: Qt.formatDateTime(clock.date, "dd")
     property string month: Qt.formatDateTime(clock.date, "MMMM")
     property string year: Qt.formatDateTime(clock.date, "yyyy")
-    property var clockVar: clock
-    property string hour: {
-        if (Mem.options.services.time.use12HourFormat) {
-            return Qt.formatDateTime(clock.date, "hh AP").split(" ")[0];
-        } else {
-            return Qt.formatDateTime(clock.date, "HH");
-        }
-    }
+    property string hour: twelveHour ? Qt.formatDateTime(clock.date, "hh AP").split(" ")[0] : Qt.formatDateTime(clock.date, "HH")
     property string minute: Qt.formatDateTime(clock.date, "mm")
 
-    property string dayTime: {
-        if (Mem.options.services.time.use12HourFormat) {
-            return Qt.formatDateTime(clock.date, "hh AP").split(" ")[1];
-        } else {
-            return "";
-        }
-    }
+    property string dayTime: twelveHour ? Qt.formatDateTime(clock.date, "hh AP").split(" ")[1] : ""
 
     // Arabic week day name
     property string arabicDayName: clock.date.toLocaleDateString(Qt.locale("ar_SA"), "dddd")
@@ -47,7 +27,7 @@ Singleton {
     property string collapsedCalendarFormat: Qt.formatDateTime(clock.date, "dd MMMM yyyy")
 
     property string gnome_format: {
-        var timeFormat = Mem.options.services.time.use12HourFormat ? "hh:mm ap" : "HH:mm";
+        var timeFormat = twelveHour ? "hh:mm ap" : "HH:mm";
         return Qt.formatDateTime(clock.date, "dd MMM, ") + Qt.formatDateTime(clock.date, timeFormat);
     }
     // Relative time formatting function

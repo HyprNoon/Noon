@@ -16,6 +16,10 @@ StyledRect {
     readonly property bool playing: BeatsService.player?.playbackState === MprisPlaybackState.Playing
     readonly property bool displayingLyrics: LyricsService.lyrics.length > 0
     property QtObject colors: BeatsService.colors
+    Component.onCompleted: {
+        BeatsService.checkConnection();
+        BeatsService.refreshSocket();
+    }
     Behavior on width {
         enabled: false
     }

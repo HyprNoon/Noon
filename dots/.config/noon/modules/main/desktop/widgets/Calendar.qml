@@ -32,7 +32,7 @@ IslandComponent {
                 }
 
                 StyledText {
-                    text: Qt.formatDateTime(DateTimeService.clockVar.date, "MMM")
+                    text: Qt.formatDateTime(DateTimeService.clock.date, "MMM")
                     font {
                         pixelSize: 46
                         variableAxes: Fonts.variableAxes.longNumbers

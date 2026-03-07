@@ -13,7 +13,9 @@ Item {
     required property bool show
     required property bool rightMode
     required property string selectedCategory
-    property QtObject colors: Colors
+    required property QtObject colors
+    readonly property var sidebar: GlobalStates.main.sidebar
+
     readonly property var bubbles: [
         {
             "cat": "Walls",
@@ -156,7 +158,7 @@ Item {
                 {
                     "icon": "restart_alt",
                     "extraVisibleCondition": BeatsService.isCurrentPlayer(),
-                    "action": () => BeatsService.startConnection()
+                    "action": () => BeatsService.refreshSocket()
                 },
                 {
                     "icon": "download",
@@ -165,24 +167,53 @@ Item {
                 },
                 {
                     "icon": "close",
-                    "extraVisibleCondition": BeatsService.isCurrentPlayer(),
                     "action": () => BeatsService.stopPlayer()
                 }
             ]
         }
     ]
-
+    readonly property var panelActionsModel: [
+        {
+            icon: "close",
+            visible: sidebar.auxWidth > 0,
+            action: () => sidebar.close_aux(),
+            toggled: false
+        },
+        {
+            icon: "select_window",
+            toggled: SidebarData.detachedContent.includes(sidebar.selectedCategory),
+            visible: SidebarData.isDetachable(sidebar.selectedCategory),
+            enabled: !SidebarData.detachedContent.includes(sidebar.selectedCategory),
+            action: () => sidebar.detach()
+        },
+        {
+            icon: "push_pin",
+            toggled: sidebar.pinned,
+            action: () => sidebar.pinned = !toggled
+        },
+        {
+            icon: getExpandIcon(),
+            action: () => sidebar.expanded = !sidebar.expanded
+        }
+    ]
+    function getExpandIcon() {
+        const direction = (root.sidebar.rightMode && !root.sidebar.expanded) || (!root.sidebar.rightMode && root.sidebar.expanded) ? "left" : "right";
+        return `keyboard_double_arrow_${direction}`;
+    }
     visible: bg.width > 0
-    height: content.implicitHeight + 2 * Padding.large
     width: show ? 55 : 0
     clip: true
+    height: bg.height
 
     StyledRect {
         id: bg
 
         radius: Rounding.verylarge
-        color: colors.colLayer0
-        anchors.fill: parent
+        color: root.colors.colLayer0
+        anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        height: content.implicitHeight + Padding.massive
 
         MouseArea {
             id: mouse
@@ -207,21 +238,17 @@ Item {
                     spacing: parent.spacing
                     visible: modelData.cat === root.selectedCategory
 
-                    ColumnLayout {
-                        spacing: parent.spacing
+                    Repeater {
+                        id: repeater
+                        model: modelData.bubbles
 
-                        Repeater {
-                            id: repeater
-                            model: modelData.bubbles
-
-                            RippleButtonWithIcon {
-                                colors: root.colors
-                                visible: modelData?.extraVisibleCondition ?? true
-                                Layout.fillWidth: true
-                                enabled: modelData.enabled !== undefined ? modelData.enabled : true
-                                materialIcon: modelData.icon
-                                releaseAction: modelData.action
-                            }
+                        RippleButtonWithIcon {
+                            colors: root.colors
+                            visible: modelData?.extraVisibleCondition ?? true
+                            Layout.fillWidth: true
+                            enabled: modelData.enabled !== undefined ? modelData.enabled : true
+                            materialIcon: modelData.icon
+                            releaseAction: modelData.action
                         }
                     }
 
@@ -230,35 +257,17 @@ Item {
                     }
                 }
             }
-            RippleButtonWithIcon {
-                colors: root.colors
-                materialIcon: "close"
-                visible: GlobalStates.main.sidebar.auxWidth > 0
-                releaseAction: () => GlobalStates.main.sidebar.close_aux()
-            }
-            RippleButtonWithIcon {
-                colors: root.colors
-                toggled: SidebarData.detachedContent.includes(GlobalStates.main.sidebar.selectedCategory)
-                enabled: !toggled
-                visible: SidebarData.isDetachable(GlobalStates.main.sidebar.selectedCategory)
-                materialIcon: "ad"
-                releaseAction: () => GlobalStates.main.sidebar.detach()
-            }
-            RippleButtonWithIcon {
-                colors: root.colors
-                materialIcon: "push_pin"
-                toggled: GlobalStates.main.sidebar.pinned
-                releaseAction: () => GlobalStates.main.sidebar.pinned = !toggled
-            }
-            RippleButtonWithIcon {
-                colors: root.colors
-                materialIcon: {
-                    if (GlobalStates.main.sidebar.rightMode) {
-                        return !GlobalStates.main.sidebar.expanded ? "keyboard_double_arrow_left" : "keyboard_double_arrow_right";
-                    } else
-                        return GlobalStates.main.sidebar.expanded ? "keyboard_double_arrow_left" : "keyboard_double_arrow_right";
+            Repeater {
+                model: root.panelActionsModel
+
+                RippleButtonWithIcon {
+                    colors: root.colors
+                    Layout.fillWidth: true
+                    visible: modelData?.visible ?? true
+                    enabled: modelData?.enabled ?? true
+                    materialIcon: modelData?.icon
+                    releaseAction: modelData?.action
                 }
-                releaseAction: () => GlobalStates.main.sidebar.expanded = !GlobalStates.main.sidebar.expanded
             }
         }
     }

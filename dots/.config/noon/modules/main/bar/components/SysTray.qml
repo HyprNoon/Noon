@@ -13,6 +13,7 @@ Item {
     property var bar
     property int iconSize: BarData.currentBarExclusiveSize / 2.5
     property bool verticalMode: Mem.options.bar.behavior.position === "left" || Mem.options.bar.behavior.position === "right"
+    readonly property var model: SystemTray.items
 
     implicitHeight: verticalMode ? content.implicitHeight + Padding.huge : parent.height
     implicitWidth: verticalMode ? parent.width : content.implicitWidth + Padding.huge
@@ -45,7 +46,7 @@ Item {
         columnSpacing: Padding.large
 
         Repeater {
-            model: SystemTray.items
+            model: root.model
             Layout.row: root.verticalMode ? 1 : 0 // Shift items down in vertical mode
 
             SysTrayItem {

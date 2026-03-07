@@ -11,7 +11,7 @@ Singleton {
     property string prayerLocation: Mem.options.services.location ?? "Cairo"
     property string calculationMethod: Mem.options.services.prayer.method ?? "Egyptian"
     property string currentCity: ""
-    readonly property var currentDate: DateTimeService.clockVar.date
+    readonly property var currentDate: DateTimeService.clock.date
     property string cachedDate: ""
     property string cachedLocation: ""
     property string cachedMethod: ""

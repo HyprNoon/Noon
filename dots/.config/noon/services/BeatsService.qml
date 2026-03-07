@@ -15,12 +15,13 @@ Singleton {
     id: root
 
     property int selectedPlayerIndex: 0
-    property list<string> excludedPlayers: [".mpd", "playerctld", "firefox", "chromium", "kdeconnect"]
     property string currentTrackPath: ""
     property var tracksMetadata: ({})
 
+    readonly property list<string> excludedPlayers: Mem.options.mediaPlayer?.excludedPlayers ?? []
     readonly property QtObject colors: palette.colors
     readonly property bool filterPlayersEnabled: false
+    readonly property bool _connected: vlcSocket.connected
     readonly property bool _playing: player && player.playbackState === MprisPlaybackState.Playing
     readonly property string artUrl: player ? StringUtils.cleanMusicTitle(player.trackArtUrl) : ""
     readonly property string title: player ? StringUtils.cleanMusicTitle(player.trackTitle) : "No Title"
@@ -28,9 +29,6 @@ Singleton {
     readonly property string _tracksDir: Qt.resolvedUrl(Mem.states.mediaPlayer?.currentTrackPath ?? Directories.beats.tracks)
     readonly property string _metadataPath: _tracksDir + "/.metadata"
     readonly property string _playlistPath: _tracksDir + "/.playlist.m3u"
-    Component.onCompleted: {
-        startConnection();
-    }
     readonly property var tracksInfo: {
         const map = {};
         for (const key in root.tracksMetadata) {
@@ -95,12 +93,18 @@ Singleton {
         return "file://" + root._tracksDir + "/" + entry.cover_art.replace(/^\.\//, "");
     }
 
-    function startConnection() {
+    function refreshSocket() {
         vlcSocket.reload();
-        NoonUtils.execDetached(`cvlc "${FileUtils.trimFileProtocol(root._playlistPath)}" "-I" "oldrc" "${vlcSocket.path}"`);
+    }
+    function checkConnection() {
+        vlcStateProc.running = true;
+    }
+    function startConnection() {
+        Quickshell.execDetached(["vlc", "--intf", "oldrc", "--rc-unix", vlcSocket.path, "--rc-fake-tty", "--one-instance", "--no-playlist-autostart", "--no-video", FileUtils.trimFileProtocol(root._playlistPath)]);
     }
 
     function playTrack(index) {
+        vlcSocket.add("play");
         vlcSocket.add("goto " + index);
     }
 
@@ -135,7 +139,7 @@ Singleton {
     }
 
     function stopPlayer() {
-        NoonUtils.execDetached("killall vlc");
+        NoonUtils.execDetached("killall " + player?.desktopEntry?.toLowerCase());
     }
 
     function downloadCurrentSong() {
@@ -150,6 +154,14 @@ Singleton {
     function downloadByCommand(command) {
         dlpProc._cmd = command;
         dlpProc.running = true;
+    }
+
+    Timer {
+        id: positionTimer
+        interval: 100
+        repeat: true
+        running: root.player && root._playing
+        onTriggered: root.player.positionChanged()
     }
 
     Process {
@@ -167,10 +179,22 @@ Singleton {
     Process {
         id: rebuildMetaProc
         command: ["python3", Directories.scriptsDir + "/build_metadata.py", FileUtils.trimFileProtocol(_tracksDir)]
-        // onStarted: NoonUtils.toast("Started rebuilding metadata", "music_note")
-        // onExited: exitCode => {
-        //     exitCode === 0 ? NoonUtils.toast("Metadata rebuilt", "check", "success") : NoonUtils.toast("Metadata rebuild failed", "close", "error");
-        // }
+    }
+
+    Process {
+        id: vlcStateProc
+        property bool isRunning
+        command: ["pidof", "vlc"]
+
+        stdout: SplitParser {
+            onRead: data => vlcStateProc.isRunning = data.trim().length > 0
+        }
+        onExited: {
+            if (vlcStateProc.isRunning)
+                return;
+            root.startConnection();
+            root.refreshSocket();
+        }
     }
 
     FileView {
@@ -194,15 +218,10 @@ Singleton {
         folder: root._tracksDir
         showDirs: false
         showFiles: true
-        onCountChanged: rebuildMetadata()
-    }
-
-    Timer {
-        id: positionTimer
-        interval: 100
-        repeat: true
-        running: root.player && root._playing
-        onTriggered: root.player.positionChanged()
+        onCountChanged: {
+            NoonUtils.toast(`New songs added`, "music_note");
+            rebuildMetadata();
+        }
     }
 
     SourceDownloader {

@@ -11,7 +11,7 @@ StyledPopup {
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 8
-        implicitWidth: 350
+        implicitWidth: 400
 
         // Header
         StyledText {
@@ -48,6 +48,11 @@ StyledPopup {
                 {
                     label: qsTr("Upload:"),
                     value: NetworkService.uploadSpeedText,
+                    show: true
+                },
+                {
+                    label: qsTr("IP:"),
+                    value: NetworkService.stats.ip_address,
                     show: true
                 }
             ]

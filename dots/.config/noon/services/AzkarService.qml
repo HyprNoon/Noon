@@ -30,7 +30,7 @@ Singleton {
     }
 
     function loadZekrForTime() {
-        const category = db[categoryForHour(DateTimeService.clockVar)];
+        const category = db[categoryForHour(DateTimeService.clock)];
         currentZekr = category[Math.floor(Math.random() * category.length)];
     }
 }

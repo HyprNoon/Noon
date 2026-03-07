@@ -64,6 +64,7 @@ StyledRect {
                     columns: listMode ? 1 : 3
                     rowSpacing: Padding.verysmall
                     columnSpacing: Padding.verysmall
+                    flow: listMode ? GridLayout.TopToBottom : GridLayout.LeftToRight
 
                     Repeater {
                         model: Mem.states.sidebar.shelf.filePaths
@@ -76,6 +77,7 @@ StyledRect {
                             width: listMode ? grid.width - Padding.large : Sizes.sidebar.shelfItemSize.width
                         }
                     }
+
                     Spacer {}
                 }
             }

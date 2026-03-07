@@ -19,7 +19,8 @@ Singleton {
         "download_speed": 0,
         "upload_speed": 0,
         "download_speed_text": "0 B/s",
-        "upload_speed_text": "0 B/s"
+        "upload_speed_text": "0 B/s",
+        "ip_address": "0.0.0.0"
     }
     // Convenience properties for direct access
     property bool wifiEnabled: stats.wifi_enabled

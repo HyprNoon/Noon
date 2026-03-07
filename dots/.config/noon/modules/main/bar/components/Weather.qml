@@ -40,17 +40,15 @@ GridView {
                 font.family: Fonts.family.main
                 color: Colors.colOnLayer1
             }
-
         }
 
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
-            ToolTip.visible: containsMouse
-            ToolTip.text: weatherData.currentCondition
-            ToolTip.delay: 500
+            StyledToolTip {
+                extraVisibleCondition: parent.containsMouse
+                content: weatherData.currentCondition
+            }
         }
-
     }
-
 }

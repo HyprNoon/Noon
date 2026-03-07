@@ -21,8 +21,8 @@ StyledPanel {
     anchors {
         top: true
         bottom: true
-        right: GlobalStates.main.sidebar.rightMode
-        left: !GlobalStates.main.sidebar.rightMode
+        right: GlobalStates.main?.sidebar?.rightMode ?? true
+        left: !GlobalStates.main?.sidebar?.rightMode ?? false
     }
 
     mask: Region {
@@ -54,8 +54,9 @@ StyledPanel {
         verticalLayoutDirection: ListView.BottomToTop
         model: GlobalStates.toasts.data
         spacing: Padding.normal
+        reuseItems: false
         delegate: Toast {
-            anchors.horizontalCenter: listview?.horizontalCenter
+            anchors.horizontalCenter: parent?.horizontalCenter
             width: Sizes.toastWidth
         }
     }

@@ -1,125 +1,116 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Hyprland
-import Quickshell.Services.UPower
 import qs.common
+import qs.services
 import qs.common.widgets
 import qs.modules.main.bar.components
-import qs.store
 
-Item {
-    id: barBackground
+StyledPanel {
+    id: root
+    readonly property int spacing: Padding.large
+    readonly property int chunkWidth: 380
+    readonly property int barHeight: 58
+    readonly property string pos: Mem.options.bar.behavior.position
+    name: "bar"
+    shell: "noon"
+    implicitHeight: barHeight + 100
+    exclusiveZone: barHeight + Sizes.elevationMargin
+    anchors.top: pos === "top"
+    anchors.bottom: pos === "bottom"
+    anchors.right: true
+    anchors.left: true
 
-    property var barRoot
-    property int chunkWidth: 380
-    readonly property int barHeight: height
-
-    anchors {
-        fill: parent
-        margins: Sizes.barElevation
+    mask: Region {
+        item: contentItem
+    }
+    Item {
+        id: contentItem
+        anchors.top: center.top
+        anchors.bottom: center.bottom
+        anchors.right: parent.right
+        anchors.left: parent.left
+        height: root.exclusiveZone
     }
 
-    RowLayout {
-        id: chunksRow
-
-        anchors.centerIn: barBackground
-        spacing: Padding.large
-
-        // Left Chunk
-        Chunk {
-            implicitWidth: 400
-
+    Chunk {
+        id: left
+        anchors.top: center.top
+        anchors.bottom: center.bottom
+        anchors.right: center.left
+        anchors.rightMargin: root.spacing
+        implicitWidth: chunkWidth
+        RLayout {
+            id: leftRow
+            anchors.fill: parent
+            anchors.margins: Padding.normal
             Media {
                 expand: true
                 Layout.fillWidth: true
             }
-
             Spacer {}
-
             Resources {}
         }
+    }
 
-        // Middle Chunk (Workspaces)
-        Chunk {
-            implicitWidth: workspaces.implicitWidth + 25
-            Layout.alignment: Qt.AlignCenter
-
-            Item {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-
-                Workspaces {
-                    id: workspaces
-
-                    anchors.centerIn: parent
-                    Layout.alignment: Qt.AlignCenter
-                    bar: barRoot
-                }
-            }
+    Chunk {
+        id: center
+        anchors.top: pos === "top" ? parent.top : undefined
+        anchors.bottom: pos === "bottom" ? parent.bottom : undefined
+        anchors.margins: Sizes.elevationMargin
+        anchors.horizontalCenter: parent.horizontalCenter
+        content: workspaces
+        Workspaces {
+            id: workspaces
+            anchors.centerIn: parent
+            bar: root
         }
+    }
 
-        // Right Chunk
-        Chunk {
-            implicitWidth: chunkWidth
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-
-            Logo {}
-
-            // StackedClockWidget {
-            //     Layout.fillWidth: true
-            // }
-
+    Chunk {
+        id: right
+        anchors.top: center.top
+        anchors.bottom: center.bottom
+        anchors.left: center.right
+        anchors.leftMargin: root.spacing
+        implicitWidth: chunkWidth
+        RLayout {
+            id: rightRow
+            anchors.fill: parent
+            anchors.leftMargin: Padding.massive
+            anchors.margins: Padding.normal
+            PowerIcon {}
+            StackedClockWidget {}
             Spacer {}
-
             StatusIcons {}
         }
     }
 
-    // Chunk with inner rectangle
-    component Chunk: StyledRect {
-        id: root
-
-        default property alias contents: innerLayout.children
-
-        color: Colors.colLayer0
-        radius: Rounding.verylarge
-        implicitHeight: barHeight
+    component StackedClockWidget: ColumnLayout {
+        spacing: 0
+        Layout.fillWidth: true
+        Layout.topMargin: Padding.tiny
+        Layout.leftMargin: Padding.normal
+        Layout.preferredHeight: 36
         Layout.alignment: Qt.AlignVCenter
-
-        StyledRect {
-            anchors.fill: parent
-            anchors.margins: Padding.small
-            color: Colors.colLayer2
-            radius: root.radius - Padding.small
-
-            RowLayout {
-                id: innerLayout
-
-                anchors.fill: parent
-                anchors.leftMargin: Padding.large
-                anchors.rightMargin: Padding.large
-                spacing: 18
-            }
+        StyledText {
+            color: Colors.colOnLayer0
+            text: DateTimeService.time
+            font.pixelSize: Fonts.sizes.normal
+            font.variableAxes: Fonts.variableAxes.title
+        }
+        StyledText {
+            color: Colors.colSubtext
+            text: DateTimeService.date
+            opacity: 0.7
         }
     }
 
-    // Simple chunk without inner rectangle
-    component SimpleChunk: StyledRect {
-        default property alias contents: layout.children
-
+    component Chunk: StyledRect {
+        property var content
         color: Colors.colLayer0
-        radius: Rounding.verylarge
-        implicitHeight: barHeight
-
-        RowLayout {
-            id: layout
-
-            anchors.fill: parent
-            anchors.leftMargin: Padding.small
-            anchors.rightMargin: Padding.small
-            spacing: Padding.small
-        }
+        radius: Rounding.large
+        implicitHeight: 56
+        implicitWidth: content.implicitWidth + Padding.massive * 1.5
+        enableBorders: true
     }
 }
