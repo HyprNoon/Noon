@@ -14,7 +14,7 @@ Scope {
     id: background
 
     Variants {
-        model: MonitorsInfo.all
+        model: Quickshell.screens //.all
 
         StyledPanel {
             id: backgroundPanel

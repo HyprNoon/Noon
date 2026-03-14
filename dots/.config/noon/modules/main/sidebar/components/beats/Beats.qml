@@ -183,15 +183,6 @@ StyledRect {
         }
     }
 
-    StyledLoader {
-        active: !root.expanded
-        visible: !root.expanded
-        asynchronous: true
-        anchors.fill: parent
-        sourceComponent: BottomTracksDialog {}
-        onLoaded: _item.colors = root.colors
-    }
-
     gradient: Gradient {
         GradientStop {
             color: "transparent"

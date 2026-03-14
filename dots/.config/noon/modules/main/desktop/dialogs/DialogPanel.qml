@@ -57,8 +57,8 @@ Scope {
                     topRadius: 40
                     enableBorders: true
                     color: Colors.colLayer0
-                    implicitWidth: 800
-                    implicitHeight: 420
+                    implicitWidth: 600 // 800
+                    implicitHeight: 220 // 420
 
                     StyledRect {
                         id: topHandle
@@ -103,7 +103,11 @@ Scope {
                         readonly property var contentMap: {
                             "dlp": {
                                 comp: "DlpContent",
-                                preload: "dropUrl"
+                                preload: "url"
+                            },
+                            "thawb": {
+                                comp: "ThawbContent",
+                                preload: "url"
                             }
                         }
                     }

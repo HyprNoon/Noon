@@ -19,7 +19,6 @@ import "desktop/toasts"
 
 Scope {
     WidgetLoader {
-        enabled: WallpaperService._loaded
         Bg {}
     }
 

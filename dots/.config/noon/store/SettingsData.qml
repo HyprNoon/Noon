@@ -281,7 +281,7 @@ Singleton {
                         {
                             "icon": "layers_clear",
                             "name": "Deload On Fullscreen",
-                            "key": "desktop.bg.deloadOnFullscreen"
+                            "key": "desktop.shell.deloadOnFullscreen"
                         },
                         {
                             "icon": "image",
@@ -924,6 +924,11 @@ Singleton {
                             "icon": "mouse",
                             "name": "Fast Touchpad",
                             "key": "interactions.scrolling.fasterTouchpadScroll"
+                        },
+                        {
+                            "icon": "mouse",
+                            "name": "Mouse Oriented",
+                            "key": "interactions.mouseOriented"
                         },
                         {
                             "icon": "swap_calls",

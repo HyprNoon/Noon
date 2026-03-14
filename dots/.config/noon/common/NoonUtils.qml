@@ -112,9 +112,16 @@ Singleton {
 
         return avList.some(domain => url.toLowerCase().includes(domain));
     }
+
     function isOnline(url) {
         return url.startsWith("http") || url.startsWith("https" || url.contains("www"));
     }
+
+    function getThawb(url) {
+        GlobalStates.main.sysDialogs.pendingData = url;
+        GlobalStates.main.sysDialogs.mode = "thawb";
+    }
+
     function runDownloader(url) {
         if (isOnline(url)) {
             if (checkIfDlp(url)) {

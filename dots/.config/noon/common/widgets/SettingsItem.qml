@@ -46,11 +46,11 @@ StyledRect {
         "slider": {
             component: sliderComponent,
             isActive: realValue > sliderMinValue,
-            width:120
+            width: 120
         },
         "combobox": {
             component: comboboxComponent,
-            width:165
+            width: 165
         },
         "field": {
             component: plainFieldComponent,
@@ -59,7 +59,7 @@ StyledRect {
         },
         "text": {
             component: textFieldComponent,
-            width:165
+            width: 165
         },
         "action": {
             component: actionComponent
@@ -104,10 +104,16 @@ StyledRect {
         current[keys[keys.length - 1]] = value;
         valueChanged(value);
 
-        if (reloadOnChange)
-            Qt.callLater(() => Quickshell.reload(true));
+        if (reloadOnChange) {
+            NoonUtils.toast(`Shell Is Reloading in ${reloadShellTimer.interval} ms`, "warning", "warn", "Don't Panic");
+            reloadShellTimer.restart();
+        }
     }
-
+    Timer {
+        id: reloadShellTimer
+        interval: 300
+        onTriggered: Quickshell.reload(true)
+    }
     Component.onCompleted: {
         let val = getConfigValue();
         if (val === undefined || val === null) {
@@ -116,25 +122,25 @@ StyledRect {
         }
 
         switch (type) {
-            case "spin":
-                intValue = Math.max(minValue, Math.min(maxValue, parseInt(val) || minValue));
-                break;
-            case "slider":
-                realValue = Math.max(sliderMinValue, Math.min(sliderMaxValue, parseFloat(val) || sliderMinValue));
-                break;
-            case "combobox":
-                let idx = comboBoxValues.indexOf(val);
-                if (idx >= 0) {
-                    comboBoxCurrentIndex = idx;
-                    comboBoxCurrentValue = val;
-                }
-                break;
-            case "text":
-            case "field":
-                textValue = String(val);
-                break;
-            default:
-                toggledState = Boolean(val);
+        case "spin":
+            intValue = Math.max(minValue, Math.min(maxValue, parseInt(val) || minValue));
+            break;
+        case "slider":
+            realValue = Math.max(sliderMinValue, Math.min(sliderMaxValue, parseFloat(val) || sliderMinValue));
+            break;
+        case "combobox":
+            let idx = comboBoxValues.indexOf(val);
+            if (idx >= 0) {
+                comboBoxCurrentIndex = idx;
+                comboBoxCurrentValue = val;
+            }
+            break;
+        case "text":
+        case "field":
+            textValue = String(val);
+            break;
+        default:
+            toggledState = Boolean(val);
         }
 
         _initializing = false;
@@ -163,10 +169,10 @@ StyledRect {
         hoverEnabled: true
         enabled: root.enabled && (type === "switch")
         onClicked: {
-                toggledState = !toggledState;
-                setConfigValue(toggledState);
-                root.clicked();
-                iconAnimation.start();
+            toggledState = !toggledState;
+            setConfigValue(toggledState);
+            root.clicked();
+            iconAnimation.start();
         }
         onPressed: feedbackAnimation.start()
     }
@@ -228,16 +234,16 @@ StyledRect {
             text: name
             color: colors.colOnLayer2
             font.pixelSize: Fonts.sizes.normal
-            truncate:true
-            Layout.fillWidth:true
+            truncate: true
+            Layout.fillWidth: true
         }
 
         Loader {
             id: mainLoader
 
             sourceComponent: root.dict[type].component
-            Layout.fillWidth:root.dict[type].fillWidth || false
-            Layout.minimumWidth:root.dict[type].width || 0
+            Layout.fillWidth: root.dict[type].fillWidth || false
+            Layout.minimumWidth: root.dict[type].width || 0
             Layout.fillHeight: root.fillHeight
         }
     }
@@ -268,12 +274,10 @@ StyledRect {
             from: root.minValue
             to: root.maxValue
             enabled: root.enabled
-            onValueChanged:
-                if (value !== root.intValue) {
-                    root.intValue = value;
-                    root.setConfigValue(value);
-                }
-
+            onValueChanged: if (value !== root.intValue) {
+                root.intValue = value;
+                root.setConfigValue(value);
+            }
         }
     }
 

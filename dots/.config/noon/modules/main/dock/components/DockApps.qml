@@ -41,7 +41,7 @@ Item {
     // Layout.fillHeight: true
     StyledListView {
         id: listView
-        spacing: 0
+        spacing: height / 10
         orientation: ListView.Horizontal
         implicitWidth: contentWidth
         implicitHeight: Mem.options.dock.appearance.iconSize

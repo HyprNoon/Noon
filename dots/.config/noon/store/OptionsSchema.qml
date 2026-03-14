@@ -122,7 +122,7 @@ JsonAdapter {
 
     property JsonObject interactions: JsonObject {
         property JsonObject scrolling
-
+        property bool mouseOriented: false
         scrolling: JsonObject {
             property bool fasterTouchpadScroll: true
             property int mouseScrollDeltaThreshold: 120
@@ -322,6 +322,7 @@ JsonAdapter {
         property bool timerOverlayMode: true
 
         shell: JsonObject {
+            property bool deloadOnFullscreen: true
             property string mode: ""
         }
         widgets: JsonObject {
@@ -340,7 +341,6 @@ JsonAdapter {
             property real borderMultiplier: 0.2
             property bool depthMode: true
             property bool useQs: true
-            property bool deloadOnFullscreen: true
 
             parallax: JsonObject {
                 property bool enabled: false

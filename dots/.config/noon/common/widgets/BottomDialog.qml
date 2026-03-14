@@ -9,7 +9,7 @@ import qs.services
 
 Item {
     id: root
-
+    readonly property bool mouseOriented: Mem.options.interactions.mouseOriented ?? true
     property int collapsedHeight: 200
     property int expandedHeight: 400
     property bool expand: false
@@ -100,6 +100,50 @@ Item {
         }
     }
 
+    Item {
+        height: ch.implicitHeight
+        width: parent.width
+        visible: root.mouseOriented
+        opacity: root.show ? 0 : 1
+
+        anchors {
+            bottom: bg.top
+            bottomMargin: Padding.huge
+            right: root.right
+            left: root.left
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: root.show = true
+        }
+
+        Behavior on opacity {
+            Anim {}
+        }
+
+        CLayout {
+            id: ch
+            anchors.centerIn: parent
+            opacity: 0.6
+            spacing: 0
+            Symbol {
+                Layout.alignment: Qt.AlignHCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Fonts.sizes.large
+                color: Colors.colSubtext
+                fill: 1
+                text: "stat_2"
+            }
+            StyledText {
+                Layout.alignment: Qt.AlignHCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Fonts.sizes.small
+                color: Colors.colSubtext
+                text: "Swipe"
+            }
+        }
+    }
     StyledRect {
         id: bg
 

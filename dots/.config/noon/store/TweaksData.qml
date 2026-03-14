@@ -663,7 +663,7 @@ Singleton {
                 {
                     "icon": "image",
                     "name": "Deload On Fullscreen",
-                    "key": "desktop.bg.deloadOnFullscreen"
+                    "key": "desktop.shell.deloadOnFullscreen"
                 },
                 {
                     "icon": "width",
@@ -693,6 +693,11 @@ Singleton {
                     "icon": "mouse",
                     "name": "Faster Scrolling",
                     "key": "interactions.scrolling.fasterTouchpadScroll"
+                },
+                {
+                    "icon": "mouse",
+                    "name": "Mouse Oriented",
+                    "key": "interactions.mouseOriented"
                 },
                 {
                     "icon": "dashboard",

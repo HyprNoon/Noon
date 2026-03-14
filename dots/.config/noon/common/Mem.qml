@@ -6,7 +6,7 @@ import qs.store
 Singleton {
     id: root
 
-    property bool ready: colorsView.loaded && todoView.loaded && optionsView.loaded && statesView.loaded && timersView.loaded
+    property bool ready: colorsView.loaded && optionsView.loaded && statesView.loaded
     property alias states: statesView.data
     property alias options: optionsView.data
     property alias timers: timersView.data

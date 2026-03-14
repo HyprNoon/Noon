@@ -7,10 +7,10 @@ import qs.common.widgets
 
 StyledRect {
     id: root
-    anchors.fill: parent
     color: Colors.colLayer1
     radius: Rounding.verylarge
-
+    focus: true
+    Component.onCompleted: Qt.callLater(() => inputField.forceActiveFocus())
     function submit() {
         PolkitService.submit(inputField.text);
     }
@@ -21,13 +21,6 @@ StyledRect {
             if (!PolkitService.interactionAvailable)
                 return;
             inputField.text = "";
-            inputField.focus = true;
-        }
-
-        function onFlowChanged() {
-            if (PolkitService.flow !== null) {
-                inputField.focus = true;
-            }
         }
     }
 
@@ -60,7 +53,6 @@ StyledRect {
             MaterialTextField {
                 id: inputField
                 Layout.fillWidth: true
-                focus: true
                 enabled: PolkitService.interactionAvailable
                 placeholderText: PolkitService.flow?.inputPrompt.trim().slice(0, -1) || ""
                 echoMode: !PolkitService.flow?.responseVisible ? TextInput.Password : TextInput.Normal

@@ -14,6 +14,10 @@ Scope {
     IpcHandler {
         target: "global"
 
+        function thawb(link: string) {
+            if (link)
+                NoonUtils.getThawb(link);
+        }
         function toast(content: string, state: string) {
             NoonUtils.toast(content, "check", state);
         }

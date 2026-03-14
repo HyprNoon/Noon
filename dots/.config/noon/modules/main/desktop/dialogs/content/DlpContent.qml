@@ -11,31 +11,35 @@ import qs.services
 Item {
     id: root
     anchors.fill: parent
-    property string dropUrl
+    property string url
 
     property var segmentedButtonsContent: ["Audio", "Video", "Command"]
     signal dismiss
 
     // Simplified quality options mapped to yt-dlp parameters
     readonly property var qualityOptions: ({
-        "video": {
-            options: ["1080p", "720p", "480p", "360p"],
-            default: "720p",
-            toParams: (quality) => {
-                let height = quality.replace("p", "");
-                return `bestvideo[height<=${height}]+bestaudio/best[height<=${height}] --no-playlist`;
+            "video": {
+                options: ["1080p", "720p", "480p", "360p"],
+                default: "720p",
+                toParams: quality => {
+                    let height = quality.replace("p", "");
+                    return `bestvideo[height<=${height}]+bestaudio/best[height<=${height}] --no-playlist`;
+                }
+            },
+            "audio": {
+                options: ["Best", "Medium", "Low"],
+                default: "Best",
+                toParams: quality => {
+                    let qualityMap = {
+                        "Best": "0",
+                        "Medium": "5",
+                        "Low": "9"
+                    };
+                    let q = qualityMap[quality];
+                    return `bestaudio --extract-audio --audio-format mp3 --audio-quality ${q} --embed-thumbnail --add-metadata --no-playlist`;
+                }
             }
-        },
-        "audio": {
-            options: ["Best", "Medium", "Low"],
-            default: "Best",
-            toParams: (quality) => {
-                let qualityMap = { "Best": "0", "Medium": "5", "Low": "9" };
-                let q = qualityMap[quality];
-                return `bestaudio --extract-audio --audio-format mp3 --audio-quality ${q} --embed-thumbnail --add-metadata --no-playlist`;
-            }
-        }
-    })
+        })
 
     readonly property var avilableActions: [
         {
@@ -54,7 +58,7 @@ Item {
     ]
 
     function execute() {
-        let url = root.dropUrl;
+        let url = root.url;
         if (!url)
             return;
 
