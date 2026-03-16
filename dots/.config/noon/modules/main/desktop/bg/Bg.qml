@@ -108,19 +108,6 @@ Scope {
                         sourceComponent: LayerClock {}
                         asynchronous: true
                     }
-                    StyledLoader {
-                        shown: Mem.options.desktop.widgets.enabled
-                        readonly property bool rightMode: Mem.options.bar.behavior.position === "left"
-                        anchors {
-                            right: rightMode ? parent.right : undefined
-                            left: !rightMode ? parent.left : undefined
-
-                            top: parent.top
-                            bottom: parent.bottom
-                            margins: Math.max(Sizes.hyprland.gapsOut, Sizes.elevationMargin)
-                        }
-                        sourceComponent: DesktopWidgets {}
-                    }
                     DesktopClock {
                         z: 9999
                         visible: Mem.options.desktop.clock.enabled && (!backgroundPanel.enableDepthMode || !layerClock.active)

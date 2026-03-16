@@ -21,7 +21,10 @@ Scope {
     WidgetLoader {
         Bg {}
     }
-
+    WidgetLoader {
+        enabled: Mem.options.desktop.widgets.enabled
+        DesktopWidgets {}
+    }
     WidgetLoader {
         enabled: Mem.options.desktop.bg.borderMultiplier > 0
         Border {}

@@ -18,7 +18,6 @@ Item {
 
     StyledRectangularShadow {
         target: bg
-        visible: bg.color !== "transparent"
         intensity: 0.5
         color: colors.colShadow
     }

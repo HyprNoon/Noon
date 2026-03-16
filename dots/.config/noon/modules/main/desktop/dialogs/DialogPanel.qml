@@ -19,7 +19,7 @@ Scope {
 
             required property var modelData
             screen: modelData
-
+            exclusiveZone: -1
             name: "systemDialog"
             shell: "noon"
 

@@ -138,7 +138,6 @@ Item {
         SidebarNavigationRail {
             content: root
             selectedCategory: root.selectedCategory
-            color: panelWindow.appearanceMode !== 2 ? colors.colLayer2 : "transparent"
             colors: root.colors
             radius: panelWindow.appearanceMode > 0 ? panelWindow.rounding : 0
         }

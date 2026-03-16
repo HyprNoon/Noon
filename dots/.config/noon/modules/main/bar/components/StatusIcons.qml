@@ -1,3 +1,4 @@
+import Noon.Services
 import Qt5Compat.GraphicalEffects
 import QtNetwork
 import QtQuick
@@ -13,14 +14,16 @@ import qs.services
 BarGroup {
     id: root
 
-    property int iconSize: Fonts.sizes.verylarge
-    property bool verticalMode: false
     readonly property var content: [
         {
             icon: "radio_button_checked",
             visible: RecordingService.isRecording,
             dialog: "Record",
-            hoverItem: recPopup
+            tooltip: "Recording " + RecordingService.getFormattedDuration()
+        },
+        {
+            icon: "volume_off",
+            visible: AudioService.sink?.audio.muted
         },
         {
             icon: NetworkService.materialSymbol,
@@ -34,16 +37,19 @@ BarGroup {
         },
         {
             icon: "notifications_off",
-            visible: Notifications.silent,
-            fill: 1
+            visible: Notifications.silent
+        },
+        {
+            icon: "mode_heat",
+            visible: ResourcesService.stats.cpu_temp > 85,
+            tooltip: "CPU Temp: " + ResourcesService.stats.cpu_temp
         }
     ]
     readonly property Component btPopup: BluetoothPopup {}
     readonly property Component networkPopup: NetworkPopup {}
-    readonly property Component recPopup: StyledToolTip {
+    readonly property Component tooltipComp: StyledToolTip {
         property var hoverTarget
         extraVisibleCondition: hoverTarget.containsMouse
-        content: "Recording " + RecordingService.getFormattedDuration()
     }
 
     implicitWidth: grid.implicitWidth + Padding.huge
@@ -63,8 +69,8 @@ BarGroup {
             delegate: Symbol {
                 text: modelData.icon || ""
                 color: Colors.colSecondary
-                font.pixelSize: root.iconSize
-                fill: modelData?.fill ?? 0
+                font.pixelSize: Fonts.sizes.verylarge
+                fill: 1
                 MouseArea {
                     id: hoverArea
                     anchors.fill: parent
@@ -77,10 +83,14 @@ BarGroup {
                     StyledLoader {
                         shown: modelData.hoverItem !== null
                         anchors.fill: parent
-                        sourceComponent: modelData?.hoverItem ?? null
-                        onLoaded: if (ready) {
-                            if ("hoverTarget" in item)
-                                item.hoverTarget = Qt.binding(() => hoverArea);
+                        sourceComponent: modelData.tooltip ? tooltipComp : modelData?.hoverItem ?? null
+                        onLoaded: {
+                            if ("hoverTarget" in _item) {
+                                _item.hoverTarget = Qt.binding(() => hoverArea);
+                            }
+                            if (("content" in _item) && modelData.tooltip) {
+                                _item.content = Qt.binding(() => modelData.tooltip);
+                            }
                         }
                     }
                 }
