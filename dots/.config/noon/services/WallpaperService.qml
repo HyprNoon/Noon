@@ -53,7 +53,7 @@ Singleton {
         onStarted: NoonUtils.toast("Generating Thumbnails", "image")
         onExited: exitcode => {
             if (exitcode === 0)
-                NoonUtils.toast("Thumbnails Done","check", "success");
+                NoonUtils.toast("Thumbnails Done", "check", "success");
             thumbnailsDone();
         }
         stdout: StdioCollector {
@@ -138,10 +138,21 @@ Singleton {
     }
 
     function applyWallpaper(fileUrl) {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --image '${FileUtils.trimFileProtocol(fileUrl)}'`);
+        const cleanPath = FileUtils.trimFileProtocol(fileUrl);
+        const thumbUrl = getThumbnailPath(fileUrl);
+        const cleanThumb = FileUtils.trimFileProtocol(thumbUrl);
+
+        let cmd = `python3 ${Directories.wallpapers.switchScript} --image '${cleanPath}'`;
+
+        if (cleanThumb && cleanThumb !== cleanPath)
+            cmd += ` --extract-col-from '${cleanThumb}'`;
+
+        NoonUtils.execDetached(cmd);
     }
 
     function applyRandomWallpaper() {
+        if (_wallpaperModel.count <= 0)
+            return;
         NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --random-no-recursive -R '${FileUtils.trimFileProtocol(currentFolderPath)}'`);
     }
 
