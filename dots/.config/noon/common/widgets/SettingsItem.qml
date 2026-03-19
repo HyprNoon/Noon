@@ -105,14 +105,13 @@ StyledRect {
         valueChanged(value);
 
         if (reloadOnChange) {
-            NoonUtils.toast(`Shell Is Reloading in ${reloadShellTimer.interval} ms`, "warning", "warn", "Don't Panic");
-            reloadShellTimer.restart();
+            NoonUtils.requestDialog("assure", {
+                title: "Restart",
+                description: "For changes to take Effect",
+                acceptText: "Accept",
+                onAccepted: () => NoonUtils.execDetached(Directories.scriptsDir + "/reload_shell.sh")
+            });
         }
-    }
-    Timer {
-        id: reloadShellTimer
-        interval: 300
-        onTriggered: Quickshell.reload(true)
     }
     Component.onCompleted: {
         let val = getConfigValue();

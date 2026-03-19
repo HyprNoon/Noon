@@ -16,7 +16,7 @@ Scope {
 
         function thawb(link: string) {
             if (link)
-                NoonUtils.getThawb(link);
+                NoonUtils.requestDialog("thawb", link);
         }
         function toast(content: string, state: string) {
             NoonUtils.toast(content, "check", state);

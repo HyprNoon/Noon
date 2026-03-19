@@ -17,6 +17,14 @@ Singleton {
     readonly property var avilableIpcCommands: Mem.store.misc.ipcCommands
     property bool ipcReady: false
     property bool commandsReady: false
+
+    function requestDialog(dialog: string, data) {
+        if (!dialog)
+            return;
+        GlobalStates.main.sysDialogs.pendingData = data;
+        GlobalStates.main.sysDialogs.mode = dialog;
+    }
+
     function openFile(path: string) {
         Quickshell.execDetached(["xdg-open", path]);
     }
@@ -115,11 +123,6 @@ Singleton {
 
     function isOnline(url) {
         return url.startsWith("http") || url.startsWith("https" || url.contains("www"));
-    }
-
-    function getThawb(url) {
-        GlobalStates.main.sysDialogs.pendingData = url;
-        GlobalStates.main.sysDialogs.mode = "thawb";
     }
 
     function runDownloader(url) {

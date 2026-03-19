@@ -73,6 +73,11 @@ Scope {
                             comp: "ThawbContent",
                             preload: "url",
                             size: Qt.size(600, 220)
+                        },
+                        "assure": {
+                            comp: "AssureContent",
+                            preload: "content",
+                            size: Qt.size(600, 220)
                         }
                     }
                     StyledText {
