@@ -20,7 +20,11 @@ JsonAdapter {
         property JsonObject bg
         property JsonObject appearance
         property JsonObject clock
+        property JsonObject shell
 
+        shell: JsonObject {
+            property bool deload: false
+        }
         icons: JsonObject {
             property string currentIconTheme: ""
         }

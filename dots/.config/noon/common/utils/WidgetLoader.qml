@@ -4,7 +4,6 @@ import qs.common
 
 LazyLoader {
     property bool enabled: true
-    property bool deload: Mem.options.desktop.shell.deloadOnFullscreen && (GlobalStates?.topLevel?.fullscreen ?? false)
     property var reloadOn
     onReloadOnChanged: if (enabled)
         reload()
@@ -24,6 +23,6 @@ LazyLoader {
         onTriggered: reload()
     }
 
-    active: enabled && Mem.ready  // && !deload
+    active: enabled && Mem.ready
     component: children[0]
 }

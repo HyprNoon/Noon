@@ -17,7 +17,7 @@ Singleton {
     property QtObject applications
     property QtObject toasts
     property var web_session
-
+    property bool showDormantSphere: true
     property bool superPressed: false
     readonly property var topLevel: ToplevelManager.activeToplevel
     readonly property bool superHeld: superHeldShortcut.pressed

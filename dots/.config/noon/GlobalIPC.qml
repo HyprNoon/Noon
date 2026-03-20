@@ -18,6 +18,15 @@ Scope {
             if (link)
                 NoonUtils.requestDialog("thawb", link);
         }
+        function toggle_dormant_sphere() {
+            GlobalStates.showDormantShere = !GlobalStates.showDormantShere;
+        }
+        function load() {
+            Mem.states.desktop.shell.deload = false;
+        }
+        function deload() {
+            Mem.states.desktop.shell.deload = true;
+        }
         function toast(content: string, state: string) {
             NoonUtils.toast(content, "check", state);
         }
