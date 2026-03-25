@@ -66,10 +66,10 @@ Item {
             return;
         let mode = segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase();
         let dir = mode === "audio" ? FileUtils.trimFileProtocol(Directories.standard.music) : FileUtils.trimFileProtocol(Directories.standard.videos);
-        let params = config.toParams(quality);
-
         let config = qualityOptions[mode];
         let quality = qualityRow.model[qualityRow.currentIndex] || config.default;
+        let params = config.toParams(quality);
+
         BeatsService.downloadWithDLP({
             parameters: params,
             url: root.url,
