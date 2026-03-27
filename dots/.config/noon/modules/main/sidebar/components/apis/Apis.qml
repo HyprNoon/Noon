@@ -1,8 +1,8 @@
 import QtQuick
 import qs.common
 import qs.common.widgets
-import qs.modules.main.sidebar.components.apis.medicalDictionary
-import qs.modules.main.sidebar.components.apis.translator
+import "medicalDictionary"
+import "translator"
 
 RedunduntMultiViewPanel {
     id: root

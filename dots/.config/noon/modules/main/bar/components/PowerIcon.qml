@@ -34,10 +34,12 @@ MaterialShapeWrappedSymbol {
     readonly property var currentModeData: aMap.filter(mode => mode.name === PowerService.modeName)[0]
 
     implicitSize: 32
+    animateChange: true
     text: !enabled ? getCurrentDesktopIcon() : currentModeData.icon
     shape: !enabled ? MaterialShape.Cookie9Sided : currentModeData.shape
     color: !enabled ? Colors.colPrimary : currentModeData.color
     colSymbol: !enabled ? Colors.colOnPrimary : currentModeData.sColor
+
     function getCurrentDesktopIcon() {
         const activeApp = MonitorsInfo.topLevel?.appId;
 
@@ -71,6 +73,7 @@ MaterialShapeWrappedSymbol {
                 pattern
             }) => pattern.test(activeApp))?.icon ?? "deployed_code";
     }
+
     MouseArea {
         id: mouse
         enabled: root.enabled

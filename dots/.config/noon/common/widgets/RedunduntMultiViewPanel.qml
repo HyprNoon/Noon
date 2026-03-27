@@ -63,8 +63,10 @@ StyledRect {
                     source: root.path + modelData + ".qml"
                     asynchronous: true
                     onLoaded: {
-                        if (listData.preload !== null && listData.preloadData !== null)
-                            _item[listData.preload] = Qt.binding(() => listData.preloadData);
+                        if (listData.preload in _item) {
+                            if (listData.preload && listData.preloadData)
+                                _item[listData.preload] = Qt.binding(() => listData.preloadData);
+                        }
                     }
                 }
             }

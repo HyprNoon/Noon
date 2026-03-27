@@ -22,7 +22,7 @@ MouseArea {
             font.pixelSize: Math.max(Math.round(root.height / 4), 12)
             color: Colors.colSubtext
             truncate: true
-            text: MonitorsInfo.topLevel.appId ?? qsTr("Desktop")
+            text: MonitorsInfo.topLevel?.appId ?? qsTr("Desktop")
             animateChange: true
             horizontalAlignment: Text.AlignLeft
         }
@@ -33,7 +33,7 @@ MouseArea {
             font.pixelSize: Math.round(appId.font.pixelSize * 1.3)
             color: Colors.colOnLayer0
             truncate: true
-            text: MonitorsInfo.topLevel.title ?? `${qsTr("Workspace")} ${monitor.activeWorkspace?.id}`
+            text: MonitorsInfo.topLevel?.title ?? `${qsTr("Workspace")} ${monitor?.activeWorkspace?.id ?? 0}`
             animateChange: true
             horizontalAlignment: Text.AlignLeft
         }

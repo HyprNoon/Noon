@@ -8,6 +8,7 @@ MaterialShape {
     property alias text: symbol.text
     property alias iconSize: symbol.iconSize
     property alias font: symbol.font
+    property alias animateChange: symbol.animateChange
     property alias colSymbol: symbol.color
     property alias fill: symbol.fill
     property real padding: 6
