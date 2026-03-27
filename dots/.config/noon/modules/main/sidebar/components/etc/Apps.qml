@@ -46,7 +46,6 @@ StyledRect {
     StyledGridView {
         id: gridView
         anchors.fill: parent
-        anchors.margins: Padding.normal
         cellWidth: Math.floor(width / root.columns)
         cellHeight: cellWidth + 20
         clip: true

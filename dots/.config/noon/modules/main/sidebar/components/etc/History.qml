@@ -66,7 +66,6 @@ StyledRect {
         animateAppearance: true
         animateMovement: true
         popin: true
-        anchors.margins: Padding.normal
         spacing: Padding.small
         clip: true
         model: filteredModel

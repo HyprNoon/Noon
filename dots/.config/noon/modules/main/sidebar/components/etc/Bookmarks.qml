@@ -39,7 +39,6 @@ StyledRect {
     StyledListView {
         id: listView
         anchors.fill: parent
-        anchors.margins: Padding.normal
         model: filteredBookmarks
         spacing: Padding.small
         currentIndex: -1

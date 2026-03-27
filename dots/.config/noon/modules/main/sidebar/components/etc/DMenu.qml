@@ -68,7 +68,6 @@ StyledRect {
     StyledListView {
         id: listView
         anchors.fill: parent
-        anchors.margins: Padding.normal
         spacing: Padding.small
         model: genericModel
 
