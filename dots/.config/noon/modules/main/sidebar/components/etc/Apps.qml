@@ -42,130 +42,104 @@ StyledRect {
             return apps.filter(entry => entry.name.toLowerCase().includes(query) || entry.genericName.toLowerCase().includes(query) || entry.keywords.some(k => k.toLowerCase().includes(query)));
         }
     }
-
-    StyledGridView {
-        id: gridView
+    ColumnLayout {
         anchors.fill: parent
-        cellWidth: Math.floor(width / root.columns)
-        cellHeight: cellWidth + 20
-        clip: true
-        currentIndex: -1
-        model: filteredModel
 
-        Connections {
-            target: root
-            function onContentFocusRequested() {
-                if (gridView.count > 0) {
-                    gridView.currentIndex = 0;
-                    gridView.forceActiveFocus();
-                }
-            }
-        }
+        StyledListView {
+            id: contentView
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            clip: true
+            model: filteredModel
+            highlightFollowsCurrentItem: true
+            highlightMoveDuration: 300
+            animateAppearance: true
+            animateMovement: true
+            popin: true
 
-        delegate: StyledRect {
-            id: appButton
-            required property int index
-            required property var modelData
-
-            implicitHeight: gridView.cellHeight
-            implicitWidth: gridView.cellWidth
-            property bool isSelected: gridView.currentIndex === index && gridView.activeFocus
-            property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
-
-            radius: Rounding.large
-            color: isSelected ? Colors.colSecondaryContainerActive : (eventArea.containsMouse ? Colors.colSecondaryContainerHover : "transparent")
-
-            MouseArea {
-                id: eventArea
-                hoverEnabled: true
-                anchors.fill: parent
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                onReleased: mouse => {
-                    if (mouse.button === Qt.RightButton)
-                        contextMenu.popup();
-                    else {
-                        GlobalStates.main.sidebar.hide();
-                        modelData.execute();
+            Connections {
+                target: root
+                function onContentFocusRequested() {
+                    if (contentView.count > 0) {
+                        contentView.currentIndex = 0;
+                        contentView.forceActiveFocus();
                     }
                 }
             }
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Padding.small
-                spacing: Padding.normal
+            delegate: StyledDelegateItem {
+                id: appButton
+                required property int index
+                required property var modelData
+                property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
+                toggled: contentView.currentIndex === index && contentView.activeFocus
+                title: modelData?.name ?? ""
+                subtext: modelData?.genericName ?? ""
+                implicitHeight: 68
+                anchors.right: parent?.right
+                anchors.left: parent?.left
+                iconSource: NoonUtils.iconPath(modelData.icon)
 
-                StyledIconImage {
-                    source: NoonUtils.iconPath(modelData.icon)
-                    colorize: Mem.options.appearance.icons.tint
-                    implicitSize: 56
-                    Layout.alignment: Qt.AlignHCenter
+                releaseAction: () => {
+                    GlobalStates.main.sidebar.hide();
+                    modelData.execute();
+                }
+                altAction: () => {
+                    contextMenu.popup();
                 }
 
-                StyledText {
-                    text: modelData.name
-                    font.pixelSize: Fonts.sizes.small
-                    color: Colors.colOnLayer2
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                    maximumLineCount: 2
-                    wrapMode: Text.WordWrap
+                StyledMenu {
+                    id: contextMenu
+                    content: [
+                        {
+                            "text": "Launch",
+                            "materialIcon": "launch",
+                            "action": () => {
+                                modelData.execute();
+                                root.dismiss();
+                            }
+                        },
+                        {
+                            "text": appButton.isPinned ? "Unpin" : "Pin",
+                            "materialIcon": "push_pin",
+                            "action": () => {
+                                const id = modelData.id;
+                                Mem.states.favorites.apps = appButton.isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
+                            }
+                        }
+                    ]
                 }
             }
 
-            StyledMenu {
-                id: contextMenu
-                content: [
-                    {
-                        "text": "Launch",
-                        "materialIcon": "launch",
-                        "action": () => {
-                            modelData.execute();
-                            root.dismiss();
-                        }
-                    },
-                    {
-                        "text": appButton.isPinned ? "Unpin" : "Pin",
-                        "materialIcon": "push_pin",
-                        "action": () => {
-                            const id = modelData.id;
-                            Mem.states.favorites.apps = appButton.isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
-                        }
+            Keys.onPressed: event => {
+                const cols = root.columns;
+                if (event.key === Qt.Key_Up) {
+                    if (currentIndex < cols) {
+                        currentIndex = -1;
+                        root.searchFocusRequested();
+                    } else
+                        currentIndex--;
+                } else if (event.key === Qt.Key_Down) {
+                    currentIndex++;
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    if (currentIndex >= 0) {
+                        model.values[currentIndex].execute();
+                        root.dismiss();
                     }
-                ]
-            }
-        }
-
-        Keys.onPressed: event => {
-            const cols = root.columns;
-            if (event.key === Qt.Key_Up) {
-                if (currentIndex < cols) {
-                    currentIndex = -1;
-                    root.searchFocusRequested();
                 } else
-                    currentIndex -= cols;
-            } else if (event.key === Qt.Key_Down) {
-                if (currentIndex + cols < count)
-                    currentIndex += cols;
-            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                if (currentIndex >= 0) {
-                    model.values[currentIndex].execute();
-                    root.dismiss();
-                }
-            } else
-                return;
-            event.accepted = true;
-        }
+                    return;
+                event.accepted = true;
+            }
 
-        ScrollEdgeFade {
-            target: gridView
-            anchors.fill: parent
+            ScrollEdgeFade {
+                target: contentView
+                anchors.fill: parent
+            }
         }
     }
 
     PagePlaceholder {
-        shown: gridView.count === 0
+        shown: contentView.count === 0
         title: root.searchQuery === "" ? "No applications found" : "No results for '" + root.searchQuery + "'"
         icon: "search_off"
         anchors.centerIn: parent

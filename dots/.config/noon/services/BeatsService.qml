@@ -5,6 +5,7 @@ import qs.common
 import qs.common.utils
 import qs.common.widgets
 import qs.common.functions
+import QtQuick.Dialogs
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -178,7 +179,9 @@ Singleton {
         dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}' '${info.name}'`];
         dlpHelperProc.running = true;
     }
-
+    function addNewFolder() {
+        folderPicker.open();
+    }
     Process {
         id: dlpHelperProc
     }
@@ -200,12 +203,23 @@ Singleton {
         path: "/tmp/vlc.sock"
     }
 
+    FolderDialog {
+        id: folderPicker
+        onAccepted: {
+            let currentFolders = Mem.states.mediaPlayer.folders;
+            if (!currentFolders.includes(selectedFolder)) {
+                currentFolders.push(selectedFolder);
+                Mem.states.mediaPlayer.folders = currentFolders;
+            }
+        }
+    }
+
     FolderListModel {
         folder: root._tracksDir
         showDirs: false
         showFiles: true
         onCountChanged: {
-            NoonUtils.toast(`New songs added`, "music_note");
+            NoonUtils.toast(`Songs Count Changed`, "music_note");
             rebuildMetadata();
         }
     }

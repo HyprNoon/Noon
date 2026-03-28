@@ -19,17 +19,25 @@ Scope {
                 return;
             TtsService.pronounce(text);
         }
-        function objectDownload(text: string): void {
-            var data = JSON.parse(text);
-            download(data.url, data.destination, data.name, data.mime, data.size);
+        function feedBookmarks(content: string) {
+            const bookmarks = JSON.parse(JSON.parse(content));
+            Mem.states.services.bookmarks.firefoxBookmarks = bookmarks;
+            console.log("Called", bookmarks.length);
         }
-        function download(url: string, destination: string, name: string, mime: string, size: int) {
+        function objectDownload(text: string): void {
+            const data = JSON.parse(text);
+            download(data.url, data.destination, data.filename, data.mime, data.fileSize, JSON.stringify(data?.headers ?? {}));
+        }
+
+        function download(url: string, destination: string, name: string, mime: string, size: int, headers: string) {
+            const headerData = JSON.parse(headers);
+            console.log(headers);
             NoonUtils.requestDialog("assure", {
                 title: "Download " + name,
                 description: "Do you want to download this file from \n" + url,
                 acceptText: "Download " + (size < 1 ? "" : StringUtils.cleanFileSizeFromBytes(size)),
                 onAccepted: () => {
-                    DownloadService.model.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim());
+                    DownloadService.model.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), headerData);
                     Qt.callLater(() => NoonUtils.callIpc("sidebar reveal Downloads"));
                 }
             });

@@ -110,11 +110,11 @@ StyledRect {
             anchors.leftMargin: Padding.huge
             anchors.margins: Padding.normal
             orientation: Qt.Horizontal
-            model: Mem.states.mediaPlayer.folders
+            model: Mem.states.mediaPlayer.folders.concat(["ADD"])
 
             delegate: StyledRect {
                 required property var modelData
-
+                readonly property bool isAdd: modelData === "ADD"
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -126,7 +126,7 @@ StyledRect {
 
                 Symbol {
                     anchors.centerIn: parent
-                    text: "folder"
+                    text: isAdd ? "add" : "folder"
                     fill: 1
                     color: root.colors.colOnLayer4
                     font.pixelSize: 20
@@ -135,7 +135,20 @@ StyledRect {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData)
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onPressed: event => {
+                        if (event.button === Qt.LeftButton) {
+                            if (isAdd) {
+                                BeatsService.addNewFolder();
+                            } else {
+                                Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
+                            }
+                        } else if (event.button === Qt.RightButton && !isAdd) {
+                            let currentFolders = Mem.states.mediaPlayer.folders;
+                            let updatedFolders = currentFolders.filter(path => path !== modelData);
+                            Mem.states.mediaPlayer.folders = updatedFolders;
+                        }
+                    }
                     StyledToolTip {
                         extraVisibleCondition: parent.containsMouse
                         content: FileUtils.getEscapedFileName(modelData)

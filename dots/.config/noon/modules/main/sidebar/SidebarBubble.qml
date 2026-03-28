@@ -207,7 +207,7 @@ Item {
         {
             icon: "push_pin",
             toggled: sidebar.pinned,
-            action: () => sidebar.pinned = !toggled
+            action: () => sidebar.pinned = !sidebar.pinned
         },
         {
             icon: getExpandIcon(),
