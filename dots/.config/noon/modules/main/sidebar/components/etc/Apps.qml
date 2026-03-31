@@ -42,11 +42,12 @@ StyledRect {
             return apps.filter(entry => entry.name.toLowerCase().includes(query) || entry.genericName.toLowerCase().includes(query) || entry.keywords.some(k => k.toLowerCase().includes(query)));
         }
     }
-    ColumnLayout {
+    CLayout {
         anchors.fill: parent
 
         StyledListView {
             id: contentView
+            property real viewScale: Mem.options.sidebar.appearance.itemListScale ?? 1
             Layout.fillHeight: true
             Layout.fillWidth: true
             clip: true
@@ -56,6 +57,7 @@ StyledRect {
             animateAppearance: true
             animateMovement: true
             popin: true
+            reuseItems: false
 
             Connections {
                 target: root
@@ -71,15 +73,17 @@ StyledRect {
                 id: appButton
                 required property int index
                 required property var modelData
+                readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
                 property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
+                colBackground: alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
                 toggled: contentView.currentIndex === index && contentView.activeFocus
                 title: modelData?.name ?? ""
                 subtext: modelData?.genericName ?? ""
-                implicitHeight: 68
+                implicitHeight: 68 * mainScale
                 anchors.right: parent?.right
                 anchors.left: parent?.left
                 iconSource: NoonUtils.iconPath(modelData.icon)
-
+                mainScale: contentView.viewScale
                 releaseAction: () => {
                     GlobalStates.main.sidebar.hide();
                     modelData.execute();
@@ -137,7 +141,7 @@ StyledRect {
             }
         }
     }
-
+    BottomScaleDialog {}
     PagePlaceholder {
         shown: contentView.count === 0
         title: root.searchQuery === "" ? "No applications found" : "No results for '" + root.searchQuery + "'"

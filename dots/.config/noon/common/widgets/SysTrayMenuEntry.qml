@@ -1,4 +1,3 @@
-
 import qs.common
 import qs.common.widgets
 import qs.common.functions
@@ -16,36 +15,36 @@ RippleButton {
     readonly property bool hasIcon: menuEntry.icon.length > 0
     readonly property bool hasSpecialInteraction: menuEntry.buttonType !== QsMenuButtonType.None
 
-    signal dismiss()
+    signal dismiss
     signal openSubmenu(handle: QsMenuHandle)
 
-    colBackground: menuEntry.isSeparator ? Colors.m3.m3outlineVariant : ColorUtils.transparentize(Colors.colLayer0)
+    colBackground: menuEntry.isSeparator ? Colors.colOutline : ColorUtils.transparentize(Colors.colLayer0)
     enabled: !menuEntry.isSeparator
     opacity: 1
 
     horizontalPadding: 12
     implicitWidth: contentItem.implicitWidth + horizontalPadding * 2
     implicitHeight: menuEntry.isSeparator ? 1 : 36
+    Layout.margins: menuEntry.isSeparator ? Padding.massive : 0
     Layout.topMargin: menuEntry.isSeparator ? 4 : 0
     Layout.bottomMargin: menuEntry.isSeparator ? 4 : 0
     Layout.fillWidth: true
-
     Component.onCompleted: {
         if (menuEntry.isSeparator) {
             root.buttonColor = root.colBackground;
         }
     }
 
-    releaseAction: () => { 
+    releaseAction: () => {
         if (menuEntry.hasChildren) {
             root.openSubmenu(root.menuEntry);
             return;
         }
         menuEntry.triggered();
-        root.dismiss(); 
+        root.dismiss();
     }
-    altAction: (event) => {
-        root.dismiss(); 
+    altAction: event => {
+        root.dismiss();
         event.accepted = false;
     }
 

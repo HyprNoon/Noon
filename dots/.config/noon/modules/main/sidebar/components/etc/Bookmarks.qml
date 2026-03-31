@@ -1,11 +1,8 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import qs.common
-import qs.common.functions
 import qs.common.widgets
 import qs.services
-import qs.store
 
 StyledRect {
     id: root
@@ -49,7 +46,8 @@ StyledRect {
         delegate: StyledDelegateItem {
             required property var modelData
             required property int index
-
+            readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
+            colBackground: alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
             width: listView.width
             title: modelData.title
             subtext: modelData.url

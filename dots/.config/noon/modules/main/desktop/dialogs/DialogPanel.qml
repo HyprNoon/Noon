@@ -78,7 +78,7 @@ Scope {
                         "assure": {
                             comp: "AssureContent",
                             preload: "content",
-                            size: Qt.size(1800, 220)
+                            size: Qt.size(700, 220)
                         }
                     }
                     StyledText {

@@ -12,6 +12,7 @@ import qs.modules.main.sidebar
 
 RippleButton {
     id: root
+    property real mainScale: 1
     property string iconSource
     property QtObject colors: Colors
     property bool active: toggled
@@ -25,8 +26,9 @@ RippleButton {
     property int extraRightPadding: 0
     property string materialIcon: "music_note"
     property int fill: 0
+    readonly property bool isMinimumScale: mainScale < 0.35
     width: parent?.width
-    implicitHeight: 64
+    implicitHeight: 64 * mainScale
     colBackgroundToggled: colors.colPrimaryContainer
     colBackgroundHover: colors.colPrimaryContainerHover
     colBackgroundToggledHover: colors.colPrimaryContainerHover
@@ -34,6 +36,8 @@ RippleButton {
     // buttonRadius: Rounding.large
     Loader {
         id: iconLoader
+        active: visible
+        visible: !root.isMinimumScale
         z: -1
         sourceComponent: iconSource.length > 0 ? iconComponent : shapeComponent
         anchors {
@@ -47,9 +51,9 @@ RippleButton {
             CroppedImage {
                 clip: true
                 asynchronous: true
-                radius: Rounding.large
                 anchors.centerIn: parent
-                implicitSize: 50
+                radius: Rounding.large * root.mainScale
+                implicitSize: 50 * root.mainScale
                 source: root.iconSource
             }
         }
@@ -60,7 +64,7 @@ RippleButton {
                 colors: root.colors
                 shape: MaterialShape.Cookie6Sided
                 padding: Padding.large
-                iconSize: parent.height / 2.5
+                iconSize: root.mainScale * parent.height / 2.5
                 colSymbol: root.active ? colors.colPrimaryActive : colors.colPrimary
                 text: root.materialIcon
                 fill: root.fill
@@ -82,13 +86,13 @@ RippleButton {
     Item {
         visible: expanded
         anchors {
-            left: iconLoader.right
-            leftMargin: Padding.large
+            left: iconLoader?.right ?? parent.right
             right: parent.right
-            rightMargin: Padding.massive + root.extraRightPadding
+            margins: Padding.normal * mainScale
+            leftMargin: Padding.large * mainScale
+            rightMargin: (Padding.massive + root.extraRightPadding) * mainScale
             top: parent.top
             bottom: parent.bottom
-            margins: Padding.normal
         }
 
         ColumnLayout {
@@ -105,7 +109,7 @@ RippleButton {
                 elide: Text.ElideRight
                 Layout.preferredWidth: 240
                 horizontalAlignment: Text.AlignLeft
-                font.pixelSize: Fonts.sizes.normal
+                font.pixelSize: Math.max(9, Fonts.sizes.normal * mainScale)
                 color: {
                     if (root.active)
                         return root.colors.colOnPrimaryContainer;
@@ -116,6 +120,7 @@ RippleButton {
 
             StyledText {
                 id: subtext
+                visible: text !== "" && font.pixelSize >= 9
                 text: root.subtext
                 Layout.fillWidth: true
                 maximumLineCount: 1
@@ -123,9 +128,8 @@ RippleButton {
                 elide: Text.ElideRight
                 Layout.rightMargin: Padding.verylarge
                 horizontalAlignment: Text.AlignLeft
-                font.pixelSize: Fonts.sizes.small
+                font.pixelSize: Fonts.sizes.small * mainScale
                 color: root.colSubtext
-                visible: text !== ""
             }
         }
     }

@@ -34,7 +34,7 @@ Button {
     property color buttonColor: ColorUtils.transparentize(root.toggled ? (root.hovered ? colBackgroundToggledHover : colBackgroundToggled) : (root.hovered ? colBackgroundHover : colBackground), root.enabled ? 0 : 1)
     property color rippleColor: root.toggled ? colRippleToggled : colRipple
     property QtObject colors: Colors
-
+    property alias eventArea: eventArea
     function startRipple(x, y) {
         const stateY = buttonBackground.y;
         rippleAnim.x = x;
@@ -51,6 +51,7 @@ Button {
     opacity: root.enabled ? 1 : 0.4
 
     MouseArea {
+        id: eventArea
         anchors.fill: parent
         cursorShape: root.pointingHandCursor ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton

@@ -13,22 +13,22 @@ StyledRect {
     Layout.bottomMargin: -10
     radius: 15
     color: root.colors.colSecondaryContainer
-    visible: BeatsService.meaningfulPlayers.length > 1
+    visible: repeater.count > 1
     property QtObject colors: BeatsService.colors
 
     function getPlayerIcon(dbus) {
         if (!dbus)
             return "music_note";
-        if (dbus.includes("spotify"))
-            return "queue_music";
-        if (dbus.includes("firefox") || dbus.includes("chromium"))
-            return "web";
-        if (dbus.includes("vlc"))
-            return "play_circle";
-        if (dbus.includes("mpv"))
-            return "video_library";
-        if (dbus.includes("mpd"))
-            return "library_music";
+        const dic = {
+            "spotify": "queue_music",
+            "firefox": "web",
+            "vlc": "play_circle",
+            "mpv": "video_library"
+        };
+        for (const key of Object.keys(dic)) {
+            if (dbus.includes(key))
+                return dic[key];
+        }
         return "music_note";
     }
 
@@ -41,10 +41,11 @@ StyledRect {
         anchors.centerIn: parent
         spacing: 4
         rows: 1
-        columns: BeatsService.meaningfulPlayers.length
+        columns: repeater.count
 
         Repeater {
-            model: BeatsService.meaningfulPlayers
+            id: repeater
+            model: BeatsService.meaningfulPlayers.filter(player => player.trackTitle.length > 0)
             delegate: RippleButtonWithIcon {
                 implicitSize: 20
                 buttonRadius: Rounding.full

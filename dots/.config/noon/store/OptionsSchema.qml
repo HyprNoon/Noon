@@ -59,7 +59,6 @@ JsonAdapter {
     property JsonObject policies: JsonObject {
         property int ai: 1
         property int translator: 1
-        property int medicalDictionary: 1
         property int todoist: 1
     }
 
@@ -259,9 +258,11 @@ JsonAdapter {
 
         appearance: JsonObject {
             property int mode: 2
+            property real itemListScale: 1
             property bool showNavTitles: false
             property bool showSliders: true
             property bool showVolumeInputSlider: false
+            property bool alternateListStripes: true
         }
     }
 
@@ -397,10 +398,12 @@ JsonAdapter {
 
         property bool enabled: true
         property int batteryLowThreshold: 20
-        property string layout: "VDynamic"
+        property string horizontalLayout: "Dynamic"
+        property string verticalLayout: "VDynamic"
+        property string currentLayout: "Dynamic"
         property JsonObject vMap: JsonObject {
             property int spacing: 6
-            property list<string> topArea: ["materialStatusIcons", "battery", "weather", "sysTray"]
+            property list<string> topArea: ["materialStatusIcons", "battery", "weather", "tray"]
             property list<string> centerArea: []
             property list<string> bottomArea: ["media", "resources", "separator", "volume", "brightness", "separator", "progressWs", "separator", "clock", "separator", "keyboard", "separator", "power"]
         }
@@ -408,7 +411,7 @@ JsonAdapter {
             property int spacing: 6
             property list<string> leftArea: ["power", "separator", "progressWs", "separator", "title"]
             property list<string> centerArea: ["media", "separator", "clock"]
-            property list<string> rightArea: ["sysTray", "battery", "materialStatusIcons"]
+            property list<string> rightArea: ["tray", "battery", "materialStatusIcons"]
         }
         property list<string> bars: ["Dynamic", "HyDe", "NovelKnocks", "Sleek", "VDynamic"]
 

@@ -14,8 +14,8 @@ Singleton {
 
     DownloadModel {
         id: downloadModel
-        jsonPath: Directories.standard.state + "/downloads.json"
-        userAgent: Mem.options.networking.userAgent
+        // jsonPath: Directories.standard.state + "/downloads.json"
+        // userAgent: Mem.options.networking.userAgent
         onDownloadFinished: (index, success) => {
             const name = downloadModel.get(index).label;
             if (success)

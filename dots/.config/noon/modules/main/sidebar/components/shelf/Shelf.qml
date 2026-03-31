@@ -32,9 +32,9 @@ StyledRect {
 
         onDropped: drop => {
             root.readyToReceive = false;
-            let newPaths = drop.urls.map(url => url.toString());
-            Mem.states.sidebar.shelf.filePaths = [...Mem.states.sidebar.shelf.filePaths, ...newPaths];
-
+            const existing = new Set(Mem.states.sidebar.shelf.filePaths);
+            const unique = drop.urls.map(url => url.toString()).filter(p => !existing.has(p));
+            Mem.states.sidebar.shelf.filePaths = [...existing, ...unique];
             if (!GlobalStates.main.sidebar.pinned) {
                 NoonUtils.callIpc("sidebar hide");
             }

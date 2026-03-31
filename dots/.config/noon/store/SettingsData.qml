@@ -836,12 +836,6 @@ Singleton {
                             "name": "Translator Policy",
                             "key": "policies.translator",
                             "type": "spin"
-                        },
-                        {
-                            "icon": "medical_services",
-                            "name": "Medical Terminology Policy",
-                            "key": "policies.medicalDictionary",
-                            "type": "spin"
                         }
                     ]
                 },

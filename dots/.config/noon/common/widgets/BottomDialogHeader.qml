@@ -42,7 +42,7 @@ RowLayout {
         Layout.fillWidth: true
     }
     RippleButtonWithIcon {
-        visible: root.target !== null && root.showCloseButton
+        visible: root.showCloseButton || !root.target
         materialIcon: "close"
         implicitSize: 42
         colors: root.colors

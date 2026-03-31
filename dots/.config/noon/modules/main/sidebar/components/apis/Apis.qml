@@ -1,7 +1,6 @@
 import QtQuick
 import qs.common
 import qs.common.widgets
-import "medicalDictionary"
 import "translator"
 
 RedunduntMultiViewPanel {
@@ -11,19 +10,13 @@ RedunduntMultiViewPanel {
         {
             "icon": "neurology",
             "enabled": Mem.options.policies.ai > 0,
-            "name": " AI ",
+            "name": "Assistant",
             "component": "AiChat"
-        },
-        {
-            "icon": "rib_cage",
-            "enabled": Mem.options.policies.medicalDictionary > 0,
-            "name": "Medical",
-            "component": "medicalDictionary/MedicalDictionary"
         },
         {
             "icon": "translate",
             "enabled": Mem.options.policies.translator > 0,
-            "name": "Dicts",
+            "name": "Translator",
             "component": "translator/Translator"
         }
     ]

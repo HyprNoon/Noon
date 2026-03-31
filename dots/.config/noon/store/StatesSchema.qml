@@ -106,7 +106,7 @@ JsonAdapter {
             property int temperature: 3600
         }
         bookmarks: JsonObject {
-            property list<var> firefoxBookmarks: []
+            property list<var> firefoxBookmarks
         }
 
         emojis: JsonObject {

@@ -490,12 +490,6 @@ Singleton {
                     "name": "Translator Policy",
                     "key": "policies.translator",
                     "type": "spin"
-                },
-                {
-                    "icon": "neurology",
-                    "name": "Medical Dictionary",
-                    "key": "policies.medicalDictionary",
-                    "type": "spin"
                 }
             ]
         },

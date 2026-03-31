@@ -94,11 +94,21 @@ Singleton {
         const cmd = `qs -c ~/.config/noon ipc call ${request}`;
         Quickshell.execDetached(["bash", "-c", cmd]);
     }
-    function execDetached(command: string, log = false) {
-        if (log)
+
+    function execDetached(command, log = false) {
+        if (log) {
             console.log(command);
-        Quickshell.execDetached(["bash", "-c", command]);
+        }
+
+        let effectiveCommand = "";
+        if (Array.isArray(command)) {
+            effectiveCommand = command.join(" ").toString();
+        } else {
+            effectiveCommand = command;
+        }
+        Quickshell.execDetached(["bash", "-c", effectiveCommand]);
     }
+
     // Atomic Changes
     function setHyprKey(key: string, value) {
         HyprlandParserService.variables[key] = value;

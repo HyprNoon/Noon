@@ -1,5 +1,6 @@
 //@ pragma UseQApplication
 //@ pragma RespectSystemStyle
+//@ pragma Env __NV_PRIME_RENDER_OFFLOAD=0
 //@ pragma Env QT_AUTO_SCREEN_SCALE_FACTOR=1
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
 //@ pragma Env QS_NO_RELOAD_POPUP=1

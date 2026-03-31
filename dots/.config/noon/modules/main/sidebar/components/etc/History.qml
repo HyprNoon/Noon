@@ -100,8 +100,8 @@ StyledRect {
             StyledRect {
                 property var itemData
                 property bool selected: false
-
-                color: selected ? Colors.colSecondaryContainerActive : Colors.colLayer2
+                readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
+                color: selected ? Colors.colSecondaryContainerActive : alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
                 radius: Rounding.small
                 clip: true
                 border.width: selected ? 2 : 0
@@ -161,13 +161,14 @@ StyledRect {
                 property var itemData
                 property bool selected: false
                 readonly property bool isColor: ColorUtils.isValidColor(title)
+                readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
 
                 toggled: selected
                 shape: MaterialShape.Shape.Clover4Leaf
                 title: itemData.text
                 subtext: qsTr("Text")
                 materialIcon: "content_paste"
-                colBackground: isColor ? itemData.text : colors.colLayer2
+                colBackground: isColor ? itemData.text : alternateStripes && (index % 2 === 0) ? "transparent" : colors.colLayer2
                 colTitle: !hovered && isColor ? ColorUtils.getReadableColOn(colBackground) : colors.colOnLayer2
                 colSubtext: !hovered && isColor ? ColorUtils.colorWithLightness(colTitle, 0.2) : colors.colSubtext
                 releaseAction: () => {

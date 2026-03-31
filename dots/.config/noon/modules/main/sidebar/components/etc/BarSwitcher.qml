@@ -24,7 +24,7 @@ StyledRect {
     ScriptModel {
         id: barModel
         values: {
-            const currentLayout = Mem.options.bar.layout;
+            const currentLayout = Mem.options.bar.currentLayout;
             const query = root.searchQuery.toLowerCase().trim();
 
             return BarData.bars.filter(name => !query || name.toLowerCase().includes(query)).map(name => {
@@ -68,7 +68,7 @@ StyledRect {
             releaseAction: () => {
                 root.dismiss();
                 // Set layout and adjust position if needed
-                Mem.options.bar.layout = modelData.layoutName;
+                Mem.options.bar.currentLayout = modelData.layoutName;
 
                 // If switching orientation, update position appropriately
                 if (modelData.isVertical && !root.isVerticalBar) {
@@ -87,7 +87,7 @@ StyledRect {
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0) {
                     const data = model.values[currentIndex];
-                    Mem.options.bar.layout = data.layoutName;
+                    Mem.options.bar.currentLayout = data.layoutName;
 
                     // Adjust position if switching orientation
                     if (data.isVertical && !root.isVerticalBar) {

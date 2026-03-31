@@ -14,7 +14,7 @@ Scope {
         StyledLoader {
             id: loader
             required property var modelData
-            readonly property string mode: settings.layout
+            readonly property string mode: settings.currentLayout
             readonly property bool vertical: mode.startsWith("V")
             readonly property string path: Qt.resolvedUrl(vertical ? "layouts/vertical/" : "layouts/horizontal/")
             shown: Mem.options.bar.enabled

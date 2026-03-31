@@ -10,7 +10,7 @@ Singleton {
     readonly property string position: settings.behavior.position
     readonly property var bars: getLayouts()
     readonly property var layoutProps: ["fillHeight", "fillWidth", "preferredWidth", "preferredHeight", "topMargin", "bottomMargin", "leftMargin", "rightMargin", "margins", "implicitWidth", "implicitHeight", "width", "height", "minimumWidth", "minimumHeight", "maximumWidth", "maximumHeight"]
-    readonly property int currentBarExclusiveSize: settings.layout.startsWith("V") ? settings.appearance.width : settings.appearance.height
+    readonly property int currentBarExclusiveSize: settings.currentLayout.startsWith("V") ? settings.appearance.width : settings.appearance.height
     readonly property var contentTable: {
         "spacer": "Spacer",
         "power": "PowerIcon",
@@ -19,7 +19,7 @@ Singleton {
         "progressWs": "ProgressWs",
         "systemStatusIcons": "SystemStatusIcons",
         "materialStatusIcons": "StatusIcons",
-        "sysTray": "SysTray",
+        "inlineTray": "SysTray",
         "utilButtons": "UtilButtons",
         "title": "VTitle",
         "resources": "Resources",
@@ -34,6 +34,7 @@ Singleton {
         "space": "Spacer",
         "date": "DateWidget",
         "volume": "VolumeIndicator",
+        "tray": "Tray",
         "brightness": "BrightnessIndicator"
     }
 
@@ -61,9 +62,9 @@ Singleton {
         const currentPosition = settings.behavior.position;
         const position = (positions.indexOf(currentPosition) + 1) % 4;
         if (position === 0 || position === 2) {
-            settings.layout = "Dynamic";
+            settings.currentLayout = "Dynamic";
         } else {
-            settings.layout = "VDynamic";
+            settings.currentLayout = "VDynamic";
         }
         settings.behavior.position = positions[position];
     }
@@ -71,7 +72,7 @@ Singleton {
     function getLayouts() {
         let arr = [];
 
-        const extract = (model) => {
+        const extract = model => {
             for (let i = 0; i < model.count; i++) {
                 let name = model.get(i, "fileBaseName").toString();
                 if (!name.includes("Content")) {

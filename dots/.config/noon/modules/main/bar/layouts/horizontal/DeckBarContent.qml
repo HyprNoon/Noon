@@ -42,7 +42,7 @@ Item {
             implicitWidth: rLay.implicitWidth + Padding.massive * 2
             RSLayout {
                 id: rLay
-                SysTray {
+                Tray {
                     bar: root.panel
                 }
                 StatusIcons {}

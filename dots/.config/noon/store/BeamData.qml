@@ -188,14 +188,6 @@ Singleton {
                     shape: MaterialShape.Shape.PixelCircle
                 }
             }
-        },
-        "terminology": {
-            prefix: "<",
-            icon: "healing",
-            shape: MaterialShape.Shape.Pill,
-            placeholder: "Medical Term ..?",
-            showHint: true,
-            showOsrButton: false
         }
     }
 
@@ -288,8 +280,7 @@ Singleton {
             "launch": getLaunchHint,
             "ipc": getIpcHint,
             "search": getSearchHint,
-            "translate": getTranslateHint,
-            "terminology": getTerminologyHint
+            "translate": getTranslateHint
         };
 
         const handler = handlers[activeState];
@@ -318,10 +309,12 @@ Singleton {
 
     function getCalcHint() {
         if (cleanQuery.length > 0) {
-            QalcService.calculate(cleanQuery);
-            return QalcService.result;
+            QalcService.calculate(cleanQuery, result => {
+                if (activeState === "calc")
+                    activeHint = result;
+            });
         }
-        return "";
+        return activeHint;
     }
 
     function getLaunchHint() {
@@ -394,17 +387,12 @@ Singleton {
 
     function getTranslateHint() {
         if (cleanQuery.length > 0) {
-            return DictService.lookup(cleanQuery);
+            TranslatorService.translate(cleanQuery, result => {
+                if (activeState === "translate")
+                    activeHint = result;
+            });
         }
-        return "";
-    }
-
-    function getTerminologyHint() {
-        if (cleanQuery.length > 0) {
-            MedicalDictionaryService.search(cleanQuery);
-            return MedicalDictionaryService.getResult(cleanQuery);
-        }
-        return "";
+        return activeHint;
     }
 
     function executeCommand() {
@@ -424,8 +412,7 @@ Singleton {
             "ipc": executeIpc,
             "search": executeSearch,
             "translate": executeTranslate,
-            "download": executeDownload,
-            "terminology": executeTerminology
+            "download": executeDownload
         };
 
         const executor = executors[activeState];
@@ -522,21 +509,13 @@ Singleton {
         BeatsService.downloadByCommand(cmd);
     }
 
-    function executeTerminology() {
-        const result = MedicalDictionaryService.getResult(cleanQuery);
-        if (result) {
-            ClipboardService.copy(result);
-        }
-    }
-
     function autocomplete(hintText) {
         if (!hintText)
             return query;
 
         const prefix = config?.prefix || "";
 
-        // For result-type hints (calc, translate, terminology), keep current query
-        const resultStates = ["calc", "translate", "terminology"];
+        const resultStates = ["calc", "translate"];
         if (resultStates.includes(activeState)) {
             return query;
         }

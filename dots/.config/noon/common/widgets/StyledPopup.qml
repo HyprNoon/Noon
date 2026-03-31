@@ -13,7 +13,7 @@ LazyLoader {
     property string name: "popup"
     property Item hoverTarget
     default property Item contentItem
-    property real popupBackgroundMargin: 0
+    property real popupBackgroundMargin: Padding.verylarge
     property int contentMargins: 40
     property bool extraVisibilityCondition: true
     // unified bar position property

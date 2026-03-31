@@ -6,33 +6,32 @@ import qs.common.utils
 
 Singleton {
     id: root
-
     property string result: ""
     property bool isBusy: calcProcess.running
-
-    function calculate(expression: string) {
+    property var _callback: null
+    function calculate(expression: string, callback: var) {
         if (!expression) {
             root.result = "";
+            callback?.("");
             return;
         }
-        calcProcess.running = false;
+        root._callback = callback ?? null;
         calcProcess.command = ["qalc", "-terse", expression];
         calcProcess.running = true;
     }
-
+    function _finish(value: string) {
+        root.result = value;
+        root._callback?.(value);
+        root._callback = null;
+    }
     Process {
         id: calcProcess
-
-        command: ["qalc", "-terse"]
-        onExited: (exitCode, exitStatus) => {
+        onExited: exitCode => {
             if (exitCode !== 0)
-                root.result = "Error: " + exitCode;
+                root._finish("Error: " + exitCode);
         }
-
         stdout: SplitParser {
-            onRead: data => {
-                return root.result = data.trim();
-            }
+            onRead: data => root._finish(data.trim())
         }
     }
 }

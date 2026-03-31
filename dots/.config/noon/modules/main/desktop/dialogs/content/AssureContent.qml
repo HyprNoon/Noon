@@ -13,7 +13,7 @@ Item {
     anchors.fill: parent
     anchors.margins: Padding.massive
     signal dismiss
-
+    clip: true
     property var content
 
     BottomDialogHeader {

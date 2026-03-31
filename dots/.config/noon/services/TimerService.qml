@@ -99,7 +99,7 @@ Singleton {
         }
     }
 
-    function addTimer(name, duration, preset) {
+    function addTimer(name: string, duration: int, isPreset: bool) {
         const newTimer = {
             id: nextTimerId,
             name: name,
@@ -107,8 +107,8 @@ Singleton {
             remainingTime: duration,
             isRunning: false,
             startTime: 0,
-            preset: preset || null,
-            icon: preset ? preset.icon : "timer"
+            preset: isPreset,
+            icon: root.presets.find(preset => preset.duration === duration)?.icon ?? "timer"
         };
 
         Mem.timers.nextTimerId = nextTimerId + 1;

@@ -13,7 +13,7 @@ PopupWindow {
     property real popupBackgroundMargin: 0
     property real padding: Sizes.elevationMargin
 
-    signal menuClosed()
+    signal menuClosed
     signal menuOpened(var qsWindow) // Correct type is QsWindow, but QML does not like that
 
     function open() {
@@ -23,7 +23,8 @@ PopupWindow {
 
     function close() {
         root.visible = false;
-        while (stackView.depth > 1)stackView.pop()
+        while (stackView.depth > 1)
+            stackView.pop();
         root.menuClosed();
     }
 
@@ -46,12 +47,12 @@ PopupWindow {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.BackButton | Qt.RightButton
-        onPressed: (event) => {
+        onPressed: event => {
             // Handle back/right button for navigation
             if ((event.button === Qt.BackButton || event.button === Qt.RightButton) && stackView.depth > 1) {
                 stackView.pop();
                 event.accepted = true;
-                return ;
+                return;
             }
             // Handle left click - close if outside popup
             if (event.button === Qt.LeftButton) {
@@ -94,59 +95,43 @@ PopupWindow {
                 implicitWidth: currentItem.implicitWidth
                 implicitHeight: currentItem.implicitHeight
 
-                pushEnter: NoAnim {
-                }
+                pushEnter: NoAnim {}
 
-                pushExit: NoAnim {
-                }
+                pushExit: NoAnim {}
 
-                popEnter: NoAnim {
-                }
+                popEnter: NoAnim {}
 
-                popExit: NoAnim {
-                }
+                popExit: NoAnim {}
 
                 initialItem: SubMenu {
                     handle: root.trayItemMenuHandle
                 }
-
             }
 
             Behavior on opacity {
-                Anim {
-                }
-
+                Anim {}
             }
 
             Behavior on implicitHeight {
-                Anim {
-                }
-
+                Anim {}
             }
 
             Behavior on implicitWidth {
-                Anim {
-                }
-
+                Anim {}
             }
-
         }
-
     }
 
     Component {
         id: subMenuComponent
 
-        SubMenu {
-        }
-
+        SubMenu {}
     }
 
     component NoAnim: Transition {
         NumberAnimation {
             duration: 0
         }
-
     }
 
     component SubMenu: ColumnLayout {
@@ -205,11 +190,8 @@ PopupWindow {
                         Layout.fillWidth: true
                         text: qsTr("Back")
                     }
-
                 }
-
             }
-
         }
 
         Repeater {
@@ -219,7 +201,6 @@ PopupWindow {
                 for (let i = 0; i < menuOpener.children.values.length; i++) {
                     if (menuOpener.children.values[i].icon.length > 0)
                         return true;
-
                 }
                 return false;
             }
@@ -227,7 +208,6 @@ PopupWindow {
                 for (let i = 0; i < menuOpener.children.values.length; i++) {
                     if (menuOpener.children.values[i].buttonType !== QsMenuButtonType.None)
                         return true;
-
                 }
                 return false;
             }
@@ -242,22 +222,17 @@ PopupWindow {
                 menuEntry: modelData
                 buttonRadius: popupBackground.radius - popupBackground.padding
                 onDismiss: root.close()
-                onOpenSubmenu: (handle) => {
+                onOpenSubmenu: handle => {
                     stackView.push(subMenuComponent.createObject(null, {
                         "handle": handle,
                         "isSubMenu": true
                     }));
                 }
             }
-
         }
 
         Behavior on opacity {
-            Anim {
-            }
-
+            Anim {}
         }
-
     }
-
 }
