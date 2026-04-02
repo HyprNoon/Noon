@@ -49,6 +49,7 @@ StyledRect {
     anchors {
         top: topMode ? mainBg.bottom : undefined
         bottom: !topMode ? mainBg.top : undefined
+        margins: Padding.normal
         horizontalCenter: parent.horizontalCenter
     }
 
