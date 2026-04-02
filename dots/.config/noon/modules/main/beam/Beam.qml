@@ -19,8 +19,18 @@ StyledPanel {
     readonly property bool reveal: GlobalStates.main.showBeam || (Mem.options.beam.behavior.revealOnEmpty && !MonitorsInfo.topLevel.activated)
     readonly property int expandedThreshold: 25
     readonly property int mainRounding: 50
-    readonly property int elevationValue: (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.height : 0) + Sizes.elevationMargin
-
+    readonly property bool topMode: Mem.options.beam.behavior.topMode ?? false
+    readonly property int elevationValue: {
+        const pos = Mem.options.bar.behavior.position;
+        const margin = Mem.options.bar.appearance.height;
+        const elevation = Sizes.elevationMargin;
+        if (topMode && pos === "top") {
+            return margin + elevation;
+        } else if (!topMode && pos === "bottom") {
+            return margin + elevation;
+        } else
+            return elevation;
+    }
     onRevealChanged: !reveal ? BeamData.query = "" : null
 
     visible: reveal || scrollReveal
@@ -31,7 +41,8 @@ StyledPanel {
 
     anchors.left: true
     anchors.right: true
-    anchors.bottom: true
+    anchors.top: topMode
+    anchors.bottom: !topMode
 
     mask: Region {
         item: bg
@@ -129,9 +140,11 @@ StyledPanel {
                 NoonUtils.runDownloader(firstItem);
             }
         }
+        readonly property real marginOffset: root.reveal && !GlobalStates.main.showOsdValues ? 0 : _hidden_offset
 
         opacity: anchors.bottomMargin > _hidden_offset ? 1 : 0
-        anchors.bottomMargin: root.reveal && !GlobalStates.main.showOsdValues ? 0 : _hidden_offset
+        anchors.bottomMargin: !root.topMode ? marginOffset : 0
+        anchors.topMargin: root.topMode ? marginOffset : 0
 
         Behavior on opacity {
             Anim {
@@ -141,6 +154,10 @@ StyledPanel {
         }
 
         Behavior on anchors.bottomMargin {
+            Anim {}
+        }
+
+        Behavior on anchors.topMargin {
             Anim {}
         }
 
@@ -166,7 +183,9 @@ StyledPanel {
                 id: bg
                 anchors {
                     horizontalCenter: parent.horizontalCenter
-                    bottom: parent.bottom
+                    top: root.topMode ? parent.top : undefined
+                    bottom: !root.topMode ? parent.bottom : undefined
+                    topMargin: elevationValue
                     bottomMargin: elevationValue
                 }
 

@@ -509,6 +509,11 @@ Singleton {
                     "key": "beam.behavior.scrollToReveal"
                 },
                 {
+                    "icon": "vertical_align_top",
+                    "name": "Top Mode",
+                    "key": "beam.behavior.topMode"
+                },
+                {
                     "icon": "height",
                     "name": "Reveal on Empty",
                     "key": "beam.behavior.revealOnEmpty"

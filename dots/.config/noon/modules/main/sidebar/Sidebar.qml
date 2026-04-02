@@ -68,9 +68,9 @@ StyledPanel {
     name: "sidebar"
     visible: true
     implicitWidth: visualContainer.width + bubble.width + Sizes.hyprland.gapsOut + rounding
-    exclusiveZone: !hoverMode && pinned ? implicitWidth - rounding : -1
+    exclusiveZone: !hoverMode && pinned ? implicitWidth - rounding : appearanceMode === 3 ? 0 : -1
     aboveWindows: true
-    // WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.layer: WlrLayer.Overlay
 
     anchors {
         top: true

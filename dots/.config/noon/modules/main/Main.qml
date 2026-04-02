@@ -36,9 +36,9 @@ Scope {
         Sidebar {}
     }
 
-    // WidgetLoader {
-    //     NotificationPopup {}
-    // }
+    WidgetLoader {
+        NotificationPopup {}
+    }
 
     WidgetLoader {
         DialogPanel {}
@@ -80,8 +80,10 @@ Scope {
     }
 
     WidgetLoader {
+        reloadOn: Mem.options.beam.behavior.topMode
         Beam {}
     }
+
     WidgetLoader {
         Toasts {}
     }

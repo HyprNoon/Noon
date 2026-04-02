@@ -10,7 +10,7 @@ import Quickshell.Wayland
 
 StyledPanel {
     id: root
-    visible: GlobalStates.main.canNotify
+    // visible: GlobalStates.main.canNotify
     name: "notificationPopup"
     WlrLayershell.layer: WlrLayer.Overlay
     exclusiveZone: 0

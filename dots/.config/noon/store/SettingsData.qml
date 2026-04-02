@@ -386,6 +386,11 @@ Singleton {
                             "key": "beam.behavior.scrollToReveal"
                         },
                         {
+                            "icon": "vertical_align_top",
+                            "name": "Top Mode",
+                            "key": "beam.behavior.topMode"
+                        },
+                        {
                             "icon": "cleaning_services",
                             "name": "Auto-Clear Chat",
                             "key": "beam.behavior.clearAiChatBeforeSearch"

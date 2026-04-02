@@ -1,6 +1,7 @@
 import QtQuick
 import qs.store
 import qs.common
+import qs.common.functions
 import qs.common.widgets
 
 BarGroup {
@@ -44,8 +45,8 @@ BarGroup {
             z: 0
             anchors.centerIn: parent
             property string value: WorkspaceLabelManager.getDisplayTextForMode(root.workspaceIndexInGroup + 1, "words").trim()
-            text: value.charAt(0).toUpperCase() + value.slice(1)
-            color: Colors.colOutlineVariant
+            text: StringUtils.capitalizeFirstLetter(value)
+            color: Colors.colLayer3
             font.weight: 900
             font.pixelSize: Fonts.sizes.small
             font.family: Fonts.family.monospace

@@ -210,6 +210,7 @@ JsonAdapter {
         property JsonObject behavior: JsonObject {
             property bool scrollToReveal: true
             property bool revealOnEmpty: false
+            property bool topMode: false
             property bool clearAiChatBeforeSearch: false
         }
     }
