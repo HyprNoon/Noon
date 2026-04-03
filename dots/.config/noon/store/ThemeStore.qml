@@ -4,6 +4,8 @@ import QtQuick
 import Quickshell
 
 Singleton {
+    id: root
+
     // Color Palettes
     readonly property var palettes: [
         {
@@ -122,6 +124,7 @@ Singleton {
             "icon": "dark_mode"
         }
     ]
+
     // Gowall
     readonly property var themes: [
         {
@@ -230,6 +233,7 @@ Singleton {
             "icon": "thunderstorm"
         }
     ]
+
     // M3 Modes
     readonly property var modes: [
         {

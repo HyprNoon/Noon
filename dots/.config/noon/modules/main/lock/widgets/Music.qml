@@ -7,70 +7,88 @@ import qs.common.widgets
 import qs.services
 
 StyledRect {
-    id: root
+    id: bg
 
-    Layout.preferredHeight: 160
-    Layout.fillWidth: true
-    Layout.margins: Padding.normal
+    z: 0
+    implicitWidth: 420
+    implicitHeight: 160
     enableBorders: true
-    color: Colors.colLayer1
+    color: "transparent"
+    clip: true
     radius: Rounding.verylarge
-    visible: BeatsService.artist.length > 0
 
-    Visualizer {}
+    Visualizer {
+        z: 1
+        active: true
+        visualizerColor: BeatsService.colors.colPrimary
+        maxVisualizerValue: 5000
+    }
+
+    BlurImage {
+        z: 0
+        anchors.fill: parent
+        source: BeatsService.artUrl
+        asynchronous: true
+        blur: true
+        tint: true
+        tintColor: BeatsService.colors.colPrimaryContainer
+        tintLevel: 0.4
+    }
 
     RowLayout {
+        z: 2
+        anchors.fill: parent
+        anchors.margins: Padding.large
+        anchors.leftMargin: Padding.massive
+        anchors.rightMargin: Padding.massive
         spacing: Padding.massive
 
-        anchors {
-            fill: parent
-            margins: Padding.verylarge
+        // Cover Art
+        MusicCoverArt {
+            radius: Rounding.verylarge - Padding.normal
+            Layout.preferredWidth: parent.height * 0.86
+            Layout.preferredHeight: parent.height * 0.86
         }
 
-        CroppedImage {
-            id: coverImage
-
-            z: 99
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            source: BeatsService.artUrl
-            mipmap: true
-            radius: root.radius
-        }
-
+        // Track Info
         ColumnLayout {
-            Layout.fillWidth: true
+            Layout.topMargin: Padding.huge
+            Layout.bottomMargin: Padding.huge
             Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.rightMargin: Padding.massive
+            z: 2
+            spacing: 0
 
             StyledText {
-                Layout.maximumWidth: parent.width * 0.8
-                Layout.fillWidth: true
                 font.pixelSize: Fonts.sizes.huge
-                font.family: Fonts.family.main
-                horizontalAlignment: Text.AlignLeft
-                elide: Text.ElideRight
-                color: Colors.colOnLayer3
-                text: {
-                    if (BeatsService.player.trackTitle)
-                        return BeatsService.player.trackTitle;
-                    else
-                        return "No players available";
-                }
+                font.variableAxes: Fonts.variableAxes.main
+                color: Colors.colOnLayer0
+                text: BeatsService.title.charAt(0).toUpperCase() + BeatsService.title.slice(1) || "No Media Playing"
+                truncate: true
+                Layout.fillWidth: true
+                maximumLineCount: 2
+                Layout.maximumWidth: 300
             }
 
             StyledText {
+                truncate: true
+                font.pixelSize: Fonts.sizes.normal
+                font.variableAxes: Fonts.variableAxes.main
+                color: Colors.colSubtext
+                text: BeatsService.artist || "No Current Artist"
+                Layout.maximumWidth: 200
+            }
+            Spacer {}
+            StyledProgressBar {
+                sperm: true
+                highlightColor: BeatsService.colors.colPrimary
+                trackColor: BeatsService.colors.colPrimaryContainer
+                indicatorColor: BeatsService.colors.colOnLayer0
+                valueBarGap: 8
+                Layout.preferredHeight: 12
                 Layout.fillWidth: true
-                font.pixelSize: 18
-                color: Colors.colOnLayer3
-                font.family: Fonts.family.main
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignLeft
-                text: {
-                    if (BeatsService.player.trackArtist)
-                        return BeatsService.player.trackArtist;
-                    else
-                        return "No players available";
-                }
+                value: BeatsService.currentTrackProgressRatio()
             }
         }
     }
