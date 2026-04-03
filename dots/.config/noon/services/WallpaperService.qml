@@ -134,7 +134,7 @@ Singleton {
     }
 
     function changeAccentColor(color: string) {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --color ${color}`);
+        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --color '${color}'`);
     }
 
     function applyWallpaper(fileUrl) {

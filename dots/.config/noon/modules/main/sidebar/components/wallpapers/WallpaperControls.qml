@@ -94,7 +94,7 @@ BottomDialog {
                 displayText: Mem.options.appearance.colors.palatteName
                 onActivated: index => {
                     if (index >= 0 && index < ThemeStore.palettes.length)
-                        Mem.options.appearance.colors.palatteName = ThemeStore.palettes[index];
+                        Mem.options.appearance.colors.palatteName = ThemeStore.palettes[index]?.value ?? "auto";
                 }
             }
         }

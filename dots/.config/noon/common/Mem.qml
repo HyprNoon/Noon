@@ -6,13 +6,12 @@ import qs.store
 Singleton {
     id: root
 
-    property bool ready: colorsView.loaded && optionsView.loaded && statesView.loaded
+    property bool ready: optionsView.loaded && statesView.loaded
     property alias states: statesView.data
     property alias options: optionsView.data
     property alias timers: timersView.data
     property alias todo: todoView.data
     property alias store: storeView.data
-    property alias colors: colorsView.data
 
     ConfigFileView {
         id: optionsView
@@ -41,13 +40,6 @@ Singleton {
 
         fileName: "timers"
         TimersSchema {}
-    }
-
-    ConfigFileView {
-        id: colorsView
-
-        fileName: "colors"
-        ColorsSchema {}
     }
 
     ConfigFileView {

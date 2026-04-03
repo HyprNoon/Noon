@@ -9,7 +9,7 @@ import qs.services
 Singleton {
     id: root
 
-    readonly property QtObject m3: Mem.colors
+    readonly property QtObject m3: ColorsService.colors
     readonly property real transparency: Mem.options.appearance.transparency.enabled ? Mem.options.appearance.transparency.scale : 0
     readonly property color colOnBackground: WallpaperService.isBright ? colLayer0 : colOnLayer0
     readonly property color colOnBackgroundSubtext: ColorUtils.colorWithLightness(colOnBackground, 0.25)

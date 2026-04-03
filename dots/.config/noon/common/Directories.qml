@@ -12,6 +12,7 @@ Singleton {
     readonly property string venv: FileUtils.trimFileProtocol(standard.state + "/.venv")
     readonly property string records: FileUtils.trimFileProtocol(standard.videos + "/records")
     readonly property string sounds: FileUtils.trimFileProtocol(assets + "/sounds/")
+    readonly property string store: FileUtils.trimFileProtocol(standard.config + "/noon/store")
     readonly property string assets: FileUtils.trimFileProtocol(standard.config + "/noon/assets")
     readonly property string gallery: FileUtils.trimFileProtocol(standard.pictures + "/Gallary/")
     readonly property string shellConfigs: FileUtils.trimFileProtocol(standard.config + "/HyprNoon/")
