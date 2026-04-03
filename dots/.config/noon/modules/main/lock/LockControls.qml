@@ -6,45 +6,51 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-ColumnLayout {
-    id: controls
-
-    spacing: Padding.normal
-
+StyledRect {
+    height: controls?.implicitHeight + Padding.massive
+    width: controls?.implicitWidth + Padding.massive
+    radius: Rounding.veryhuge
+    color: Colors.colLayer1
     anchors {
         right: parent.right
         bottom: parent.bottom
         rightMargin: -75
         margins: Padding.huge
     }
+    ColumnLayout {
+        id: controls
+        anchors.centerIn: parent
+        spacing: Padding.normal
 
-    RippleButtonWithIcon {
-        materialIcon: "power_settings_new"
-        implicitSize: 72
-        releaseAction: () => {
-            NoonUtils.execDetached("systemctl poweroff");
+        Repeater {
+            model: ScriptModel {
+                values: {
+                    return [
+                        {
+                            icon: "power_settings_new",
+                            releaseAction: () => NoonUtils.execDetached("systemctl poweroff")
+                        },
+                        {
+                            icon: "restart_alt",
+                            releaseAction: () => NoonUtils.execDetached("reboot")
+                        },
+                        {
+                            icon: "dark_mode",
+                            releaseAction: () => NoonUtils.execDetached("systemctl suspend")
+                        }
+                    ];
+                }
+            }
+            delegate: RippleButtonWithIcon {
+                materialIcon: modelData?.icon
+                buttonRadius: Rounding.verylarge
+                implicitSize: 72
+                releaseAction: modelData.action()
+            }
         }
     }
-
-    RippleButtonWithIcon {
-        materialIcon: "restart_alt"
-        implicitSize: 72
-        releaseAction: () => {
-            NoonUtils.execDetached("reboot");
-        }
-    }
-
-    RippleButtonWithIcon {
-        materialIcon: "dark_mode"
-        implicitSize: 72
-        releaseAction: () => {
-            NoonUtils.execDetached("systemctl suspend");
-        }
-    }
-
     Anim on anchors.rightMargin {
         from: -75
         to: anchors.margins
     }
-
 }

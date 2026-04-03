@@ -35,7 +35,7 @@ Image {
 
     layer.effect: MultiEffect {
         source: root
-        saturation: 0.2
+        // saturation: 0.2
         blurEnabled: true
         blurMax: root.blurMax
         blur: root.blurSize

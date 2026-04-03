@@ -10,37 +10,39 @@ import qs.modules.main.desktop.bg
 import qs.services
 import qs.store
 
-Item {
+Rectangle {
     id: root
 
     required property LockContext context
     property alias blurredArt: backgroundImage
+    color: Colors.colLayer0
 
-    Image {
+    BlurImage {
         id: backgroundImage
-
-        z: -1
+        z: 0
         anchors.fill: parent
         source: WallpaperService.currentWallpaper
         fillMode: Image.PreserveAspectCrop
+        tint: true
+        tintColor: Colors.colPrimaryContainer
+        tintLevel: 0.9
+        blur: true
+        blurSize: 2
+        blurMax: 40
 
         Anim on opacity {
             from: 0
             to: 1
         }
-
     }
 
-    LockQuotes {
-    }
+    LockProfilePicture {}
 
-    LockContentArea {
-    }
+    LockQuotes {}
 
-    LockControls {
-    }
+    LockContentArea {}
 
-    LockBeam {
-    }
+    LockControls {}
 
+    LockBeam {}
 }

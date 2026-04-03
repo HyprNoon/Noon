@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
+import qs.common
 import qs.common.utils
 
 Singleton {
@@ -9,6 +10,7 @@ Singleton {
     property string distroId: "unknown"
     property string distroIcon: "arch-symbolic"
     property string username: "user"
+    property string userPfp: Directories.standard.home + "/.face.png"
 
     Timer {
         triggeredOnStart: true

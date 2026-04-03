@@ -10,17 +10,6 @@ import qs.common.widgets
 import qs.services
 
 StyledRect {
-    // gradient: Gradient {
-    //     GradientStop {
-    //         position: 0
-    //         color: Colors.colLayer1
-    //     }
-    //     GradientStop {
-    //         position: 0.95
-    //         color: "transparent"
-    //     }
-    // }
-
     id: root
 
     implicitWidth: 450
@@ -45,26 +34,13 @@ StyledRect {
             bottomMargin: 2 * Padding.massive
         }
 
-        LockClock {
-        }
-
-        Spacer {
-        }
-
-        Row {
-        }
-
-        Weather {
-        }
-
-        Music {
-        }
-
+        LockClock {}
+        Spacer {}
+        Music {}
     }
 
     Anim on anchors.bottomMargin {
         from: -root.implicitHeight
         to: -Padding.massive
     }
-
 }

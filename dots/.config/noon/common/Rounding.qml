@@ -13,6 +13,7 @@ Singleton {
     property int large: 16 * scale
     property int verylarge: 20 * scale
     property int huge: 22 * scale
+    property int veryhuge: 26 * scale
     property int massive: 28 * scale
     property int silly: 32 * scale
     property int full: 999
