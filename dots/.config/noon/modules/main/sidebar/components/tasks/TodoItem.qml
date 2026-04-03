@@ -13,6 +13,21 @@ StyledRect {
     property alias symbol: symb.text
     property alias colSymbol: symb.color
     property bool isEditing: false
+    readonly property string daysRemaining: {
+        if (!modelData.due)
+            return "";
+        const parts = modelData.due.split("/");
+        if (parts.length !== 2)
+            return "";
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const due = new Date(now.getFullYear(), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        if (due < today)
+            due.setFullYear(due.getFullYear() + 1);
+        const diff = Math.ceil((due - today) / 86400000);
+        return diff === 0 ? "today" : diff === 1 ? "tomorrow" : "in " + diff + " days";
+    }
+
     width: 100
     height: 70
     radius: Rounding.large
@@ -78,7 +93,6 @@ StyledRect {
                 text: taskData.content
                 onTextChanged: {
                     if (root.isEditing) {
-                        console.log("edited", root.index, text);
                         TodoService.editItem(root.index, text);
                     }
                 }
@@ -88,7 +102,7 @@ StyledRect {
                 id: date
                 visible: text !== -1
                 color: Colors.colSubtext
-                text: modelData.due
+                text: modelData.due + " " + daysRemaining
                 font.pixelSize: 14
                 horizontalAlignment: Text.AlignRight
                 Layout.fillWidth: true

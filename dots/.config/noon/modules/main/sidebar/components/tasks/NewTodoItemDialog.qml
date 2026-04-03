@@ -42,6 +42,7 @@ BottomDialog {
             }
             MaterialTextField {
                 id: inputArea
+                placeholderText: "Task Name"
                 Layout.fillWidth: true
             }
         }

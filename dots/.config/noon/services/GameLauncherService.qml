@@ -179,6 +179,5 @@ Singleton {
         id: colorsgen
         active: Mem.options.services.games.adaptiveTheme
         source: Qt.resolvedUrl(selectedInfo.coverImage)
-        onSourceChanged: console.log(source)
     }
 }

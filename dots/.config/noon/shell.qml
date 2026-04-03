@@ -24,7 +24,7 @@ Scope {
     readonly property Component main: Main {}
     readonly property Component xp: XP {}
     readonly property Component nobuntu: NoBuntu {}
-    readonly property bool deload: Mem.states.desktop.shell.deload || (Mem.options.desktop.shell.deloadOnFullscreen && (GlobalStates.topLevel.fullscreen ?? false))
+    readonly property bool deload: Mem.states.desktop.shell.deload || (Mem.options.desktop.shell.deloadOnFullscreen && (GlobalStates.topLevel?.fullscreen ?? false))
     readonly property string mode: Mem.options.desktop.shell.mode
     readonly property var shellMap: {
         "main": main,

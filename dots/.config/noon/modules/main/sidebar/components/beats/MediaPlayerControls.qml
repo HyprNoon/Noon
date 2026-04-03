@@ -9,7 +9,7 @@ import Quickshell.Services.Mpris
 ColumnLayout {
     id: root
 
-    required property bool showCover
+    property bool showCover: false
     readonly property MprisPlayer player: BeatsService.player
     readonly property bool isPlaying: player.playbackState === MprisPlaybackState.Playing
     readonly property var trackColors: BeatsService.colors
@@ -24,7 +24,7 @@ ColumnLayout {
         spacing: Padding.massive
 
         Revealer {
-            reveal: root.showCover
+            reveal: root?.showCover
             Layout.preferredWidth: 75
             Layout.preferredHeight: 75
 
@@ -32,7 +32,7 @@ ColumnLayout {
                 anchors.fill: parent
 
                 CroppedImage {
-                    visible: parent.reveal
+                    visible: root?.showCover
                     anchors.centerIn: parent
                     radius: Rounding.large
                     source: BeatsService.artUrl

@@ -14,9 +14,9 @@ Image {
     asynchronous: true
     cache: true
     mipmap: true
-    sourceSize: parentImage.sourceSize
-    x: parentImage.x
-    y: parentImage.y
+    sourceSize: parentImage?.sourceSize
+    x: parentImage?.x ?? 0
+    y: parentImage?.y ?? 0
     function refresh() {
         fgImage.source = "";
         fgImage.source = FileUtils.trimFileProtocol(Directories.wallpapers.depthDir + Qt.md5(FileUtils.trimFileProtocol(Mem.states.desktop.bg.currentBg)) + ".png");

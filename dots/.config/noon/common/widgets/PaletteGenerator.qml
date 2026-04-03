@@ -25,6 +25,6 @@ Item {
     ColorsGenerator {
         id: palette
         active: root.active
-        keyColor: quantizer.colors[0]
+        keyColor: quantizer?.colors[0] ?? "black"
     }
 }

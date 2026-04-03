@@ -117,7 +117,7 @@ Item {
                 if ("web_view" in item)
                     GlobalStates.web_session = Qt.binding(() => item.web_view);
                 if ("colors" in item)
-                    item.colors = Qt.binding(() => parentRoot.colors);
+                    item.colors = Qt.binding(() => parentRoot?.colors ?? Colors);
                 if ("searchQuery" in item)
                     item.searchQuery = Qt.binding(() => searchBar.searchText);
                 if ("detached" in item)
