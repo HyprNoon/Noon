@@ -38,11 +38,16 @@ Rectangle {
 
     LockProfilePicture {}
 
-    LockContentArea {}
+    LockClock {}
+
+    LockMusic {
+        beamComp: beam
+    }
 
     LockControls {}
 
     LockBeam {
+        id: beam
         context: root.context
     }
 }

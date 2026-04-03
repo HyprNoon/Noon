@@ -9,15 +9,20 @@ import qs.services
 ColumnLayout {
     id: root
 
-    Layout.topMargin: Padding.massive
-    Layout.fillWidth: true
-    Layout.alignment: Qt.AlignHCenter
-    Layout.preferredHeight: 160
-    z: 2
+    anchors {
+        top: parent.top
+        left: parent.left
+        topMargin: Padding.massive
+        margins: Padding.massive * 2
+    }
+    implicitWidth: 400
+    implicitHeight: 160
 
     ColumnLayout {
+        id: contentColumn
         spacing: -Padding.massive
-
+        Layout.fillHeight: true
+        Layout.fillWidth: true
         StyledText {
             id: clockText
 
@@ -40,7 +45,6 @@ ColumnLayout {
             opacity: 0.75
             text: DateTimeService.date
         }
-
     }
 
     RowLayout {
@@ -68,7 +72,6 @@ ColumnLayout {
             text: Todo.list.length
             icon: "task_alt"
         }
-
     }
 
     component BottomInfo: Row {
@@ -93,7 +96,5 @@ ColumnLayout {
             opacity: 0.75
             text: root.text
         }
-
     }
-
 }
