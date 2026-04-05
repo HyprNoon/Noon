@@ -7,7 +7,7 @@ import qs.common
 Singleton {
     id: root
 
-    property var alarms: Mem.timers.alarms
+    property var alarms: Mem.states.services.timers.alarms
     property bool hasAlarms: alarms.length > 0
     property int timeUntilNext: getTimeUntil()
 
@@ -64,7 +64,7 @@ Singleton {
         }
 
         if (changed) {
-            Mem.timers.alarms = updated;
+            Mem.states.services.timers.alarms = updated;
         }
     }
 
@@ -84,12 +84,13 @@ Singleton {
             lastRemind: null
         };
 
-        Mem.timers.alarms = alarms.concat([newAlarm]);
+        Mem.states.services.timers.alarms = alarms.concat([newAlarm]);
     }
 
     function toggleAlarm(index, setActive) {
         const updated = alarms.map((a, idx) => {
-            if (idx !== index) return a;
+            if (idx !== index)
+                return a;
             return {
                 time: a.time,
                 message: a.message,
@@ -99,19 +100,20 @@ Singleton {
                 lastRemind: a.lastRemind
             };
         });
-        Mem.timers.alarms = updated;
+        Mem.states.services.timers.alarms = updated;
     }
 
     function removeAlarm(index) {
-        Mem.timers.alarms = alarms.filter((a, idx) => idx !== index);
+        Mem.states.services.timers.alarms = alarms.filter((a, idx) => idx !== index);
     }
 
     function clearAll() {
-        Mem.timers.alarms = [];
+        Mem.states.services.timers.alarms = [];
     }
 
     function parseTimeString(timeStr) {
-        if (!timeStr) return null;
+        if (!timeStr)
+            return null;
 
         const now = new Date();
         let alarmTime = new Date();
@@ -124,8 +126,10 @@ Singleton {
             const timeOnly = timeStr.replace(/[ap]m/gi, "").trim();
             const [hours, minutes] = timeOnly.split(":").map(Number);
             let hour = hours;
-            if (isPM && hour !== 12) hour += 12;
-            if (isAM && hour === 12) hour = 0;
+            if (isPM && hour !== 12)
+                hour += 12;
+            if (isAM && hour === 12)
+                hour = 0;
             alarmTime.setHours(hour, minutes || 0, 0, 0);
             if (alarmTime <= now) {
                 alarmTime.setDate(alarmTime.getDate() + 1);
@@ -140,9 +144,12 @@ Singleton {
             while ((match = regex.exec(timeStr)) !== null) {
                 const value = parseInt(match[1]);
                 const unit = match[2];
-                if (unit === "h") totalMs += value * 3600000;
-                else if (unit === "m") totalMs += value * 60000;
-                else if (unit === "s") totalMs += value * 1000;
+                if (unit === "h")
+                    totalMs += value * 3600000;
+                else if (unit === "m")
+                    totalMs += value * 60000;
+                else if (unit === "s")
+                    totalMs += value * 1000;
             }
             if (totalMs > 0) {
                 alarmTime = new Date(now.getTime() + totalMs);
@@ -164,7 +171,8 @@ Singleton {
     function getTimeUntil() {
         const now = new Date();
         const active = alarms.filter(a => a.active && !a.ringed && new Date(a.time) > now);
-        if (active.length === 0) return -1;
+        if (active.length === 0)
+            return -1;
         const next = active.reduce((n, a) => {
             return new Date(a.time) < new Date(n.time) ? a : n;
         });
@@ -172,10 +180,13 @@ Singleton {
     }
 
     function formatUntil(seconds) {
-        if (seconds < 0) return "Passed";
-        if (seconds < 60) return `${seconds}s`;
+        if (seconds < 0)
+            return "Passed";
+        if (seconds < 60)
+            return `${seconds}s`;
         const min = Math.floor(seconds / 60);
-        if (min < 60) return `${min}min`;
+        if (min < 60)
+            return `${min}min`;
         return `${Math.floor(min / 60)}h ${min % 60}min`;
     }
 
@@ -185,13 +196,14 @@ Singleton {
     }
 
     function describeAlarms() {
-        if (alarms.length === 0) return "No alarms set.";
+        if (alarms.length === 0)
+            return "No alarms set.";
         let text = "Alarms:\n";
         for (let i = 0; i < alarms.length; i++) {
             const a = alarms[i];
             const active = a.active ? "Active" : "Inactive";
             const ringed = a.ringed ? " (Rung)" : "";
-            text += `${i+1}. ${formatTime(a.time)}: ${a.message} (${active}${ringed})\n`;
+            text += `${i + 1}. ${formatTime(a.time)}: ${a.message} (${active}${ringed})\n`;
         }
         if (timeUntilNext >= 0) {
             text += `\nNext alarm in: ${formatUntil(timeUntilNext)}`;

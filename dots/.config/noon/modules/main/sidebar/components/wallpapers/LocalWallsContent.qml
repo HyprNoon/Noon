@@ -122,7 +122,6 @@ StyledRect {
         popin: true
 
         spacing: Padding.small
-        hint: false
         model: filteredModel
         currentIndex: filteredModel.values.indexOf(WallpaperService.currentWallpaper)
         highlightFollowsCurrentItem: true

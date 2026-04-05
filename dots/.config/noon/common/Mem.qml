@@ -9,8 +9,6 @@ Singleton {
     property bool ready: optionsView.loaded && statesView.loaded
     property alias states: statesView.data
     property alias options: optionsView.data
-    property alias timers: timersView.data
-    property alias todo: todoView.data
     property alias store: storeView.data
 
     ConfigFileView {
@@ -22,24 +20,10 @@ Singleton {
     }
 
     ConfigFileView {
-        id: todoView
-
-        fileName: "todo"
-        TodoSchema {}
-    }
-
-    ConfigFileView {
         id: statesView
 
         fileName: "states"
         StatesSchema {}
-    }
-
-    ConfigFileView {
-        id: timersView
-
-        fileName: "timers"
-        TimersSchema {}
     }
 
     ConfigFileView {

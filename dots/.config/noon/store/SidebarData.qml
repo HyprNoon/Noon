@@ -136,17 +136,6 @@ Singleton {
             colors: GameLauncherService.colors,
             enabled: Mem.options.sidebar.content.games
         },
-        "Tweaks": {
-            icon: "settings",
-            activeIcon: "settings_heart",
-            shell: "main",
-            componentPath: "settings/QuickSettings",
-            expandable: true,
-            searchable: true,
-            expandSize: sizePresets.threeQuarter,
-            shape: "Ghostish",
-            enabled: Mem.options.sidebar.content.tweaks
-        },
         "Bookmarks": {
             icon: "bookmark",
             activeIcon: "bookmark_heart",
@@ -200,6 +189,17 @@ Singleton {
             detachable: true,
             shape: "Cookie9Sided",
             enabled: Mem.options.sidebar.content.islam
+        },
+        "Tweaks": {
+            icon: "settings",
+            activeIcon: "settings_heart",
+            shell: "main",
+            componentPath: "settings/QuickSettings",
+            expandable: true,
+            searchable: true,
+            expandSize: sizePresets.threeQuarter,
+            shape: "Ghostish",
+            enabled: Mem.options.sidebar.content.tweaks
         },
         "Session": {
             icon: "power_settings_new",

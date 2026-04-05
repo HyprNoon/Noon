@@ -71,7 +71,19 @@ JsonAdapter {
         property JsonObject mediaPlayer
         property JsonObject power
         property JsonObject games
+        property JsonObject todo
+        property JsonObject timers
 
+        timers: JsonObject {
+            property list<var> alarms: []
+            property int nextAlarmId: 1
+            property list<var> timers: []
+            property int nextTimerId: 1
+        }
+
+        todo: JsonObject {
+            property list<var> tasks: []
+        }
         games: JsonObject {
             property list<var> list: []
             property string gameModeCommand

@@ -8,8 +8,8 @@ Singleton {
     id: root
 
     // Direct binding to JsonAdapter
-    property var timers: Mem.timers.timers
-    property int nextTimerId: Mem.timers.nextTimerId
+    property var timers: Mem.states.services.timers.timers
+    property int nextTimerId: Mem.states.services.timers.nextTimerId
 
     signal timerFinished(int timerId, string name)
 
@@ -95,7 +95,7 @@ Singleton {
         }
 
         if (changed) {
-            Mem.timers.timers = updated;
+            Mem.states.services.timers.timers = updated;
         }
     }
 
@@ -111,13 +111,13 @@ Singleton {
             icon: root.presets.find(preset => preset.duration === duration)?.icon ?? "timer"
         };
 
-        Mem.timers.nextTimerId = nextTimerId + 1;
-        Mem.timers.timers = timers.concat([newTimer]);
+        Mem.states.services.timers.nextTimerId = nextTimerId + 1;
+        Mem.states.services.timers.timers = timers.concat([newTimer]);
         return newTimer.id;
     }
 
     function removeTimer(timerId) {
-        Mem.timers.timers = timers.filter(t => t.id !== timerId);
+        Mem.states.services.timers.timers = timers.filter(t => t.id !== timerId);
     }
 
     function startTimer(timerId) {
@@ -136,7 +136,7 @@ Singleton {
             };
         });
 
-        Mem.timers.timers = updated;
+        Mem.states.services.timers.timers = updated;
         NoonUtils.playSound("record_started");
     }
 
@@ -163,7 +163,7 @@ Singleton {
             };
         });
 
-        Mem.timers.timers = updated;
+        Mem.states.services.timers.timers = updated;
     }
 
     function resetTimer(timerId) {
@@ -182,7 +182,7 @@ Singleton {
             };
         });
 
-        Mem.timers.timers = updated;
+        Mem.states.services.timers.timers = updated;
     }
 
     function updateTimer(timerId, newDuration) {
@@ -209,7 +209,7 @@ Singleton {
             };
         });
 
-        Mem.timers.timers = updated;
+        Mem.states.services.timers.timers = updated;
         if (wasRunning)
             Qt.callLater(() => startTimer(timerId));
     }
