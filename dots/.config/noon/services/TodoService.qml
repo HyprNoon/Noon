@@ -33,6 +33,10 @@ Singleton {
         }
     }
 
+    function removeDone() {
+        list = list.filter(item => item.status !== status_done);
+    }
+
     function addTask(desc, status = status_todo, date = -1) {
         const newTask = {
             content: desc,

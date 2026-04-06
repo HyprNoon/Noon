@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 
-# From https://github.com/difference-engine/thumbnail-generator-ubuntu (MIT License)
-# Since the script is small and the maintainers seem inactive to accept my PR (#11) I decided to just copy it over.
-# When it gets merged and the python package gets updated we can just use it
-
+import fcntl
 import os
 import sys
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import click
 import gi
@@ -26,21 +23,37 @@ thumbnail_size_map = {
 }
 
 factory = None
-current_size = "normal"
 logger.remove()
 logger.add(sys.stdout, level="INFO")
 logger.add("/tmp/thumbnails_service.log", level="DEBUG", rotation="100 MB")
 
+LOCK_FILE = "/tmp/thumbnails_service.lock"
+_lock_fh = None
+
+
+def acquire_lock() -> None:
+    global _lock_fh
+    _lock_fh = open(LOCK_FILE, "w")
+    try:
+        fcntl.flock(_lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        logger.error("Another instance is already running. Exiting.")
+        sys.exit(1)
+
+
+def release_lock() -> None:
+    if _lock_fh:
+        fcntl.flock(_lock_fh, fcntl.LOCK_UN)
+        _lock_fh.close()
+
 
 def init_worker(size: str) -> None:
-    """Initialize the factory in each worker process."""
     global factory
     factory = GnomeDesktop.DesktopThumbnailFactory.new(thumbnail_size_map[size])
 
 
 def make_thumbnail(fpath: str) -> bool:
     mtime = os.path.getmtime(fpath)
-    # Use Gio to determine the URI and mime type
     f = Gio.file_new_for_path(str(fpath))
     uri = f.get_uri()
     info = f.query_info("standard::content-type", Gio.FileQueryInfoFlags.NONE, None)
@@ -163,17 +176,21 @@ def main(
     recursive: bool,
     machine_progress: bool,
 ) -> None:
-    img_dirs = [Path(img_dir) for img_dir in img_dirs.split()]
-    for img_dir in img_dirs:
-        thumbnail_folder(
-            dir_path=img_dir,
-            workers=workers,
-            only_images=only_images,
-            recursive=recursive,
-            size=size,
-            machine_progress=machine_progress,
-        )
-    print("Thumbnail Generation Completed!")
+    acquire_lock()
+    try:
+        img_dirs = [Path(img_dir) for img_dir in img_dirs.split()]
+        for img_dir in img_dirs:
+            thumbnail_folder(
+                dir_path=img_dir,
+                workers=workers,
+                only_images=only_images,
+                recursive=recursive,
+                size=size,
+                machine_progress=machine_progress,
+            )
+        print("Thumbnail Generation Completed!")
+    finally:
+        release_lock()
 
 
 if __name__ == "__main__":

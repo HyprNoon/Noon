@@ -20,9 +20,16 @@ StyledRect {
     radius: Rounding.verylarge
     color: Colors.colLayer1
     onContentFocusRequested: list.forceActiveFocus()
+    Component.onCompleted: TodoService.removeDone()
+    ScrollEdgeFade {
+        target: list
+        vertical: true
+    }
 
     StyledListView {
         id: list
+        hint: false
+        anchors.topMargin: Padding.large
         anchors.fill: parent
         clip: true
         highlightFollowsCurrentItem: true

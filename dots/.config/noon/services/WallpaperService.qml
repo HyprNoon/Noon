@@ -50,11 +50,9 @@ Singleton {
     Process {
         id: thumbnailGenerator
         running: false
-        onStarted: NoonUtils.toast("Generating Thumbnails", "image")
         onExited: exitcode => {
             if (exitcode === 0)
-                NoonUtils.toast("Thumbnails Done", "check", "success");
-            thumbnailsDone();
+                thumbnailsDone();
         }
         stdout: StdioCollector {
             onStreamFinished: _thumbnailCache = {}
@@ -201,6 +199,7 @@ Singleton {
         onCountChanged: {
             modelUpdated();
             _preparedCache = {};
+            generateThumbnailsForCurrentFolder();
         }
 
         onFolderChanged: modelUpdated()

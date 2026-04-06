@@ -39,15 +39,24 @@ Rectangle {
     LockProfilePicture {}
 
     LockClock {}
-
-    LockMusic {
-        beamComp: beam
-    }
-
     LockControls {}
 
     LockBeam {
         id: beam
         context: root.context
+    }
+
+    CLayout {
+        anchors.margins: Padding.massive
+        spacing: -Padding.huge
+        anchors.top: parent.top
+        anchors.right: parent.right
+        LockMusic {}
+        LockWeather {}
+        Anim on anchors.rightMargin {
+            from: -width
+            to: Padding.massive
+            duration: 800
+        }
     }
 }

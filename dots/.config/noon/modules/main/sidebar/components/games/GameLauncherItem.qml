@@ -19,8 +19,7 @@ StyledRect {
     width: parent.width
     height: 125
     radius: Rounding.verylarge
-    color: colors.colLayer1
-    enableBorders: true
+    color: colors.colLayer2
     signal gameStarted
     property QtObject colors: Colors
 
@@ -63,7 +62,7 @@ StyledRect {
             Layout.fillHeight: true
             implicitWidth: height
             radius: Rounding.normal
-            color: root.colors.colLayer2
+            color: root.colors.colLayer3
             clip: true
 
             StyledImage {

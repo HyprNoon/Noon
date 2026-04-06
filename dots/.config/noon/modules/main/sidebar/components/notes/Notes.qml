@@ -85,7 +85,7 @@ StyledRect {
             spacing: 0
 
             StyledText {
-                text: "Scratch Pad"
+                text: NotesService.fileName.replace(/.md/g, "")
                 Layout.fillWidth: true
                 color: Colors.colOnLayer1
                 font.variableAxes: Fonts.variableAxes.title

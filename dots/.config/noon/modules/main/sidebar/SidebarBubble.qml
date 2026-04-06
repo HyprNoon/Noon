@@ -162,14 +162,7 @@ Item {
             },
             {
                 "cat": "Tasks",
-                "bubbles": [
-                    {
-                        "icon": TodoService.SyncState.Offline ? "cloud_off" : TodoService.SyncState.Error ? "error" : "sync",
-                        "action": () => {
-                            TodoService.syncWithTodoist();
-                        }
-                    }
-                ]
+                "bubbles": []
             },
             {
                 "cat": "Beats",

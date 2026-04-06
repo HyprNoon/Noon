@@ -27,12 +27,12 @@ StyledRect {
         const diff = Math.ceil((due - today) / 86400000);
         return diff === 0 ? "today" : diff === 1 ? "tomorrow" : "in " + diff + " days";
     }
-
-    width: 100
+    anchors.rightMargin: Padding.normal
+    anchors.leftMargin: Padding.normal
     height: 70
     radius: Rounding.large
     opacity: 0.9
-    color: index % 2 === 0 ? "transparent" : Colors.colLayer2
+    color: index % 2 !== 0 ? "transparent" : Colors.colLayer2
 
     StyledRect {
         visible: height > 0
