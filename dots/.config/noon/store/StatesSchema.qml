@@ -64,7 +64,6 @@ JsonAdapter {
         property JsonObject bookmarks
         property JsonObject ai
         property JsonObject radio
-        property JsonObject rembg
         property JsonObject emojis
         property JsonObject nightLight
         property JsonObject ambientSounds
@@ -102,9 +101,6 @@ JsonAdapter {
         }
         radio: JsonObject {
             property string url: ""
-        }
-        rembg: JsonObject {
-            property bool initialized: false
         }
         power: JsonObject {
             property string controller: ""

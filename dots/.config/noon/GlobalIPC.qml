@@ -42,9 +42,6 @@ Scope {
         function inc_brightness() {
             BrightnessService.increaseBrightness();
         }
-        function setup_rembg() {
-            RemBgService.setup();
-        }
         function dec_brightness() {
             BrightnessService.decreaseBrightness();
         }

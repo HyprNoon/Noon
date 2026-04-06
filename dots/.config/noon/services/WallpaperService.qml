@@ -13,6 +13,7 @@ Singleton {
     id: root
 
     readonly property string currentWallpaper: Mem.states.desktop.bg.currentBg ?? "root:///assets/images/default_wallpaper.png"
+    readonly property string currentFgPath: FileUtils.trimFileProtocol(Directories.wallpapers.depthDir + Qt.md5(FileUtils.trimFileProtocol(currentWallpaper)) + ".png")
     readonly property string shellMode: Mem.states.desktop.appearance.mode
     readonly property string currentFolderPath: Mem.states.desktop.bg.currentFolder
     readonly property FolderListModel wallpaperModel: _wallpaperModel
@@ -31,10 +32,8 @@ Singleton {
         }
         return true;
     }
-    Component.onCompleted: refreshFolderDelayed()
     signal thumbnailsDone
-    onCurrentWallpaperChanged: NoonUtils.playSound("pressed")
-
+    Component.onCompleted: refreshFolderDelayed()
     onCurrentFolderPathChanged: {
         refreshFolderDelayed();
         if (_thumbnailCache.length <= 0)

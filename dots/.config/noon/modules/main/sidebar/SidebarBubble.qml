@@ -55,10 +55,10 @@ Item {
                         }
                     },
                     {
-                        "enabled": !RemBgService.isBusy,
-                        "icon": RemBgService.isBusy ? "hourglass" : "content_cut",
+                        "enabled": !GowallService.isBusy,
+                        "icon": GowallService.isBusy ? "hourglass" : "content_cut",
                         "action": () => {
-                            RemBgService.process_current_bg();
+                            GowallService.removeBackground(WallpaperService.currentWallpaper);
                         }
                     },
                     {
