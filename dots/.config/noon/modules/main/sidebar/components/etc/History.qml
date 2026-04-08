@@ -13,7 +13,7 @@ StyledRect {
     opacity: width > 320 ? 1 : 0
     color: Colors.colLayer1
     radius: Rounding.verylarge
-
+    clip: true
     property string searchQuery: ""
 
     signal searchFocusRequested
@@ -62,6 +62,8 @@ StyledRect {
 
     StyledListView {
         id: listView
+        hint: false
+        anchors.margins: Padding.large
         anchors.fill: parent
         animateAppearance: true
         animateMovement: true
@@ -214,11 +216,10 @@ StyledRect {
                 event.accepted = true;
             }
         }
-
-        ScrollEdgeFade {
-            target: listView
-            anchors.fill: parent
-        }
+    }
+    ScrollEdgeFade {
+        target: listView
+        anchors.fill: parent
     }
 
     // Empty state

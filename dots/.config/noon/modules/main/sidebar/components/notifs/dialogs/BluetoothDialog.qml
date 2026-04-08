@@ -73,7 +73,15 @@ BottomDialog {
             Layout.preferredHeight: 50
             Layout.fillWidth: true
 
-            Item {
+            StyledSwitch {
+                checked: BluetoothService.currentDevice.discoverable
+                onCheckedChanged: BluetoothService.currentDevice.discoverable = !BluetoothService.currentDevice.discoverable
+                Layout.rightMargin: Padding.large
+            }
+
+            StyledText {
+                text: "Discoverable"
+                color: Colors.colOnLayer0
                 Layout.fillWidth: true
             }
 

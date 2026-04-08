@@ -25,14 +25,17 @@ RowLayout {
             id: titleArea
             truncate: true
             Layout.fillWidth: true
+            font.variableAxes: Fonts.variableAxes.title
             font.pixelSize: Fonts.sizes.subTitle
             color: root.colors.colOnLayer2
         }
 
         StyledText {
             id: subTitleArea
+            visible: text.length > 0
             truncate: true
             Layout.fillWidth: true
+            font.variableAxes: Fonts.variableAxes.main
             font.pixelSize: Fonts.sizes.normal
             color: root.colors.colSubtext
         }
@@ -42,7 +45,7 @@ RowLayout {
         Layout.fillWidth: true
     }
     RippleButtonWithIcon {
-        visible: root.showCloseButton || !root.target
+        visible: root.showCloseButton && root.target
         materialIcon: "close"
         implicitSize: 42
         colors: root.colors

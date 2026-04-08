@@ -2,32 +2,57 @@ import qs.common
 import qs.common.widgets
 import qs.services
 import qs.store
-import qs.common.functions
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Mpris
-import Quickshell.Hyprland
 
 BarGroup {
     id: root
 
-    readonly property MprisPlayer activePlayer: MprisController.activePlayer
-    readonly property string cleanedTitle: StringUtils.cleanMusicTitle(activePlayer?.trackTitle) || ""
-    property bool bordered: Mem.options.bar.appearance.modulesBg
-    property bool expand: false
-    vertical: false
-    Layout.preferredWidth: Math.min(rowLayout.implicitWidth, 280)
+    property bool expanded: true
+    Layout.preferredWidth: rowLayout.implicitWidth + Padding.huge
 
-    Timer {
-        running: activePlayer?.playbackState == MprisPlaybackState.Playing
-        interval: 1000
-        repeat: true
-        onTriggered: activePlayer.positionChanged()
+    RowLayout {
+        id: rowLayout
+        spacing: Padding.large
+        anchors.centerIn: parent
+        Item {
+            width: 36
+            Layout.fillHeight: true
+
+            ClippedFilledCircularProgress {
+                anchors.centerIn: parent
+                value: BeatsService.currentTrackProgressRatio()
+                lineWidth: 2
+                implicitSize: 26
+            }
+
+            Symbol {
+                z: 999
+                anchors.centerIn: parent
+                fill: 1
+                animateChange: true
+                text: BeatsService._playing ? "pause" : "music_note"
+                font.pixelSize: Fonts.sizes.normal
+                color: Colors.colOnSecondary
+            }
+        }
+
+        StyledText {
+            visible: root.expanded
+            truncate: true
+            color: Colors.colOnLayer1
+            Layout.fillWidth: true
+            Layout.maximumWidth: 180
+            horizontalAlignment: Text.AlignHCenter
+            text: BeatsService.title
+        }
     }
+
     MediaPopup {
         hoverTarget: mouse
     }
+
     MouseArea {
         id: mouse
         anchors.fill: parent
@@ -35,51 +60,20 @@ BarGroup {
         hoverEnabled: true
 
         onPressed: event => {
-            if (event.button === Qt.MiddleButton) {
-                activePlayer.togglePlaying();
-            } else if (event.button === Qt.BackButton) {
+            const activePlayer = BeatsService.player;
+            switch (event.button) {
+            case Qt.MiddleButton:
+            case Qt.BackButton:
                 activePlayer.previous();
-            } else if (event.button === Qt.ForwardButton || event.button === Qt.RightButton) {
+                break;
+            case Qt.ForwardButton:
+            case Qt.RightButton:
                 activePlayer.next();
-            } else if (event.button === Qt.LeftButton) {
-                NoonUtils.callIpc("sidebar reveal Beats");
+                break;
+            case Qt.LeftButton:
+                activePlayer.togglePlaying();
+                break;
             }
-        }
-    }
-
-    RowLayout {
-        id: rowLayout
-        spacing: 16
-        anchors.fill: parent
-
-        CircularProgress {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.leftMargin: rowLayout.spacing
-            lineWidth: 2
-            value: activePlayer?.position / activePlayer?.length
-            size: 26
-            secondaryColor: Colors.colSecondaryContainer
-            primaryColor: Colors.m3.m3onSecondaryContainer
-
-            Symbol {
-                anchors.centerIn: parent
-                fill: 1
-                text: activePlayer?.isPlaying ? "pause" : "music_note"
-                font.pixelSize: Fonts.sizes.normal
-                color: Colors.m3.m3onSecondaryContainer
-            }
-        }
-
-        StyledText {
-            visible: text.length > 0
-            Layout.alignment: Qt.AlignVCenter
-            Layout.fillWidth: true
-            Layout.rightMargin: rowLayout.spacing
-            Layout.maximumWidth: root.expand ? parent.width - 30 : 130
-            horizontalAlignment: Text.AlignHCenter
-            truncate: true
-            color: Colors.colOnLayer1
-            text: `${cleanedTitle}${activePlayer?.trackArtist ? ' • ' + activePlayer.trackArtist : ''}`
         }
     }
 }

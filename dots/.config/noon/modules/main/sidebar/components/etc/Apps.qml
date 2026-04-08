@@ -11,7 +11,7 @@ StyledRect {
     opacity: width > 320 ? 1 : 0
     color: Colors.colLayer1
     radius: Rounding.verylarge
-
+    clip: true
     readonly property int columns: 3
     property string searchQuery: ""
     property string _debouncedQuery: ""
@@ -42,105 +42,100 @@ StyledRect {
             return apps.filter(entry => entry.name.toLowerCase().includes(query) || entry.genericName.toLowerCase().includes(query) || entry.keywords.some(k => k.toLowerCase().includes(query)));
         }
     }
-    CLayout {
+    StyledListView {
+        id: contentView
+        hint: false
         anchors.fill: parent
-
-        StyledListView {
-            id: contentView
-            property real viewScale: Mem.options.sidebar.appearance.itemListScale ?? 1
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            clip: true
-            model: filteredModel
-            highlightFollowsCurrentItem: true
-            highlightMoveDuration: 300
-            animateAppearance: true
-            animateMovement: true
-            popin: true
-            reuseItems: false
-
-            Connections {
-                target: root
-                function onContentFocusRequested() {
-                    if (contentView.count > 0) {
-                        contentView.currentIndex = 0;
-                        contentView.forceActiveFocus();
-                    }
+        anchors.margins: Padding.large
+        readonly property real viewScale: Mem.options.sidebar.appearance.itemListScale ?? 1
+        model: filteredModel
+        highlightFollowsCurrentItem: true
+        highlightMoveDuration: 300
+        animateAppearance: true
+        animateMovement: true
+        popin: true
+        reuseItems: false
+        Connections {
+            target: root
+            function onContentFocusRequested() {
+                if (contentView.count > 0) {
+                    contentView.currentIndex = 0;
+                    contentView.forceActiveFocus();
                 }
-            }
-
-            delegate: StyledDelegateItem {
-                id: appButton
-                required property int index
-                required property var modelData
-                readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
-                property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
-                colBackground: alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
-                toggled: contentView.currentIndex === index && contentView.activeFocus
-                title: modelData?.name ?? ""
-                subtext: modelData?.genericName ?? ""
-                implicitHeight: 68 * mainScale
-                anchors.right: parent?.right
-                anchors.left: parent?.left
-                iconSource: NoonUtils.iconPath(modelData.icon)
-                mainScale: contentView.viewScale
-                releaseAction: () => {
-                    GlobalStates.main.sidebar.hide();
-                    modelData.execute();
-                }
-                altAction: () => {
-                    contextMenu.popup();
-                }
-
-                StyledMenu {
-                    id: contextMenu
-                    content: [
-                        {
-                            "text": "Launch",
-                            "materialIcon": "launch",
-                            "action": () => {
-                                modelData.execute();
-                                root.dismiss();
-                            }
-                        },
-                        {
-                            "text": appButton.isPinned ? "Unpin" : "Pin",
-                            "materialIcon": "push_pin",
-                            "action": () => {
-                                const id = modelData.id;
-                                Mem.states.favorites.apps = appButton.isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
-                            }
-                        }
-                    ]
-                }
-            }
-
-            Keys.onPressed: event => {
-                const cols = root.columns;
-                if (event.key === Qt.Key_Up) {
-                    if (currentIndex < cols) {
-                        currentIndex = -1;
-                        root.searchFocusRequested();
-                    } else
-                        currentIndex--;
-                } else if (event.key === Qt.Key_Down) {
-                    currentIndex++;
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                    if (currentIndex >= 0) {
-                        model.values[currentIndex].execute();
-                        root.dismiss();
-                    }
-                } else
-                    return;
-                event.accepted = true;
-            }
-
-            ScrollEdgeFade {
-                target: contentView
-                anchors.fill: parent
             }
         }
+
+        delegate: StyledDelegateItem {
+            id: appButton
+            required property int index
+            required property var modelData
+            readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
+            property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
+            colBackground: alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
+            toggled: contentView.currentIndex === index && contentView.activeFocus
+            title: modelData?.name ?? ""
+            subtext: modelData?.genericName ?? ""
+            implicitHeight: 68 * mainScale
+            anchors.right: parent?.right
+            anchors.left: parent?.left
+            iconSource: NoonUtils.iconPath(modelData.icon)
+            mainScale: contentView.viewScale
+            releaseAction: () => {
+                GlobalStates.main.sidebar.hide();
+                modelData.execute();
+            }
+            altAction: () => {
+                contextMenu.popup();
+            }
+
+            StyledMenu {
+                id: contextMenu
+                content: [
+                    {
+                        "text": "Launch",
+                        "materialIcon": "launch",
+                        "action": () => {
+                            modelData.execute();
+                            root.dismiss();
+                        }
+                    },
+                    {
+                        "text": appButton.isPinned ? "Unpin" : "Pin",
+                        "materialIcon": "push_pin",
+                        "action": () => {
+                            const id = modelData.id;
+                            Mem.states.favorites.apps = appButton.isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
+                        }
+                    }
+                ]
+            }
+        }
+
+        Keys.onPressed: event => {
+            const cols = root.columns;
+            if (event.key === Qt.Key_Up) {
+                if (currentIndex < cols) {
+                    currentIndex = -1;
+                    root.searchFocusRequested();
+                } else
+                    currentIndex--;
+            } else if (event.key === Qt.Key_Down) {
+                currentIndex++;
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                if (currentIndex >= 0) {
+                    model.values[currentIndex].execute();
+                    root.dismiss();
+                }
+            } else
+                return;
+            event.accepted = true;
+        }
     }
+    ScrollEdgeFade {
+        target: contentView
+        anchors.fill: root
+    }
+
     BottomScaleDialog {}
     PagePlaceholder {
         shown: contentView.count === 0

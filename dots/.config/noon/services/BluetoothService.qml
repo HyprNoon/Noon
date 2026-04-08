@@ -90,9 +90,8 @@ Singleton {
     }
 
     function togglePower() {
-        if (adapter && adapter.powered !== undefined) {
-            adapter.powered = !adapter.powered;
-        }
+        if (adapted)
+            adapter.enabled = !adapter.enabled;
     }
 
     function sortDevices(devices) {

@@ -6,81 +6,109 @@ import qs.services
 
 StyledPopup {
     id: root
-
-    ColumnLayout {
-        id: columnLayout
-
+    contentMargins: 0
+    contentItem: StyledRect {
+        id: main
+        clip: true
+        color: Colors.colLayer0
         anchors.centerIn: parent
-        spacing: 4
+        radius: Rounding.silly
+        implicitWidth: 300
+        implicitHeight: 120
 
-        // Header
-        Row {
-            id: header
-
-            spacing: 5
-
-            Symbol {
-                anchors.verticalCenter: parent.verticalCenter
-                fill: 0
-                font.weight: Font.Medium
-                text: "battery_android_full"
-                font.pixelSize: Fonts.sizes.large
-                color: Colors.m3.m3onSurfaceVariant
+        StyledRect {
+            id: progress
+            z: 10
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
             }
-
-            StyledText {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Battery"
-                color: Colors.m3.m3onSurfaceVariant
-
-                font {
-                    weight: Font.Medium
-                    pixelSize: Fonts.sizes.normal
+            rightRadius: Rounding.silly
+            color: {
+                const p = BatteryService.percentage;
+                switch (p) {
+                case p < 15:
+                    return Colors.colError;
+                    break;
+                case p >= 15:
+                    return Colors.colPrimary;
+                    break;
+                case p >= 85:
+                    return Colors.colSuccess;
+                    break;
+                default:
+                    return Colors.colPrimary;
                 }
-
             }
-
-            Spacer {
+            Anim on width {
+                from: 0
+                to: BatteryService?.percentage * main.width
+                duration: 2500
             }
-
         }
 
         StyledText {
-            text: Math.round(BatteryService.percentage * 100) + "%"
-
+            z: 9999
+            anchors.left: parent.left
+            anchors.leftMargin: Padding.massive
+            anchors.verticalCenter: parent.verticalCenter
+            text: Math.round(BatteryService.percentage * 100)
+            color: {
+                const p = BatteryService.percentage;
+                switch (p) {
+                case p < 15:
+                    return Colors.colOnError;
+                    break;
+                case p >= 15:
+                    return Colors.colOnPrimary;
+                    break;
+                case p >= 85:
+                    return Colors.colOnSuccess;
+                    break;
+                default:
+                    return Colors.colOnPrimary;
+                }
+            }
             font {
-                pixelSize: Fonts.sizes.title
+                pixelSize: 100
                 family: Fonts.family.numbers
                 variableAxes: Fonts.variableAxes.longNumbers
             }
-
         }
-        // This row is hidden when the battery is full.
-
-        RowLayout {
-            property bool rowVisible: {
-                let timeValue = BatteryService.isCharging ? BatteryService.timeToFull : BatteryService.timeToEmpty;
-                let power = BatteryService.energyRate;
-                return !(BatteryService.chargeState == 4 || timeValue <= 0 || power <= 0.01);
+        ColumnLayout {
+            id: rightColumn
+            z: 999
+            readonly property color rightColor: BatteryService.percentage > 0.77 ? Colors.colPrimary : Colors.colOnLayer0
+            anchors {
+                right: parent.right
+                rightMargin: Padding.massive * 2
+                verticalCenter: parent.verticalCenter
             }
-
-            spacing: 5
-            Layout.fillWidth: true
-            visible: rowVisible
-            opacity: rowVisible ? 1 : 0
 
             Symbol {
-                text: "schedule"
-                color: Colors.m3.m3onSurfaceVariant
-                font.pixelSize: Fonts.sizes.large
+                visible: BatteryService.isCharging
+                fill: 1
+                text: "bolt"
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                color: rightColumn.rightColor
+                font.pixelSize: Fonts.sizes.title
             }
+            // StyledText {
+            //     color: Colors.colSubtext
+            //     font.pixelSize: Fonts.sizes.small
+            //     horizontalAlignment: Text.AlignHCenter
+            //     Layout.fillWidth: true
+            //     text: BatteryService.energyRate.toFixed(2)
+            // }
 
             StyledText {
-                text: BatteryService.isCharging ? qsTr("Time to full:") : qsTr("Time to empty:")
-                color: Colors.m3.m3onSurfaceVariant
-            }
-
-            StyledText {
+                color: rightColumn.rightColor
+                font {
+                    pixelSize: Fonts.sizes.huge
+                    variableAxes: Fonts.variableAxes.main
+                }
                 function formatTime(seconds) {
                     var h = Math.floor(seconds / 3600);
                     var m = Math.floor((seconds % 3600) / 60);
@@ -90,71 +118,8 @@ StyledPopup {
                         return `${m}m`;
                 }
 
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignRight
-                color: Colors.m3.m3onSurfaceVariant
-                text: {
-                    if (BatteryService.isCharging)
-                        return formatTime(BatteryService.timeToFull);
-                    else
-                        return formatTime(BatteryService.timeToEmpty);
-                }
+                text: BatteryService.isCharging ? formatTime(BatteryService.timeToFull) : formatTime(BatteryService.timeToEmpty)
             }
-
-            Behavior on opacity {
-                Anim {
-                }
-
-            }
-
         }
-
-        RowLayout {
-            property bool rowVisible: !(BatteryService.chargeState != 4 && BatteryService.energyRate == 0)
-
-            spacing: 5
-            Layout.fillWidth: true
-            visible: rowVisible
-            opacity: rowVisible ? 1 : 0
-
-            Symbol {
-                text: "bolt"
-                color: Colors.m3.m3onSurfaceVariant
-                font.pixelSize: Fonts.sizes.large
-            }
-
-            StyledText {
-                text: {
-                    if (BatteryService.chargeState == 4)
-                        return qsTr("Fully charged");
-                    else if (BatteryService.chargeState == 1)
-                        return qsTr("Charging:");
-                    else
-                        return qsTr("Discharging:");
-                }
-                color: Colors.m3.m3onSurfaceVariant
-            }
-
-            StyledText {
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignRight
-                color: Colors.m3.m3onSurfaceVariant
-                text: {
-                    if (BatteryService.chargeState == 4)
-                        return "";
-                    else
-                        return `${BatteryService.energyRate.toFixed(2)}W`;
-                }
-            }
-
-            Behavior on opacity {
-                Anim {
-                }
-
-            }
-
-        }
-
     }
-
 }

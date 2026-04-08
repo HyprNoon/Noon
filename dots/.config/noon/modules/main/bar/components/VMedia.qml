@@ -32,6 +32,24 @@ BarGroup {
     MouseArea {
         id: mouse
         anchors.fill: parent
+        acceptedButtons: Qt.MiddleButton | Qt.BackButton | Qt.ForwardButton | Qt.RightButton | Qt.LeftButton
         hoverEnabled: true
+
+        onPressed: event => {
+            const activePlayer = BeatsService.player;
+            switch (event.button) {
+            case Qt.MiddleButton:
+            case Qt.BackButton:
+                activePlayer.previous();
+                break;
+            case Qt.ForwardButton:
+            case Qt.RightButton:
+                activePlayer.next();
+                break;
+            case Qt.LeftButton:
+                activePlayer.togglePlaying();
+                break;
+            }
+        }
     }
 }

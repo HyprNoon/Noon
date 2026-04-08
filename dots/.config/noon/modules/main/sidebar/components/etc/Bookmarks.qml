@@ -13,6 +13,7 @@ StyledRect {
     signal contentFocusRequested
     signal dismiss
 
+    clip: true
     color: Colors.colLayer1
     radius: Rounding.verylarge
 
@@ -35,10 +36,16 @@ StyledRect {
         }
     }
 
+    ScrollEdgeFade {
+        target: listView
+        anchors.fill: parent
+    }
+
     StyledListView {
         id: listView
-
+        hint: false
         anchors.fill: parent
+        anchors.margins: Padding.large
         model: filteredBookmarks
         spacing: Padding.small
         currentIndex: -1
