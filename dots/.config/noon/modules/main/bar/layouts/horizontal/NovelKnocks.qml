@@ -44,7 +44,6 @@ StyledPanel {
             anchors.fill: parent
             anchors.margins: Padding.normal
             Media {
-                expand: true
                 Layout.fillWidth: true
             }
             Spacer {}

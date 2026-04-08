@@ -30,18 +30,13 @@ Scope {
             property string wallpaper: WallpaperService.currentWallpaper
             property var workspaceList: Hyprland.workspaces.values.filter(ws => ws.id >= 0).sort((a, b) => a.id - b.id)
             property real currentWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
-            onWallpaperChanged: fgLoader.item && fgLoader.item.refresh
             readonly property real wallpaperScale: Mem.options.desktop.bg.parallax.parallaxStrength + 1
             readonly property real effectiveWallpaperScale: enableParallax ? wallpaperScale : 1.0
             readonly property real effectiveMovableXSpace: (effectiveWallpaperScale - 1) / 2 * screen.width
             readonly property real effectiveMovableYSpace: (effectiveWallpaperScale - 1) / 2 * screen.height
+            onWallpaperChanged: fgLoader.item && fgLoader.item.refresh
             exclusiveZone: -1
-            anchors {
-                top: true
-                bottom: true
-                left: true
-                right: true
-            }
+            fill: true
 
             Item {
                 anchors.fill: parent

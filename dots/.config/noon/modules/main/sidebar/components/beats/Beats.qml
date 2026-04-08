@@ -14,7 +14,7 @@ StyledRect {
     property bool detached: false
     property bool expanded: false
     readonly property bool playing: BeatsService.player?.playbackState === MprisPlaybackState.Playing
-    readonly property bool displayingLyrics: LyricsService.lyrics.length > 0
+    readonly property bool displayingLyrics: activeLyrics.showContent
     property QtObject colors: Colors
 
     Component.onCompleted: {
@@ -105,12 +105,14 @@ StyledRect {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            SpotifyLyrics {}
+            SpotifyLyrics {
+                id: activeLyrics
+            }
 
             StyledLoader {
                 anchors.centerIn: parent
-                width: 300
-                height: 300
+                width: 320
+                height: 320
                 fade: true
                 asynchronous: true
                 active: !root.displayingLyrics
@@ -118,7 +120,7 @@ StyledRect {
                 sourceComponent: MusicCoverArt {
                     anchors.fill: parent
                     clip: true
-                    radius: Rounding.massive
+                    radius: Rounding.silly
                     enableBorders: false
                 }
             }

@@ -64,8 +64,9 @@ Item {
         let url = root.url;
         if (!url)
             return;
+        const isAudio = mode === "audio";
         let mode = segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase();
-        let dir = mode === "audio" ? FileUtils.trimFileProtocol(Directories.standard.music) : FileUtils.trimFileProtocol(Directories.standard.videos);
+        let dir = isAudio ? FileUtils.trimFileProtocol(Directories.standard.music) : FileUtils.trimFileProtocol(Directories.standard.videos);
         let config = qualityOptions[mode];
         let quality = qualityRow.model[qualityRow.currentIndex] || config.default;
         let params = config.toParams(quality);
@@ -73,7 +74,7 @@ Item {
         BeatsService.downloadWithDLP({
             parameters: params,
             url: root.url,
-            destination: FileUtils.trimFileProtocol(Directories.standard.downloads)
+            destination: dir
         });
         root.dismiss();
     }

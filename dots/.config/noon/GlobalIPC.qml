@@ -129,32 +129,29 @@ Scope {
             Mem.states.services.bookmarks.firefoxBookmarks = data;
         }
 
-        function feedDownloadInfo(text: string): void {
-            const msg = JSON.parse(text);
-            console.log(msg, Array.from(DownloadService.model).toString());
-            if (msg.type === "downloads.add")
-                DownloadService.model.handleAdd(msg.data);
-            else if (msg.type === "downloads.changed")
-                DownloadService.model.handleChanged(msg.data);
-            else if (msg.type === "downloads.erased")
-                DownloadService.model.handleErased(msg.data);
-        }
+        // function feedDownloadInfo(text: string): void {
+        //     const msg = JSON.parse(text);
+        //     console.log(text, Array.from(DownloadService.model).toString());
+        //     if (msg.type === "downloads.add")
+        //         DownloadService.model.handleAdd(msg);
+        // }
 
-        function objectDownload(text: string): void {
-            const data = JSON.parse(text);
-            console.log("[Mirsal] Download Requested: ", text);
-            download(data.url, data.destination, data.filename, data.mime, data.fileSize, JSON.stringify(data?.headers ?? {}));
+        function feedDownloadInfo(text: string): void {
+            const parsed = JSON.parse(text);
+            const data = parsed.data;
+            const headers = JSON.stringify(data.headers);
+            console.log("[Mirsal] Download Requested: ", headers);
+            download(data.url, data.destination, data.filename, data.mime, data.fileSize, headers);
         }
 
         function download(url: string, destination: string, name: string, mime: string, size: int, headers: string) {
-            const headerData = JSON.parse(headers);
             console.log(headers);
             NoonUtils.requestDialog("assure", {
                 title: "Download " + name,
                 description: url,
                 acceptText: "Download " + (size < 1 ? "" : StringUtils.cleanFileSizeFromBytes(size)),
                 onAccepted: () => {
-                    DownloadService.model.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), headerData);
+                    DownloadService.model.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), JSON.parse(headers));
                     Qt.callLater(() => NoonUtils.callIpc("sidebar reveal Downloads"));
                 }
             });

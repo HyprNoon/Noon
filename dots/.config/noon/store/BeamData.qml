@@ -374,9 +374,9 @@ Singleton {
     }
 
     function getSearchHint() {
-        if (FirefoxBookmarksService.bookmarkTitles.length > 0) {
+        if (BookmarksService.bookmarkTitles.length > 0) {
             const queryLower = cleanQuery.toLowerCase();
-            for (let bookmark of FirefoxBookmarksService.bookmarkTitles) {
+            for (let bookmark of BookmarksService.bookmarkTitles) {
                 if (bookmark.toLowerCase().startsWith(queryLower)) {
                     return bookmark;
                 }

@@ -39,12 +39,7 @@ Scope {
             readonly property real effectiveMovableYSpace: (effectiveWallpaperScale - 1) / 2 * screen.height
             exclusiveZone: -1
 
-            anchors {
-                top: true
-                bottom: true
-                left: true
-                right: true
-            }
+            fill: true
             FocusHandler {
                 windows: [backgroundPanel]
                 active: _overview

@@ -48,9 +48,9 @@ Singleton {
 
     sidebar: QtObject {
         readonly property real bar: 65
-        readonly property real contentQuarter: Math.round(Screen.width * 0.235) - bar
-        readonly property real half: Math.round(Screen.width * 0.457)
-        readonly property real quarter: Math.round(Screen.width * 0.246)
+        readonly property real contentQuarter: Math.round(Screen.width * 0.24) - bar
+        readonly property real half: Math.round(Screen.width * 0.46)
+        readonly property real quarter: Math.round(Screen.width * 0.256)
         readonly property real largerQuarter: Math.round(Screen.width * 0.28)
         readonly property real threeQuarter: Math.round(Screen.width * 0.85)
 

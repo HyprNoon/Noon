@@ -24,7 +24,7 @@ StyledRect {
     property string downloadingId: ""
     property int selectedCategory: 0
 
-    readonly property var categories: [
+    property var categories: [
         {
             label: "Hot",
             icon: "mode_heat",

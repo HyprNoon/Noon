@@ -159,6 +159,9 @@ Singleton {
         },
         "Widgets": {
             icon: "ripples",
+            expandable: true,
+            baseSize: sizePresets.quarter,
+            expandSize: sizePresets.half,
             componentPath: "widgets/Widgets",
             enabled: Mem.options.sidebar.content.widgets
         },
@@ -204,6 +207,7 @@ Singleton {
         "Session": {
             icon: "power_settings_new",
             componentPath: "etc/Session",
+            baseSize: sizePresets.session,
             enabled: Mem.options.sidebar.content.session
         },
         "DMenu": {
@@ -269,10 +273,10 @@ Singleton {
         const content = registry[id];
         if (barMode || !content)
             return sizePresets.bar;
-        if (id === "Session")
-            return sizePresets.session;
-
-        return (expanded && content.expandable) ? content.expandSize ?? sizePresets.half : sizePresets.quarter;
+        if (expanded && content.expandable)
+            return content.expandSize ?? sizePresets.half;
+        else
+            return content?.baseSize ?? sizePresets.quarter;
     }
 
     function _navigate(id, step) {

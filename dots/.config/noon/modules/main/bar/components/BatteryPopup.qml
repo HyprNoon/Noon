@@ -7,6 +7,7 @@ import qs.services
 StyledPopup {
     id: root
     contentMargins: 0
+    extraVisibilityCondition: BatteryService?.percentage
     contentItem: StyledRect {
         id: main
         clip: true
@@ -26,24 +27,16 @@ StyledPopup {
             }
             rightRadius: Rounding.silly
             color: {
-                const p = BatteryService.percentage;
-                switch (p) {
-                case p < 15:
+                const p = BatteryService?.percentage * 100;
+                if (p > 0 && p < 15)
                     return Colors.colError;
-                    break;
-                case p >= 15:
-                    return Colors.colPrimary;
-                    break;
-                case p >= 85:
+                if (p >= 85)
                     return Colors.colSuccess;
-                    break;
-                default:
-                    return Colors.colPrimary;
-                }
+                return Colors.colPrimary;
             }
-            Anim on width {
+            Anim on implicitWidth {
                 from: 0
-                to: BatteryService?.percentage * main.width
+                to: BatteryService?.percentage * main.implicitWidth
                 duration: 2500
             }
         }
@@ -55,20 +48,12 @@ StyledPopup {
             anchors.verticalCenter: parent.verticalCenter
             text: Math.round(BatteryService.percentage * 100)
             color: {
-                const p = BatteryService.percentage;
-                switch (p) {
-                case p < 15:
+                const p = BatteryService.percentage * 100;
+                if (p < 15)
                     return Colors.colOnError;
-                    break;
-                case p >= 15:
-                    return Colors.colOnPrimary;
-                    break;
-                case p >= 85:
+                if (p >= 85)
                     return Colors.colOnSuccess;
-                    break;
-                default:
-                    return Colors.colOnPrimary;
-                }
+                return Colors.colOnPrimary;
             }
             font {
                 pixelSize: 100
@@ -79,7 +64,14 @@ StyledPopup {
         ColumnLayout {
             id: rightColumn
             z: 999
-            readonly property color rightColor: BatteryService.percentage > 0.77 ? Colors.colPrimary : Colors.colOnLayer0
+            readonly property color rightColor: {
+                const p = BatteryService.percentage * 100;
+                if (p < 15)
+                    return Colors.colOnError;
+                if (p >= 85)
+                    return Colors.colOnSuccess;
+                return Colors.colOnLayer0;
+            }
             anchors {
                 right: parent.right
                 rightMargin: Padding.massive * 2

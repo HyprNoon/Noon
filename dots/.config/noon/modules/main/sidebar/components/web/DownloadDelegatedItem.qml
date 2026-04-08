@@ -112,7 +112,7 @@ StyledRect {
 
             ClippedFilledCircularProgress {
                 anchors.centerIn: parent
-                value: root.modelData.progress / 100
+                value: modelData.progress === 0 ? 1 : modelData.progress / 100
                 implicitSize: 38
             }
 

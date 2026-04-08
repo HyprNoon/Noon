@@ -19,23 +19,17 @@ Item {
     onRevealChildChanged: {
         if (revealChild)
             revealChild.anchors.fill = root;
-
     }
 
     Behavior on implicitWidth {
         enabled: !vertical
 
-        Anim {
-        }
-
+        Anim {}
     }
 
     Behavior on implicitHeight {
         enabled: vertical
 
-        Anim {
-        }
-
+        Anim {}
     }
-
 }

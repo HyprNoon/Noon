@@ -11,21 +11,33 @@ import qs.common.functions
 Item {
     id: root
 
-    anchors.fill: parent
     z: -1
+    visible: opacity > 0
+    anchors.fill: parent
+    opacity: showContent ? 1 : 0
 
-    property int coverArtSize: 320
+    Behavior on opacity {
+        Anim {}
+    }
 
     readonly property real scale: (parent.height + parent.width) / 1000
     readonly property var displayLines: syncedLines.length > 0 ? syncedLines : plainLines
     readonly property bool loading: LyricsService.state === LyricsService.Loading
     readonly property bool hasError: LyricsService.state === LyricsService.NetworkError
     readonly property bool noLyricsFound: LyricsService.state === LyricsService.NoLyricsFound
-    readonly property bool showContent: !loading && displayLines.length > 0
+    readonly property bool showContent: !loading && displayLines.length > 2
     readonly property int currentLineIndex: getCurrentIndex()
 
     property var syncedLines: []
     property var plainLines: []
+
+    Connections {
+        target: BeatsService
+        function onTitleChanged() {
+            syncedLines = [];
+            plainLines = [];
+        }
+    }
 
     readonly property var stateTexts: ({
             [LyricsService.Loading]: "Loading",
@@ -139,7 +151,7 @@ Item {
         }
 
         Timer {
-            interval: 25
+            interval: 40
             running: showContent && currentLineIndex >= 0 && column.height > flick.height
             repeat: true
             onTriggered: {

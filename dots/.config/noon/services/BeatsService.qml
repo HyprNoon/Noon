@@ -176,7 +176,7 @@ Singleton {
         }
     }
     function downloadWithDLP(info) {
-        dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}' '${info.name}'`];
+        dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}'`];
         dlpHelperProc.running = true;
     }
     function addNewFolder() {

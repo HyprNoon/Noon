@@ -25,14 +25,14 @@ ColumnLayout {
 
         Revealer {
             reveal: root?.showCover
-            Layout.preferredWidth: 75
-            Layout.preferredHeight: 75
+            implicitWidth: reveal ? 75 : 0
+            implicitHeight: 75
 
             Item {
+                visible: root?.showCover
                 anchors.fill: parent
 
                 CroppedImage {
-                    visible: root?.showCover
                     anchors.centerIn: parent
                     radius: Rounding.large
                     source: BeatsService.artUrl

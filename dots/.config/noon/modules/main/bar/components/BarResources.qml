@@ -1,3 +1,4 @@
+import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -5,193 +6,46 @@ import qs.common
 import qs.common.widgets
 
 ColumnLayout {
-    id: resourcesContainer
-
-    // Required properties for each resource
-    required property double batteryPercentage
-    required property double cpuPercentage
-    required property double memoryPercentage
-    required property double swapPercentage
-
-    spacing: 6
-
-    // Battery Resource
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Symbol {
-            Layout.alignment: Qt.AlignVCenter
-            fill: 1
-            text: "battery_full" // This will show the battery icon
-            iconSize: Fonts.sizes.normal
-            color: Colors.m3.m3onSecondaryContainer
+    id: root
+    implicitWidth: 85
+    Layout.topMargin: -4
+    Layout.fillHeight: true
+    spacing: 0
+    readonly property var resourcesModel: [
+        {
+            iconName: "memory",
+            percentage: (ResourcesService.stats.mem_total - ResourcesService.stats.mem_available) / ResourcesService.stats.mem_total
+        },
+        {
+            iconName: "swap_horiz",
+            percentage: (ResourcesService.stats.swap_total - ResourcesService.stats.swap_free) / ResourcesService.stats.swap_total
+        },
+        {
+            iconName: "settings_slow_motion",
+            percentage: ResourcesService.stats.cpu_percent / 100
+        },
+        {
+            iconName: "thermometer",
+            percentage: ResourcesService.stats.cpu_temp / 100
         }
-
-        Item {
+    ]
+    Repeater {
+        model: resourcesModel
+        delegate: RowLayout {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            height: 4
-
-            Rectangle {
-                anchors.fill: parent
-                color: Colors.m3.m3secondaryContainer
-                radius: height / 2
-
-                Rectangle {
-                    height: parent.height
-                    width: parent.width * batteryPercentage
-                    color: Colors.m3.m3onSecondaryContainer
-                    radius: height / 2
-
-                    Behavior on width {
-                        Anim {}
-                    }
-                }
+            visible: modelData.percentage > 0.01
+            Symbol {
+                text: modelData.iconName
+                color: Colors.colOnLayer0
+                fill: 1
+                font.pixelSize: 12
             }
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignVCenter
-            color: Colors.colOnLayer1
-            text: `${Math.round(batteryPercentage * 100)}%`
-            Layout.minimumWidth: 45
-            horizontalAlignment: Text.AlignRight
-        }
-    }
-
-    // CPU Resource
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Symbol {
-            Layout.alignment: Qt.AlignVCenter
-            fill: 1
-            text: "memory" // CPU icon
-            iconSize: Fonts.sizes.normal
-            color: Colors.m3.m3onSecondaryContainer
-        }
-
-        Item {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            height: 4
-
-            Rectangle {
-                anchors.fill: parent
-                color: Colors.m3.m3secondaryContainer
-                radius: height / 2
-
-                Rectangle {
-                    height: parent.height
-                    width: parent.width * cpuPercentage
-                    color: Colors.m3.m3onSecondaryContainer
-                    radius: height / 2
-
-                    Behavior on width {
-                        Anim {}
-                    }
-                }
+            ClippedProgressBar {
+                showEndPoint: false
+                Layout.fillWidth: true
+                Layout.preferredHeight: 6
+                value: modelData.percentage
             }
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignVCenter
-            color: Colors.colOnLayer1
-            text: `${Math.round(cpuPercentage * 100)}%`
-            Layout.minimumWidth: 45
-            horizontalAlignment: Text.AlignRight
-        }
-    }
-
-    // Memory Resource
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Symbol {
-            Layout.alignment: Qt.AlignVCenter
-            fill: 1
-            text: "database" // Memory icon
-            iconSize: Fonts.sizes.normal
-            color: Colors.m3.m3onSecondaryContainer
-        }
-
-        Item {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            height: 4
-
-            Rectangle {
-                anchors.fill: parent
-                color: Colors.m3.m3secondaryContainer
-                radius: height / 2
-
-                Rectangle {
-                    height: parent.height
-                    width: parent.width * memoryPercentage
-                    color: Colors.m3.m3onSecondaryContainer
-                    radius: height / 2
-
-                    Behavior on width {
-                        Anim {}
-                    }
-                }
-            }
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignVCenter
-            color: Colors.colOnLayer1
-            text: `${Math.round(memoryPercentage * 100)}%`
-            Layout.minimumWidth: 45
-            horizontalAlignment: Text.AlignRight
-        }
-    }
-
-    // Swap Resource
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Symbol {
-            Layout.alignment: Qt.AlignVCenter
-            fill: 1
-            text: "swap_horiz" // Swap icon
-            iconSize: Fonts.sizes.normal
-            color: Colors.m3.m3onSecondaryContainer
-        }
-
-        Item {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            height: 4
-
-            Rectangle {
-                anchors.fill: parent
-                color: Colors.m3.m3secondaryContainer
-                radius: height / 2
-
-                Rectangle {
-                    height: parent.height
-                    width: parent.width * swapPercentage
-                    color: Colors.m3.m3onSecondaryContainer
-                    radius: height / 2
-
-                    Behavior on width {
-                        Anim {}
-                    }
-                }
-            }
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignVCenter
-            color: Colors.colOnLayer1
-            text: `${Math.round(swapPercentage * 100)}%`
-            Layout.minimumWidth: 45
-            horizontalAlignment: Text.AlignRight
         }
     }
 }

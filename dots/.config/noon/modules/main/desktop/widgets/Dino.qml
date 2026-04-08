@@ -20,7 +20,7 @@ SquareComponent {
         ColorOverlay {
             anchors.fill: img
             source: img
-            color: Colors.colPrimary
+            color: Colors.colSecondary
         }
     }
     MouseArea {
@@ -45,6 +45,6 @@ SquareComponent {
             pixelSize: Fonts.sizes.small
             variableAxes: Fonts.variableAxes.title
         }
-        color: Colors.colPrimary
+        color: Colors.colSecondary
     }
 }
