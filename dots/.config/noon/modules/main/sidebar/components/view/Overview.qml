@@ -134,6 +134,12 @@ Item {
                     const win = root.windowByAddress[`0x${t.HyprlandToplevel.address}`];
                     const id = win?.workspace?.id;
                     return id > 0 && id > root.workspaceGroup * root.workspacesShown && id <= (root.workspaceGroup + 1) * root.workspacesShown;
+                }).sort((a, b) => {
+                    const wa = root.windowByAddress[`0x${a.HyprlandToplevel.address}`];
+                    const wb = root.windowByAddress[`0x${b.HyprlandToplevel.address}`];
+                    const areaA = (wa?.size[0] ?? 0) * (wa?.size[1] ?? 0);
+                    const areaB = (wb?.size[0] ?? 0) * (wb?.size[1] ?? 0);
+                    return areaB - areaA;
                 })
             }
 
@@ -160,7 +166,7 @@ Item {
 
                 Timer {
                     id: updatePos
-                    interval: Mem.options.hacks.arbitraryRaceConditionDelay
+                    interval: 50
                     onTriggered: {
                         const wd = window.windowData;
                         const md = window.monitorData;

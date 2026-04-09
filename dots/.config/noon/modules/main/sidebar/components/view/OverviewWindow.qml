@@ -21,17 +21,29 @@ StyledRect {
     property bool restrictToWorkspace: true
     property bool hovered: false
     property bool pressed: false
-
-    property real initX: Math.max((windowData?.at[0] - (monitorData?.x ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * viewScale, 0) + xOffset
-    property real initY: Math.max((windowData?.at[1] - (monitorData?.y ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * viewScale, 0) + yOffset
+    property real initX: ((windowData?.at[0] - (monitorData?.x ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * viewScale) + xOffset
+    property real initY: ((windowData?.at[1] - (monitorData?.y ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * viewScale) + yOffset
     readonly property real targetWindowWidth: (windowData?.size[0] ?? 0) * viewScale
     readonly property real targetWindowHeight: (windowData?.size[1] ?? 0) * viewScale
 
     x: initX
     y: initY
-    width: Math.min(targetWindowWidth, restrictToWorkspace ? availableWorkspaceWidth : availableWorkspaceWidth - x + xOffset)
-    height: Math.min(targetWindowHeight, restrictToWorkspace ? availableWorkspaceHeight : availableWorkspaceHeight - y + yOffset)
-
+    width: {
+        if (!availableWorkspaceWidth || !targetWindowWidth)
+            return 0;
+        const relX = x - xOffset;
+        if (relX >= 0)
+            return Math.min(targetWindowWidth, availableWorkspaceWidth);
+        return Math.min(targetWindowWidth + relX, availableWorkspaceWidth);
+    }
+    height: {
+        if (!availableWorkspaceHeight || !targetWindowHeight)
+            return 0;
+        const relY = y - yOffset;
+        if (relY >= 0)
+            return Math.min(targetWindowHeight, availableWorkspaceHeight);
+        return Math.min(targetWindowHeight + relY, availableWorkspaceHeight);
+    }
     color: Colors.colLayer1
     radius: Rounding.verylarge
     enableBorders: true
