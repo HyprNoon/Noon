@@ -24,4 +24,16 @@ Item {
         parentRoot: root
         colors: SidebarData.getColors(category)
     }
+    StyledLoader {
+        anchors.fill: parent
+        shown: !category
+        sourceComponent: PagePlaceholder {
+            anchors.centerIn: parent
+            iconSize: 150
+            shape: MaterialShape.Shape.PixelCircle
+            icon: "question_mark"
+            title: "Nothig here !"
+            description: "Incubated Content Will Show here"
+        }
+    }
 }
