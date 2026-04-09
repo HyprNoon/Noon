@@ -60,8 +60,17 @@ Item {
                 highlightColorHover: root.colors.colSecondaryContainerHover
                 highlightColorActive: root.colors.colSecondaryContainerActive
                 itemColorActive: root.colors.colOnLayer2
-                onClicked: content.changeContent(modelData)
-
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    propagateComposedEvents: true
+                    onClicked: event => {
+                        if (event.button === Qt.LeftButton)
+                            content.changeContent(modelData);
+                        else if (event.button === Qt.RightButton)
+                            content.incubateContent(modelData);
+                    }
+                }
                 StyledToolTip {
                     content: modelData
                     extraVisibleCondition: selectedCategory !== ""

@@ -33,7 +33,11 @@ Scope {
 
             FocusHandler {
                 windows: [panel]
-                active: panel.visible
+                active: panel.visible && bg.contentMap[root.currentMode]?.focus
+                onCleared: {
+                    if (bg.contentMap[root.currentMode]?.focus)
+                        dismiss();
+                }
             }
 
             mask: Region {
@@ -74,6 +78,12 @@ Scope {
                             comp: "ThawbContent",
                             preload: "url",
                             size: Qt.size(600, 220)
+                        },
+                        "incubate": {
+                            comp: "IncubatorContent",
+                            preload: "category",
+                            focus: true,
+                            size: Qt.size(Screen.width * 0.8, Screen.height * 0.7)
                         },
                         "assure": {
                             comp: "AssureContent",

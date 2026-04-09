@@ -39,6 +39,12 @@ StyledPanel {
             reset_reveal_conditions();
     }
 
+    function incubate(cat = selectedCategory) {
+        if (SidebarData.isIncubatable(cat)) {
+            GlobalStates.main.sysDialogs.mode = "incubate";
+            GlobalStates.main.sysDialogs.pendingData = cat;
+        }
+    }
     function detach(cat = selectedCategory) {
         if (SidebarData.isDetachable(cat) || !isDetached()) {
             detachedWindow.createObject(root, {

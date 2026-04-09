@@ -32,6 +32,7 @@ Singleton {
             activeIcon: "cognition_2",
             componentPath: "apis/Apis",
             expandable: true,
+            incubatable: true,
             detachable: true,
             shape: "PixelCircle",
             enabled: Mem.options.sidebar.content.apis
@@ -40,6 +41,7 @@ Singleton {
             icon: "globe",
             componentPath: "web/WebBrowser",
             expandable: true,
+            incubatable: true,
             preExpand: true,
             async: true,
             on_accepted_only: true,
@@ -94,6 +96,7 @@ Singleton {
         "View": {
             icon: "ad",
             activeIcon: "view_cozy",
+            incubatable: true,
             componentPath: "view/Overview",
             expandable: true,
             preExpand: true,
@@ -102,6 +105,7 @@ Singleton {
         },
         "Downloads": {
             icon: "download",
+            incubatable: true,
             activeIcon: "view_cozy",
             componentPath: "web/DownloadManager",
             enabled: true
@@ -131,6 +135,7 @@ Singleton {
             activeIcon: "joystick",
             componentPath: "games/Games",
             searchable: true,
+            incubatable: true,
             shape: "Ghostish",
             detachable: true,
             colors: GameLauncherService.colors,
@@ -154,6 +159,7 @@ Singleton {
         "Shelf": {
             icon: "shelves",
             activeIcon: "book_ribbon",
+            incubatable: true,
             componentPath: "shelf/Shelf",
             enabled: Mem.options.sidebar.content.shelf
         },
@@ -176,6 +182,7 @@ Singleton {
             icon: "timer",
             componentPath: "timers/Timers",
             detachable: true,
+            incubatable: true,
             shape: "Cookie4Sided",
             enabled: Mem.options.sidebar.content.timers
         },
@@ -199,6 +206,7 @@ Singleton {
             shell: "main",
             componentPath: "settings/QuickSettings",
             expandable: true,
+            incubatable: true,
             searchable: true,
             expandSize: sizePresets.threeQuarter,
             shape: "Ghostish",
@@ -250,6 +258,9 @@ Singleton {
     }
     function isSearchable(id) {
         return !!_get(id)?.searchable;
+    }
+    function isIncubatable(id) {
+        return !!_get(id)?.incubatable;
     }
     function isDetachable(id) {
         return !!_get(id)?.detachable;

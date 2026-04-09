@@ -112,6 +112,15 @@ StyledPanel {
         scrollGestureEnabled: true
         acceptedButtons: Qt.NoButton
         onWheel: wheel => {
+            if (wheel.modifiers === Qt.ControlModifier) {
+                if (wheel.angleDelta.y < 0)
+                    GlobalStates.main.sysDialogs.mode = "incubate";
+                else
+                    GlobalStates.main.sysDialogs.mode = "";
+                wheel.accepted = true;
+                return;
+            }
+
             if (!root.scrollReveal)
                 return;
 
