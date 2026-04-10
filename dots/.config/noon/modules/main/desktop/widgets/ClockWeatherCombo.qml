@@ -78,11 +78,12 @@ SquareComponent {
                     StyledText {
                         Layout.fillWidth: true
                         Layout.rightMargin: root.expanded ? 20 : 0
-                        text: WeatherService.weatherData.currentTemp
+                        text: WeatherService.weatherData.currentTemp.substring(/C/g, '')
                         horizontalAlignment: !root.expanded ? Text.AlignHCenter : Text.AlignRight
                         color: Colors.colSecondary
+                        font.family: Fonts.family.variable
                         font.pixelSize: root.expanded ? Fonts.sizes.title : Fonts.sizes.verylarge
-                        font.variableAxes: Fonts.variableAxes.title
+                        font.variableAxes: Fonts.variableAxes.longNumbers
                     }
                 }
             }

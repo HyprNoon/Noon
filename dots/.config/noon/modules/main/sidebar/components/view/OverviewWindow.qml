@@ -68,11 +68,11 @@ StyledRect {
         z: 999
         mipmap: true
         _source: AppSearch.guessIcon(root.windowData?.class)
-        implicitSize: Math.sqrt(Math.pow(parent.width, 2) + Math.pow(parent.height, 2)) * 0.18
+        implicitSize: Math.sqrt(Math.pow(parent.width, 2) + Math.pow(parent.height, 2)) * 0.11
         anchors {
             bottom: parent.bottom
             right: parent.right
-            margins: implicitSize / 10
+            margins: implicitSize * 0.175
         }
     }
 }

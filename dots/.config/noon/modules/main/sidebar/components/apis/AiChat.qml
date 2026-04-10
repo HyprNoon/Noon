@@ -8,6 +8,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import Quickshell
+import Noon.Services
 
 Item {
     id: root

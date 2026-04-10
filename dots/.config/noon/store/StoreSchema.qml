@@ -11,7 +11,13 @@ JsonAdapter {
         property JsonObject icons
         property JsonObject emojis
         property JsonObject backlight
+        property JsonObject cheats
 
+        cheats: JsonObject {
+            property list<string> superKeys: ["󰖳", "󰌽", "󰘳", "", "󰨡", "", "", "󰣇", "", "", "", "", "", "", "󱄛"]
+            property list<var> defaultKeybinds: []
+            property list<var> shellKeybinds: []
+        }
         backlight: JsonObject {
             property list<var> devices: []
         }

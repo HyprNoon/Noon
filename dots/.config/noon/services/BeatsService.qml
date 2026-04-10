@@ -14,6 +14,7 @@ import Qt.labs.folderlistmodel
 
 Singleton {
     id: root
+    readonly property alias socket: vlcSocket
 
     property int selectedPlayerIndex: 0
     property string currentTrackPath: ""
@@ -94,19 +95,19 @@ Singleton {
         return "file://" + root._tracksDir + "/" + entry.cover_art.replace(/^\.\//, "");
     }
 
-    function refreshSocket() {
-        vlcSocket.reload();
-    }
-    function checkConnection() {
-        vlcStateProc.running = true;
-    }
     function startConnection() {
-        Quickshell.execDetached(["vlc", "--intf", "oldrc", "--rc-unix", vlcSocket.path, "--rc-fake-tty", "--one-instance", "--no-playlist-autostart", "--no-video", FileUtils.trimFileProtocol(root._playlistPath)]);
+        if (vlcSocket.connected)
+            return;
+        Quickshell.execDetached(["vlc", "--intf", "oldrc", "--rc-unix", vlcSocket.path, "--rc-fake-tty", "--one-instance", "--no-video", FileUtils.trimFileProtocol(root._playlistPath)]);
+        vlcSocket.reconnect();
     }
 
     function playTrack(index) {
-        vlcSocket.add("play");
-        vlcSocket.add("goto " + index);
+        if (vlcSocket.connected) {
+            vlcSocket.add("goto " + index);
+        } else {
+            vlcSocket.reconnect();
+        }
     }
 
     function currentTrackProgressRatio() {
@@ -160,21 +161,6 @@ Singleton {
         command: ["python3", Directories.scriptsDir + "/build_metadata.py", FileUtils.trimFileProtocol(_tracksDir)]
     }
 
-    Process {
-        id: vlcStateProc
-        property bool isRunning
-        command: ["pidof", "vlc"]
-
-        stdout: SplitParser {
-            onRead: data => vlcStateProc.isRunning = data.trim().length > 0
-        }
-        onExited: {
-            if (vlcStateProc.isRunning)
-                return;
-            root.startConnection();
-            root.refreshSocket();
-        }
-    }
     function downloadWithDLP(info) {
         dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}'`];
         dlpHelperProc.running = true;

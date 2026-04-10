@@ -90,7 +90,7 @@ JsonAdapter {
         "
         property string tool: "functions"
         // property list<var> extraModels: []
-        property string model: "gemini-2.5-flash"
+        property string model: "gemini-3.1-flash-lite"
         property real temperature: 0.5
         property JsonObject context: JsonObject {
             property bool distro: false
@@ -459,6 +459,18 @@ JsonAdapter {
         appearance: JsonObject {
             property real iconSize: 100 * iconSizeMultiplier
             property real iconSizeMultiplier: 0.5
+        }
+    }
+
+    property JsonObject cheats: JsonObject {
+        property string superKey: "󰌽"
+        property bool useMacSymbol: true
+        property bool splitButtons: true
+        property bool useMouseSymbol: true
+        property bool useFnSymbol: true
+        property JsonObject fontSize: JsonObject {
+            property int key: Fonts.sizes.large
+            property int comment: Fonts.sizes.verylarge
         }
     }
 

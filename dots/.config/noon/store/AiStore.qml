@@ -411,17 +411,17 @@ Singleton {
     }
 
     property var models: Mem.options.policies.ai === 2 ? {} : {
-        "gemini-2.5-flash": aiModelComponent.createObject(this, {
-            "name": "Gemini 2.5 Flash",
+        "gemini-3.1-flash-lite": aiModelComponent.createObject(this, {
+            "name": "Gemini 3.1 Flash-Lite Preview",
             "icon": "google-gemini-symbolic",
-            "description": qsTr("Online | Google's model\nNewer model that's slower than its predecessor but should deliver higher quality answers"),
+            "description": qsTr("Online | Google's newest lite model\nExtremely fast and cost-efficient. Ideal for high-volume tasks and low-latency responses."),
             "homepage": "https://aistudio.google.com",
-            "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent",
-            "model": "gemini-2.5-flash",
+            "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:streamGenerateContent",
+            "model": "gemini-3.1-flash-lite-preview",
             "requires_key": true,
             "key_id": "gemini",
             "key_get_link": "https://aistudio.google.com/app/apikey",
-            "key_get_description": qsTr("**Pricing**: free. Data used for training.\n\n**Instructions**: Log into Google account, allow AI Studio to create Google Cloud project or whatever it asks, go back and click Get API key"),
+            "key_get_description": qsTr("**Pricing**: Very low cost / Free tier available. Data may be used for training on the free tier.\n\n**Instructions**: Log into Google AI Studio, create an API key, and ensure the 'Gemini API' is enabled."),
             "api_format": "gemini"
         }),
         "mistral-medium-3": aiModelComponent.createObject(this, {

@@ -30,7 +30,7 @@ StyledRect {
         spacing: Padding.large
 
         BottomDialogHeader {
-            title: "Beats"
+            title: BeatsService._connected ? "Beats" : "Offline"
             subTitle: `There are ${filteredModel.values.length} Tracks in your playlist !`
             showCloseButton: false
         }

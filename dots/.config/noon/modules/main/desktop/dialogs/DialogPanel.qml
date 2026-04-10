@@ -85,6 +85,10 @@ Scope {
                             focus: true,
                             size: Qt.size(Screen.width * 0.8, Screen.height * 0.7)
                         },
+                        "cheats": {
+                            comp: "CheatsContent",
+                            size: Qt.size(Screen.width * 0.9, Screen.height * 0.8)
+                        },
                         "assure": {
                             comp: "AssureContent",
                             preload: "content",

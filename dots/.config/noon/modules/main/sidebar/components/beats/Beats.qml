@@ -17,10 +17,6 @@ StyledRect {
     readonly property bool displayingLyrics: activeLyrics.showContent
     property QtObject colors: Colors
 
-    Component.onCompleted: {
-        BeatsService.checkConnection();
-        BeatsService.refreshSocket();
-    }
     Behavior on width {
         enabled: false
     }

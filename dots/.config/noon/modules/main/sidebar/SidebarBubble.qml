@@ -168,9 +168,8 @@ Item {
                 "cat": "Beats",
                 "bubbles": [
                     {
-                        "icon": "restart_alt",
-                        "extraVisibleCondition": BeatsService.isCurrentPlayer(),
-                        "action": () => BeatsService.refreshSocket()
+                        "icon": "upload",
+                        "action": () => BeatsService.startConnection()
                     },
                     {
                         "icon": "download",

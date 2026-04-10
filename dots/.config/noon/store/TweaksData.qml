@@ -657,6 +657,13 @@ Singleton {
                     "key": "desktop.bg.depthMode"
                 },
                 {
+                    "icon": "keyboard_command_key",
+                    "name": "Super Key",
+                    "type": "combobox",
+                    "comboBoxValues": Mem.store.services.cheats.superKeys,
+                    "key": "cheats.superKey"
+                },
+                {
                     "icon": "width",
                     "name": "Parallax Effect",
                     "key": "desktop.bg.parallax.enabled"

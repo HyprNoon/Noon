@@ -86,8 +86,7 @@ Singleton {
             enabled: Mem.options.sidebar.content.notes
         },
         "View": {
-            icon: "ad",
-            activeIcon: "view_cozy",
+            icon: "workspaces",
             incubatable: true,
             componentPath: "view/Overview",
             expandable: true,

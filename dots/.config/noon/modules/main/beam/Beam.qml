@@ -112,11 +112,19 @@ StyledPanel {
         scrollGestureEnabled: true
         acceptedButtons: Qt.NoButton
         onWheel: wheel => {
-            if (wheel.modifiers === Qt.ControlModifier) {
+            switch (wheel.modifiers) {
+            case Qt.ControlModifier:
                 if (wheel.angleDelta.y < 0)
                     GlobalStates.main.sysDialogs.mode = "incubate";
                 else
                     GlobalStates.main.sysDialogs.mode = "";
+                break;
+            case Qt.ShiftModifier:
+                if (wheel.angleDelta.y < 0)
+                    GlobalStates.main.sysDialogs.mode = "cheats";
+                else
+                    GlobalStates.main.sysDialogs.mode = "";
+                break;
                 wheel.accepted = true;
                 return;
             }
