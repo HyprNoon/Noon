@@ -26,7 +26,7 @@ JsonAdapter {
         }
 
         colors: JsonObject {
-            property string palatteName: "auto"
+            property string palattePath: "auto"
             property bool palatte: false
         }
 

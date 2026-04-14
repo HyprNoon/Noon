@@ -12,6 +12,11 @@ JsonAdapter {
         property JsonObject emojis
         property JsonObject backlight
         property JsonObject cheats
+        property JsonObject colors
+
+        colors: JsonObject {
+            property list<var> palettes: []
+        }
 
         cheats: JsonObject {
             property list<string> superKeys: ["󰖳", "󰌽", "󰘳", "", "󰨡", "", "", "󰣇", "", "", "", "", "", "", "󱄛"]

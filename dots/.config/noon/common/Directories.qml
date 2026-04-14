@@ -62,6 +62,12 @@ Singleton {
         readonly property string tracks: FileUtils.trimFileProtocol(standard.music)
     }
 
+    // plugins
+    readonly property QtObject plugins: QtObject {
+        readonly property string main: FileUtils.trimFileProtocol(standard.home + "/.noon_plugins")
+        readonly property string palettes: main + "/palettes"
+    }
+
     Component.onCompleted: {
         FileUtils.mkdir([
             // standard
@@ -73,6 +79,8 @@ Singleton {
             // wallpapers
             wallpapers.main, wallpapers.switchScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats
-            beats.main, beats.coverArt, beats.lyrics, beats.tracks]);
+            beats.main, beats.coverArt, beats.lyrics, beats.tracks,
+            // plugins
+            plugins.main, plugins.palettes]);
     }
 }

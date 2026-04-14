@@ -1,35 +1,23 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
-import qs.common.utils
 import qs.store
 import qs.services
+import qs.common.utils
 
 Singleton {
     id: root
 
     readonly property alias colors: colorsView.data
 
-    readonly property string currentFilePath: {
-        const current = Mem?.options?.appearance?.colors?.palatteName ?? "auto";
-        const m3 = Directories?.standard.state + "/colors.json";
-        const palettesDir = Qt.resolvedUrl(Directories.assets);
-        if (current === "auto")
-            return m3;
-        else
-            return palettesDir + "/db/palettes/" + current + ".json";
-    }
-
     ConfigFileView {
         id: colorsView
 
-        path: currentFilePath
+        path: Mem.options.appearance.colors?.palattePath
         ColorsSchema {}
         onPathChanged: {
-            if (!root.currentFilePath?.includes("colors.json")) {
-                Qt.callLater(() => {
-                    WallpaperService.changeAccentColor(Colors?.m3.m3primaryContainer);
-                });
-            }
+            Qt.callLater(() => {
+                WallpaperService.changeAccentColor(Colors?.m3.m3primaryContainer);
+            });
         }
     }
 }

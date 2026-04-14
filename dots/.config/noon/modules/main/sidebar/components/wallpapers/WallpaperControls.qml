@@ -65,10 +65,11 @@ BottomDialog {
                 model: ThemeStore.themes
                 textRole: "name"
                 valueRole: "value"
-                currentIndex: root.findIndex(ThemeStore.themes, Mem.states.desktop.appearance.theme, "value")
+                currentIndex: 0
+                displayText: "Gowall"
                 onActivated: index => {
                     if (index >= 0 && index < ThemeStore.themes.length)
-                        GowallService.convertTheme(ThemeStore.themes[index].value);
+                        GowallService.convertTheme(ThemeStore.themes[index]);
                 }
             }
 
@@ -91,10 +92,12 @@ BottomDialog {
                 model: ThemeStore.palettes
                 textRole: "name"
                 valueRole: "name"
-                displayText: Mem.options.appearance.colors.palatteName
+                displayText: ThemeStore.palettes.find(t => t.path === Mem.options.appearance.colors.palattePath)?.name
                 onActivated: index => {
-                    if (index >= 0 && index < ThemeStore.palettes.length)
-                        Mem.options.appearance.colors.palatteName = ThemeStore.palettes[index]?.value ?? "auto";
+                    if (index >= 0 && index < ThemeStore.palettes.length) {
+                        const newTheme = ThemeStore.palettes[index];
+                        Mem.options.appearance.colors.palattePath = newTheme.path;
+                    }
                 }
             }
         }

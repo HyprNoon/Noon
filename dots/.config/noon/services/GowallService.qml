@@ -24,7 +24,7 @@ Singleton {
 
     function convertTheme(themeName): void {
         root._pendingOutput = current_processed_wall;
-        proc.command = ["gowall", "convert", "--yes", "-t", themeName, inputPath, "--output", current_processed_wall];
+        proc.command = ["gowall", "convert", "-t", themeName, inputPath, "--output", current_processed_wall];
         proc.running = true;
     }
 
