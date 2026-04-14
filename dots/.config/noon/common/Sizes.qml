@@ -36,7 +36,7 @@ Singleton {
         property size controlsSize: Qt.size(600, 80)
     }
     screenshot: QtObject {
-        property size size: Qt.size(400, 85)
+        property size size: Qt.size(400, 60)
     }
     osd: QtObject {
         readonly property size nobuntu: Qt.size(220, 64)

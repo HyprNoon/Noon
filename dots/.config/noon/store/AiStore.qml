@@ -41,7 +41,7 @@ Singleton {
             "{PLAYING}": Mem.options.ai.context.playing ? `title:${BeatsService.title}  artist:${BeatsService.artist}` : "",
             "{WEATHER}": Mem.options.ai.context.weather ? WeatherService.weatherData.currentTemp : "",
             "{PDF}": Mem.options.ai.context.weather ? WeatherService.weatherData.pdf : "",
-            "{ALARMS}": Mem.options.ai.context.alarms ? Mem.timers.alarms : ""
+            "{ALARMS}": Mem.options.ai.context.alarms ? Mem.states.services.timers.alarms : ""
         })
     property var tools: {
         "gemini": {

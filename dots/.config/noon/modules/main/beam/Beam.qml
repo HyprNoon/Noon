@@ -69,29 +69,21 @@ StyledPanel {
         onCleared: root.hide()
     }
 
-    Connections {
-        id: clip_watcher
-        target: ClipboardService
-        enabled: clip_watcher.waiting
-        ignoreUnknownSignals: true
-
-        property bool waiting: false
-
-        function onEntriesRefreshed() {
-            const img = ClipboardService.getImagePath(0);
-            if (ClipboardService.isImage(img)) {
-                Ai.attachFile(img);
-                GlobalStates.main.showBeam = true;
-            }
-            clip_watcher.waiting = false;
+    function takeScreenshot() {
+        ScreenShotService.request({
+            temp: true,
+            region: ScreenShotService.Regions.Window
+        });
+        attach.restart();
+        Qt.callLater(hide);
+    }
+    Timer {
+        id: attach
+        interval: Mem.options.hacks.arbitraryRaceConditionDelay
+        onTriggered: {
+            Ai.attachFile(Qt.resolvedUrl(ScreenShotService.tempPath));
         }
     }
-
-    function takeScreenshot() {
-        clip_watcher.waiting = true;
-        ScreenShotService.takeScreenShot();
-    }
-
     function hide() {
         GlobalStates.main.showBeam = false;
     }
@@ -324,7 +316,7 @@ StyledPanel {
                         }
                     }
 
-                    RippleButtonWithIcon {
+                    GroupButtonWithIcon {
                         id: osrButton
                         z: 999
                         buttonRadius: root.mainRounding
@@ -344,7 +336,7 @@ StyledPanel {
                     }
                 }
 
-                RippleButtonWithIcon {
+                GroupButtonWithIcon {
                     id: sendButton
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right

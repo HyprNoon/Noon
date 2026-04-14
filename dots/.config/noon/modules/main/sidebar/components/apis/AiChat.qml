@@ -233,7 +233,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         messageListView.positionViewAtEnd();
     }
     function decodeImageAndAttach(entry) {
-        if (entry && ClipboardService.entryIsImage(entry)) {
+        if (entry && ClipboardService.isImage(entry)) {
             const filePath = ClipboardService.decodeImageEntry(entry);
             Ai.attachFile(filePath);
         }
@@ -656,7 +656,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                             // Try image paste first
                             const currentClipboardEntry = ClipboardService.entries[0];
                             const cleanCliphistEntry = StringUtils.cleanCliphistEntry(currentClipboardEntry);
-                            if (ClipboardService.entryIsImage(currentClipboardEntry)) {
+                            if (ClipboardService.isImage(currentClipboardEntry)) {
                                 decodeImageAndAttach(currentClipboardEntry);
                                 event.accepted = true;
                                 return;

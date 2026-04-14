@@ -87,10 +87,9 @@ Scope {
     WidgetLoader {
         Toasts {}
     }
-    // WidgetLoader {
-    //     enabled: GlobalStates.main.showScreenshot
-    //     Screenshot {}
-    // }
+    WidgetLoader {
+        Screenshot {}
+    }
 
     NIPC {}
 }

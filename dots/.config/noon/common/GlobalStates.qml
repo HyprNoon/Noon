@@ -27,10 +27,13 @@ Singleton {
         name: "superHeld"
         onPressed: GlobalStates.superPressed = !GlobalStates.superPressed
     }
+    Component.onCompleted: {
+        ClipboardService.init();
+        ClipboardService.parent = root;
+    }
     function handle_init(mode) {
         KeyringStorage.reload();
         NightLightService.reload();
-        ClipboardService.init();
         Hyprland.dispatch("submap " + Mem.options.desktop.hyprland.tilingLayout);
         switch (mode) {
         case "main":

@@ -18,7 +18,6 @@ Singleton {
 
     IdleInhibitor {
         enabled: Mem.options.services.idle.inhibit
-
         window: DummyPanel {}
     }
 

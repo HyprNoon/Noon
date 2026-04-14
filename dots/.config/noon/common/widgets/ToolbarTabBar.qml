@@ -7,6 +7,7 @@ import QtQuick.Layouts
 
 Item {
     id: root
+    property int tabButtonhorizontalPadding: 10
     property alias currentIndex: tabBar.currentIndex
     property bool showSelectedOnly: tabButtonList.length > 3
     required property var tabButtonList
@@ -34,8 +35,10 @@ Item {
         Repeater {
             model: root.tabButtonList
             delegate: ToolbarTabButton {
+                id: delegatedButton
                 required property int index
                 required property var modelData
+                horizontalPadding: root.tabButtonhorizontalPadding
                 current: index == root.currentIndex
                 text: current ? modelData.name : root.showSelectedOnly ? "" : modelData.name
                 materialSymbol: modelData.icon

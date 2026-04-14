@@ -98,10 +98,23 @@ Singleton {
     function startConnection() {
         if (vlcSocket.connected)
             return;
-        Quickshell.execDetached(["vlc", "--intf", "oldrc", "--rc-unix", vlcSocket.path, "--rc-fake-tty", "--one-instance", "--no-video", FileUtils.trimFileProtocol(root._playlistPath)]);
+        Quickshell.execDetached(buildConnectionCommand());
         vlcSocket.reconnect();
     }
 
+    function buildConnectionCommand() {
+        var vlcConf = {
+            random: true,
+            loop: true
+        };
+        var cmd = ["vlc", "--intf", "oldrc", "--rc-unix", vlcSocket.path, "--rc-fake-tty", "--one-instance", "--no-video", FileUtils.trimFileProtocol(root._playlistPath)];
+
+        if (vlcConf.random)
+            cmd.push("--random");
+        if (vlcConf.loop)
+            cmd.push("--loop");
+        return cmd;
+    }
     function playTrack(index) {
         if (vlcSocket.connected) {
             vlcSocket.add("goto " + index);

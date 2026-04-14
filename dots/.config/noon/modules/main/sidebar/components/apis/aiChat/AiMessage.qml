@@ -24,9 +24,9 @@ StyledRect {
     clip: true
     anchors.left: !rightMode ? parent?.left : undefined
     anchors.right: rightMode ? parent?.right : undefined
-
-    implicitHeight: Math.max(loadingSize.height, columnLayout.implicitHeight)
-    implicitWidth: Math.max(loadingSize.width, Math.min(messageData.content.length * (Fonts.sizes.normal), parent.width - Padding.massive * 2))
+    property int attachedWidth: messageData.annotationSources.length > 0 ? loadingSize.width : 0
+    implicitHeight: Math.max(attachedWidth, loadingSize.height, columnLayout.implicitHeight)
+    implicitWidth: Math.max(attachedWidth, loadingSize.width, Math.min(messageData.content.length * (Fonts.sizes.normal), parent.width - Padding.massive * 2))
     radius: Math.max(24, Rounding.verylarge)
     animationDuration: Animations.durations.small
 

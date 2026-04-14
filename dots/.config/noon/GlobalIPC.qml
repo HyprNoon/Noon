@@ -14,6 +14,10 @@ Scope {
     IpcHandler {
         target: "global"
 
+        function toggle_screenshot(): void {
+            GlobalStates.main.showScreenshot = !GlobalStates.main.showScreenshot;
+        }
+
         function pronounce(text: string): void {
             if (!text)
                 return;

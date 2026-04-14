@@ -40,6 +40,7 @@ Singleton {
         readonly property string aiChats: FileUtils.trimFileProtocol(standard.state + "/user/generated/ai")
         readonly property string m3path: FileUtils.trimFileProtocol(standard.state + "/user/generated/colors.json")
         readonly property string gamesCoverArts: FileUtils.trimFileProtocol(standard.state + "/user/generated/gamesCoverArts")
+        readonly property string screenshots: FileUtils.trimFileProtocol(standard.pictures + "/Screenshots")
     }
 
     // wallpapers directories
@@ -68,7 +69,7 @@ Singleton {
             // misc
             venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
-            services.notifications, services.latex, services.aiChats, services.gamesCoverArts,
+            services.notifications, services.latex, services.aiChats, services.gamesCoverArts, services.screenshots,
             // wallpapers
             wallpapers.main, wallpapers.switchScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats
