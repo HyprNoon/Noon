@@ -226,7 +226,10 @@ Singleton {
         return MaterialShape.Shape[_get(id)?.shape || ""];
     }
     function getIcon(id, active = false) {
-        return active ? _get(id)?.activeIcon : _get(id)?.icon;
+        if (active && _get(id)?.activeIcon)
+            return _get(id)?.activeIcon;
+        else
+            return _get(id)?.icon;
     }
     function getComponentPath(id) {
         const c = _get(id);

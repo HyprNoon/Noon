@@ -53,7 +53,7 @@ Item {
                 baseSize: Math.round(navRailList.width * 0.88)
                 toggled: root.selectedCategory === modelData
 
-                buttonIcon: SidebarData.getIcon(modelData, toggled)
+                buttonIcon: SidebarData?.getIcon(modelData, toggled ?? false)
                 buttonText: modelData || ""
 
                 highlightColor: root.colors.colSecondaryContainer
