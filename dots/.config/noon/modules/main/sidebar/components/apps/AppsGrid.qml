@@ -12,19 +12,11 @@ StyledRect {
     clip: true
 
     property string searchQuery: ""
-    property string _debouncedQuery: ""
-
-    Timer {
-        id: debounceTimer
-        interval: 200
-        onTriggered: root._debouncedQuery = root.searchQuery
-    }
-    onSearchQueryChanged: debounceTimer.restart()
 
     ScriptModel {
         id: filteredModel
         values: {
-            const query = root._debouncedQuery.toLowerCase().trim();
+            const query = root.searchQuery.toLowerCase().trim();
             const groups = {};
             const others = new Set();
 
@@ -75,18 +67,17 @@ StyledRect {
         cellHeight: 200
         opacity: popup.active ? 0 : 1
         Behavior on opacity {
-            NumberAnimation {
-                duration: 200
-            }
+            Anim {}
         }
 
         delegate: Item {
-            width: contentView.cellWidth - Padding.normal
+            width: contentView.cellWidth
             height: contentView.cellHeight
 
             StyledRect {
                 id: groupTile
                 anchors.fill: parent
+                anchors.margins: Padding.normal
                 anchors.bottomMargin: 40
                 color: Colors.colLayer2
                 radius: Rounding.large
@@ -126,6 +117,7 @@ StyledRect {
 
     PagePlaceholder {
         shown: contentView.count === 0 && !popup.active
+        icon: "search"
         title: "No results for '" + root.searchQuery + "'"
         anchors.centerIn: parent
     }

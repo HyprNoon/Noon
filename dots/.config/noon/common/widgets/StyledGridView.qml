@@ -105,7 +105,6 @@ GridView {
     }
 
     layer.effect: OpacityMask {
-
         maskSource: Rectangle {
             width: root.width
             height: root.height
