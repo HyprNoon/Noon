@@ -32,7 +32,7 @@ GridView {
         visible: Mem.options.interactions.scrolling.fasterTouchpadScroll ?? true
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
-        propagateComposedEvents: true
+        propagateComposedEvents: false
         onWheel: function (wheelEvent) {
             const delta = wheelEvent.angleDelta.y / root.mouseScrollDeltaThreshold;
             // The angleDelta.y of a touchpad is usually small and continuous,

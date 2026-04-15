@@ -70,7 +70,6 @@ StyledRect {
             required property int index
             required property var modelData
             readonly property bool alternateStripes: Mem.options.sidebar.appearance.alternateListStripes
-            property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
             colBackground: alternateStripes && (index % 2 === 0) ? "transparent" : Colors.colLayer2
             toggled: contentView.currentIndex === index && contentView.activeFocus
             title: modelData?.name ?? ""
@@ -88,26 +87,10 @@ StyledRect {
                 contextMenu.popup();
             }
 
-            StyledMenu {
+            AppContextMenu {
                 id: contextMenu
-                content: [
-                    {
-                        "text": "Launch",
-                        "materialIcon": "launch",
-                        "action": () => {
-                            modelData.execute();
-                            root.dismiss();
-                        }
-                    },
-                    {
-                        "text": appButton.isPinned ? "Unpin" : "Pin",
-                        "materialIcon": "push_pin",
-                        "action": () => {
-                            const id = modelData.id;
-                            Mem.states.favorites.apps = appButton.isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
-                        }
-                    }
-                ]
+                modelData: appButton.modelData
+                onDismiss: root.dismiss()
             }
         }
 

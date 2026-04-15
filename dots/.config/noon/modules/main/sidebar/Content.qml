@@ -1,3 +1,4 @@
+import "components/apps"
 import "components/downloads"
 import "components/notes"
 import "components/timers"

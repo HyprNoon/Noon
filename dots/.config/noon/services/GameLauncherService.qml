@@ -23,7 +23,7 @@ Singleton {
 
     property int selectedIndex: 0
     property var selectedInfo: store.list[selectedIndex]
-    property QtObject colors: selectedInfo.coverImage.length > 0 ? colorsgen.colors : Colors
+    property QtObject colors: selectedInfo.coverImage.length > 0 ? colorsgen?.colors ?? Colors : Colors
     property string pendingSelectedGame: ""
     property string pendingSelectedCover: ""
     property alias addDialog: addGamePicker
