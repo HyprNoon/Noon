@@ -65,6 +65,7 @@ Singleton {
     // plugins
     readonly property QtObject plugins: QtObject {
         readonly property string main: FileUtils.trimFileProtocol(standard.home + "/.noon_plugins")
+        readonly property string sidebar: main + "/sidebar"
         readonly property string palettes: main + "/palettes"
     }
 
@@ -81,6 +82,6 @@ Singleton {
             // beats
             beats.main, beats.coverArt, beats.lyrics, beats.tracks,
             // plugins
-            plugins.main, plugins.palettes]);
+            plugins.main, plugins.palettes, plugins.sidebar]);
     }
 }

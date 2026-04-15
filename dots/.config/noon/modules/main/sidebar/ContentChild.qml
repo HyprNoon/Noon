@@ -35,7 +35,7 @@ Item {
         }
         contentStack.slideDirection = SidebarData.getCategoryDirection(previousCategory, category);
         contentStack.replace(null, SidebarData.getComponentPath(category));
-
+        console.log("[new cat path]: ", SidebarData.getComponentPath(category));
         previousCategory = category;
     }
 

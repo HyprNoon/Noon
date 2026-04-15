@@ -1,0 +1,16 @@
+{
+  "name": "My New Plugin",
+  "mentainer": "PharmaRacist",
+  "entry": "@plugins/qml/Main.qml",
+  "enabled": true,
+  "icon": "task_alt",
+  "expandable": true,
+  "incubatable": true,
+  "detachable": true,
+  "searchable": true,
+  "preExpand": true,
+  "baseSize": 350,
+  "expandSize": 500,
+  "stealth": false,
+  "shape": "Clover8Leaf"
+}

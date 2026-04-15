@@ -15,7 +15,8 @@ Singleton {
     property var detachedContent: []
     readonly property QtObject sizePresets: Sizes.sidebar
     readonly property var enabledCategories: Object.keys(registry).filter(key => (registry[key].enabled ?? true) && !registry[key].stealth && (registry[key].shell === undefined || registry[key].shell === Mem.options.desktop.shell.mode))
-    readonly property var registry: {
+    property var registry: shellReg
+    readonly property var shellReg: {
         "Apps": {
             icon: "rocket",
             activeIcon: "rocket_launch",
@@ -232,6 +233,20 @@ Singleton {
     function _get(id) {
         return registry[id];
     }
+
+    Component.onCompleted: rebuildRegistry()
+
+    function rebuildRegistry() {
+        registry = Object.assign({}, shellReg, PluginsManager.sidebarPlugins);
+    }
+
+    Connections {
+        target: PluginsManager
+        function onSidebarPluginsChanged() {
+            root.rebuildRegistry();
+        }
+    }
+
     function getColors(id) {
         return _get(id)?.colors ?? Colors;
     }
@@ -246,7 +261,10 @@ Singleton {
     }
     function getComponentPath(id) {
         const c = _get(id);
-        return c ? "components/" + c.componentPath + ".qml" : "";
+        if (c.isPlugin)
+            return c.entry;
+        else
+            return c ? "components/" + c.componentPath + ".qml" : "";
     }
     function isSearchable(id) {
         return !!_get(id)?.searchable;
