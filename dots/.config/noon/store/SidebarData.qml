@@ -87,7 +87,7 @@ Singleton {
             icon: "download",
             incubatable: true,
             activeIcon: "view_cozy",
-            componentPath: "web/DownloadManager",
+            componentPath: "downloads/DownloadManager",
             enabled: true
         },
         "Beats": {
