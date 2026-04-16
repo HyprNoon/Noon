@@ -10,9 +10,15 @@ StyledRect {
     color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
-
+    readonly property alias gridView: contentView
     property string searchQuery: ""
-
+    signal dismiss
+    signal searchFocusRequested
+    signal contentFocusRequested
+    onContentFocusRequested: {
+        contentView.forceActiveFocus();
+        contentView.currentIndex = 0;
+    }
     ScriptModel {
         id: filteredModel
         values: {
@@ -56,10 +62,15 @@ StyledRect {
         popup.categoryTitle = title;
         popup.appsData = items;
         popup.active = true;
+        Qt.callLater(() => {
+            popup.forceActiveFocus();
+        });
     }
 
     StyledGridView {
         id: contentView
+        focus: true
+        currentIndex: -1
         anchors.fill: parent
         anchors.margins: Padding.huge
         model: filteredModel
@@ -71,6 +82,9 @@ StyledRect {
         }
 
         delegate: Item {
+            required property int index
+            required property var modelData
+            readonly property bool isSelected: index === contentView.currentIndex
             width: contentView.cellWidth
             height: contentView.cellHeight
 
@@ -79,7 +93,7 @@ StyledRect {
                 anchors.fill: parent
                 anchors.margins: Padding.normal
                 anchors.bottomMargin: 40
-                color: Colors.colLayer2
+                color: isSelected ? Colors.colSecondaryContainer : Colors.colLayer2
                 radius: Rounding.large
 
                 MouseArea {
@@ -97,6 +111,15 @@ StyledRect {
                         StyledIconImage {
                             implicitSize: 60
                             _source: modelData.icon
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    modelData.execute();
+                                    root.dismiss();
+                                }
+                            }
                         }
                     }
                 }
@@ -108,6 +131,41 @@ StyledRect {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: Padding.small
             }
+        }
+
+        Keys.onPressed: event => {
+            // Dynamically calculate columns based on width and cellWidth
+            const cols = Math.floor(contentView.width / contentView.cellWidth);
+            const lastIndex = contentView.count - 1;
+
+            if (event.key === Qt.Key_Up) {
+                if (currentIndex < cols) {
+                    currentIndex = -1;
+                    root.searchFocusRequested();
+                } else {
+                    currentIndex -= cols;
+                }
+            } else if (event.key === Qt.Key_Down) {
+                if (currentIndex + cols <= lastIndex) {
+                    currentIndex += cols;
+                }
+            } else if (event.key === Qt.Key_Left) {
+                if (currentIndex % cols !== 0) {
+                    currentIndex--;
+                }
+            } else if (event.key === Qt.Key_Right) {
+                if (currentIndex < lastIndex && (currentIndex + 1) % cols !== 0) {
+                    currentIndex++;
+                }
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                if (currentIndex >= 0) {
+                    const data = model.values[currentIndex];
+                    openCategory(data.items, root, data.category);
+                }
+            } else {
+                return;
+            }
+            event.accepted = true;
         }
     }
 

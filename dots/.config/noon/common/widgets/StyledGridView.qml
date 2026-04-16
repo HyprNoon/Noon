@@ -67,7 +67,11 @@ GridView {
             easing.bezierCurve: Animations.curves.expressiveFastSpatial
         }
     }
-
+    populate: Transition {
+        Anim {
+            properties: "x,y"
+        }
+    }
     addDisplaced: Transition {
         Anim {
             properties: "x,y"

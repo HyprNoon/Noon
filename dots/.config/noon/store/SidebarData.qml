@@ -22,11 +22,11 @@ Singleton {
             activeIcon: "rocket_launch",
             shell: "main",
             componentPath: "apps/AppsGrid",
+            expandable: true,
             searchable: true,
-            expandSize: sizePresets.quarter,
+            expandSize: sizePresets.half,
             shape: "Ghostish",
-            enabled: Mem.options.sidebar.content.apps,
-            async: true
+            enabled: Mem.options.sidebar.content.apps
         },
         "API": {
             icon: "cognition",
