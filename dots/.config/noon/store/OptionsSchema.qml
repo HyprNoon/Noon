@@ -229,15 +229,12 @@ JsonAdapter {
         content: JsonObject {
             property bool apps: true
             property bool apis: true
-            property bool share: false
-            property bool web: false
             property bool shelf: true
             property bool tasks: true
             property bool history: true
             property bool emojies: true
             property bool notifs: true
             property bool notes: true
-            property bool barSwitcher: true
             property bool beats: true
             property bool tweaks: true
             property bool wallpapers: true
@@ -245,9 +242,7 @@ JsonAdapter {
             property bool widgets: true
             property bool overview: false
             property bool sounds: true
-            property bool deen: true
             property bool timers: true
-            property bool games: false
         }
 
         behavior: JsonObject {

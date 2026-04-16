@@ -378,16 +378,6 @@ Singleton {
                     "key": "sidebar.content.apis"
                 },
                 {
-                    "icon": "share",
-                    "name": "QuickShare",
-                    "key": "sidebar.content.share"
-                },
-                {
-                    "icon": "public",
-                    "name": "Web",
-                    "key": "sidebar.content.web"
-                },
-                {
                     "icon": "view_agenda",
                     "name": "Shelf",
                     "key": "sidebar.content.shelf"
@@ -438,11 +428,6 @@ Singleton {
                     "key": "sidebar.content.session"
                 },
                 {
-                    "icon": "sports_esports",
-                    "name": "Games",
-                    "key": "sidebar.content.games"
-                },
-                {
                     "icon": "stylus",
                     "name": "Notes",
                     "key": "sidebar.content.notes"
@@ -451,11 +436,6 @@ Singleton {
                     "icon": "extension",
                     "name": "Widgets",
                     "key": "sidebar.content.widgets"
-                },
-                {
-                    "icon": "more_horiz",
-                    "name": "Misc",
-                    "key": "sidebar.content.misc"
                 }
             ]
         },
