@@ -59,9 +59,9 @@ StyledRect {
                     required property var modelData
                     required property int index
                     readonly property var listData: root.tabButtonList.find(item => item.component === modelData)
-                    active: root.lazy && root.selectedTabIndex === index
+                    active: root.lazy ? root.selectedTabIndex === index : true
                     source: root.path + modelData + ".qml"
-                    asynchronous: true
+                    asynchronous: root.lazy
                     onLoaded: {
                         if (listData.preload in _item) {
                             // if (listData.preload && listData.preloadData)

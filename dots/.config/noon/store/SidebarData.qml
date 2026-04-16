@@ -21,7 +21,7 @@ Singleton {
             icon: "rocket",
             activeIcon: "rocket_launch",
             shell: "main",
-            componentPath: "apps/AppsGrid",
+            componentPath: "apps/Apps",
             expandable: true,
             searchable: true,
             expandSize: sizePresets.half,
