@@ -23,9 +23,9 @@ Item {
     }
     Connections {
         target: player
-        function on_PlayingChanged(){
+        function on_PlayingChanged() {
             if (player._playing)
-                opacity = 1
+                opacity = 1;
         }
     }
     function hide() {
@@ -79,23 +79,21 @@ Item {
                         {
                             "icon": "fullscreen",
                             "action": () => {
-                                root.window.fullscreen = !root.window.fullscreen
+                                root.window.fullscreen = !root.window.fullscreen;
                             }
                         }
-
                     ]
-                    delegate: RippleButtonWithIcon {
+                    delegate: GroupButtonWithIcon {
                         required property var modelData
-                        implicitSize: bg.height * 0.5
-                        materialIconFill: true
+                        baseSize: bg.height * 0.5
                         materialIcon: modelData.icon
                         releaseAction: () => modelData.action()
                     }
                 }
             }
             StyledProgressBar {
-                id:progressBar
-                visible:root.player._playing
+                id: progressBar
+                visible: root.player._playing
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: 16
@@ -116,7 +114,6 @@ Item {
                         root.player.position = ratio * root.player.length;
                     }
                 }
-
             }
         }
     }

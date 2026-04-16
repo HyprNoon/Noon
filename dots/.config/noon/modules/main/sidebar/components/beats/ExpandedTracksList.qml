@@ -102,7 +102,7 @@ StyledRect {
             bottom: parent.bottom
             right: parent.right
             left: parent.left
-            margins: Padding.normal
+            margins: Padding.large
         }
         radius: Rounding.massive
         color: root.colors.colLayer3
@@ -111,52 +111,38 @@ StyledRect {
         StyledListView {
             id: foldersList
             anchors.fill: parent
-            anchors.leftMargin: Padding.huge
             anchors.margins: Padding.normal
             orientation: Qt.Horizontal
             model: Mem.states.mediaPlayer.folders.concat(["ADD"])
 
-            delegate: StyledRect {
+            delegate: GroupButtonWithIcon {
                 required property var modelData
                 readonly property bool isAdd: modelData === "ADD"
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    margins: Padding.small
-                }
-                width: height
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                baseWidth: height
                 radius: Rounding.large
-                color: root.colors.colLayer4
-
-                Symbol {
-                    anchors.centerIn: parent
-                    text: isAdd ? "add" : "folder"
-                    fill: 1
-                    color: root.colors.colOnLayer4
-                    font.pixelSize: 20
+                color: root.colors.colLayer4Hover
+                materialIcon: isAdd ? "add" : "folder"
+                releaseAction: () => {
+                    if (isAdd) {
+                        BeatsService.addNewFolder();
+                    } else {
+                        Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
+                    }
+                }
+                altAction: () => {
+                    if (!isAdd) {
+                        let currentFolders = Mem.states.mediaPlayer.folders;
+                        let updatedFolders = currentFolders.filter(path => path !== modelData);
+                        Mem.states.mediaPlayer.folders = updatedFolders;
+                    }
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onPressed: event => {
-                        if (event.button === Qt.LeftButton) {
-                            if (isAdd) {
-                                BeatsService.addNewFolder();
-                            } else {
-                                Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
-                            }
-                        } else if (event.button === Qt.RightButton && !isAdd) {
-                            let currentFolders = Mem.states.mediaPlayer.folders;
-                            let updatedFolders = currentFolders.filter(path => path !== modelData);
-                            Mem.states.mediaPlayer.folders = updatedFolders;
-                        }
-                    }
-                    StyledToolTip {
-                        extraVisibleCondition: parent.containsMouse
-                        content: FileUtils.getEscapedFileName(modelData)
-                    }
+                StyledToolTip {
+                    extraVisibleCondition: parent.containsMouse
+                    content: FileUtils.getEscapedFileName(modelData)
                 }
             }
         }

@@ -36,13 +36,13 @@ Button {
     Layout.fillHeight: (clickIndex - 1 <= parentGroup.children.indexOf(root) && parentGroup.children.indexOf(root) <= clickIndex + 1)
     implicitWidth: (root.down && bounce) ? clickedWidth : baseWidth
     implicitHeight: (root.down && bounce) ? clickedHeight : baseHeight
-
-    property color colBackground: ColorUtils.transparentize(Colors.colLayer1Hover, 1) || "transparent"
-    property color colBackgroundHover: Colors.colLayer1Hover ?? "#E5DFED"
-    property color colBackgroundActive: Colors.colLayer1Active ?? "#D6CEE2"
-    property color colBackgroundToggled: Colors.colPrimary ?? "#65558F"
-    property color colBackgroundToggledHover: Colors.colPrimaryHover ?? "#77699C"
-    property color colBackgroundToggledActive: Colors.colPrimaryActive ?? "#D6CEE2"
+    property QtObject colors: Colors
+    property color colBackground: ColorUtils.transparentize(colors.colLayer1Hover, 1) || "transparent"
+    property color colBackgroundHover: colors.colLayer1Hover ?? "#E5DFED"
+    property color colBackgroundActive: colors.colLayer1Active ?? "#D6CEE2"
+    property color colBackgroundToggled: colors.colPrimary ?? "#65558F"
+    property color colBackgroundToggledHover: colors.colPrimaryHover ?? "#77699C"
+    property color colBackgroundToggledActive: colors.colPrimaryActive ?? "#D6CEE2"
 
     property real radius: root.down ? root.buttonRadiusPressed : root.buttonRadius
     property real leftRadius: root.down ? root.buttonRadiusPressed : root.buttonRadius
@@ -120,6 +120,6 @@ Button {
     contentItem: StyledText {
         leftPadding: root.buttonTextPadding
         text: root.buttonText
-        color: root.toggled ? Colors.colOnPrimary : Colors.colOnLayer1
+        color: root.toggled ? colors.colOnPrimary : colors.colOnLayer1
     }
 }

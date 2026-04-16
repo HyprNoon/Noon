@@ -113,7 +113,6 @@ ColumnLayout {
         spacing: Padding.small
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
-
         MediaButton {
             materialIcon: "shuffle"
             enabled: root.player?.canControl
@@ -182,10 +181,12 @@ ColumnLayout {
         }
     }
 
-    component MediaButton: RippleButtonWithIcon {
-        implicitSize: 32
+    component MediaButton: GroupButtonWithIcon {
+        Layout.fillHeight: false
+        Layout.fillWidth: false
+        buttonRadiusPressed: Rounding.tiny
+        baseSize: 32
         colors: BeatsService.colors
-        buttonRadius: Rounding.full
-        opacity: enabled ? 1 : 0.5
+        buttonRadius: Rounding.large
     }
 }

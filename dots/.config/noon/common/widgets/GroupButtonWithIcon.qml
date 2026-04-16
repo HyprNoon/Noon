@@ -15,7 +15,7 @@ GroupButton {
 
     Symbol {
         id: symb
-        color: Colors.colOnLayer2
+        color: parent.toggled ? Colors.colOnPrimary : Colors.colOnLayer2
         font.pixelSize: Fonts.sizes.large
         anchors.centerIn: parent
         fill: 1
