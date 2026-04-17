@@ -27,17 +27,34 @@ Item {
         anchors.fill: parent
         color: colors.colLayer2
 
-        StyledListView {
+        ListView {
             id: navRailList
             anchors.centerIn: parent
             implicitWidth: Sizes.sidebar.bar * 2 / 3
             implicitHeight: contentHeight
-            hint: true
             clip: true
-            popin: false
-            radius: Rounding.large
             spacing: sleek ? Padding.normal : Padding.verylarge
             model: SidebarData.enabledCategories
+            currentIndex: SidebarData.enabledCategories.indexOf(root.selectedCategory)
+            highlightFollowsCurrentItem: false
+            highlight: Item {
+                width: navRailList.width
+                height: navRailList.currentItem ? navRailList.currentItem.height : 0
+                y: navRailList.currentItem ? navRailList.currentItem.y : 0
+                z: -2
+
+                Behavior on y {
+                    Anim {}
+                }
+
+                StyledRect {
+                    anchors.centerIn: parent
+                    width: navRailList.width
+                    height: width * 0.8
+                    radius: width / 2
+                    color: root.colors.colSecondaryContainer
+                }
+            }
 
             delegate: NavigationRailButton {
                 required property int index
@@ -50,16 +67,16 @@ Item {
 
                 implicitWidth: baseSize
 
-                baseSize: Math.round(navRailList.width * 0.88)
+                baseSize: Math.round(navRailList.width)
                 toggled: root.selectedCategory === modelData
 
                 buttonIcon: SidebarData?.getIcon(modelData, toggled ?? false)
                 buttonText: modelData || ""
 
-                highlightColor: root.colors.colSecondaryContainer
-                highlightColorHover: root.colors.colSecondaryContainerHover
-                highlightColorActive: root.colors.colSecondaryContainerActive
-                itemColorActive: root.colors.colOnLayer2
+                highlightColor: "transparent"
+                highlightColorHover: index === navRailList?.currentIndex ? "transparent" : root.colors.colLayer2Hover
+                highlightColorActive: "transparent"
+                itemColorActive: root.colors.colOnSecondaryContainer
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton

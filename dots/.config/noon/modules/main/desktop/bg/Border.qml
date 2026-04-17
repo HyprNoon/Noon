@@ -12,7 +12,7 @@ StyledPanel {
 
     property int frameThickness: Sizes.frameThickness
 
-    name: "border"
+    name: "blurred_layer"
     color: "transparent"
     visible: true
     WlrLayershell.layer: WlrLayer.Top

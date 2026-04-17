@@ -16,7 +16,7 @@ Scope {
 
         StyledPanel {
             id: dockRoot
-            name: "dock"
+            name: "slide_layer"
             shell: "noon"
             screen: modelData
             _layer: "Top"

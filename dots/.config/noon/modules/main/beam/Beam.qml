@@ -12,7 +12,7 @@ import qs.store
 
 StyledPanel {
     id: root
-    name: "slide_layer"
+    name: "blurred_layer"
     property bool isRecording: false // dummy
     readonly property int detectionArea: scrollReveal ? 20 : 4
     readonly property bool scrollReveal: Mem.options.beam.behavior.scrollToReveal

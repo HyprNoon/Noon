@@ -92,9 +92,9 @@ TabButton {
                 }
             }
 
-            Behavior on color {
-                CAnim {}
-            }
+            // Behavior on color {
+            //     CAnim {}
+            // }
         }
 
         Item {
@@ -114,9 +114,8 @@ TabButton {
 
                 rotation: root.buttonIconRotation
                 anchors.centerIn: parent
-                font.pixelSize: root.baseSize / 1.7
+                font.pixelSize: root.baseSize / 2
                 fill: toggled ? 1 : 0
-                font.weight: (toggled || root.hovered) ? Font.DemiBold : Font.Normal
                 text: buttonIcon
                 color: toggled ? root.itemColorActive : root.itemColor
 

@@ -71,7 +71,7 @@ StyledPanel {
         });
     }
 
-    name: "sidebar"
+    name: "blurred_layer"
     visible: true
     implicitWidth: visualContainer.width + bubble.width + Sizes.hyprland.gapsOut + rounding
     exclusiveZone: !hoverMode && pinned ? implicitWidth - rounding : appearanceMode === 3 ? 0 : -1

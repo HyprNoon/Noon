@@ -20,6 +20,7 @@ Scope {
             id: backgroundPanel
             required property var modelData
             screen: modelData
+            shell: "noshell"
             name: "bg"
             WlrLayershell.layer: WlrLayer.Background
             color: Colors.colLayer0

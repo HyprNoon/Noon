@@ -14,7 +14,7 @@ GroupButton {
     property string buttonSubtext
     property bool showButtonName: false
     property bool halfToggled: toggled
-    readonly property int smallRadius: Rounding.large
+    readonly property int smallRadius: Rounding.large + 2
     readonly property int largeRadius: 50
 
     Layout.fillWidth: showButtonName

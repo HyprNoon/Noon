@@ -26,8 +26,30 @@ Item {
             bottomMargin: Padding.large
             topMargin: Padding.normal
         }
+        RowLayout {
+            Layout.fillWidth: true
+            DateUptime {}
+            ButtonGroup {
+                GroupButtonWithIcon {
+                    baseSize: 40
+                    buttonRadius: 20
+                    materialIcon: "settings"
+                    materialIconFill: 1
+                    releaseAction: () => {
+                        NoonUtils.callIpc("sidebar hide");
+                        Qt.callLater(() => NoonUtils.callIpc("apps settings"));
+                    }
+                }
 
-        DateUptime {}
+                GroupButtonWithIcon {
+                    baseSize: 40
+                    buttonRadius: 20
+                    materialIcon: "power_settings_new"
+                    materialIconFill: 1
+                    releaseAction: () => NoonUtils.callIpc("sidebar reveal Session")
+                }
+            }
+        }
 
         Group {
             visible: Mem.options.sidebar.appearance.showSliders ?? false
@@ -92,11 +114,15 @@ Item {
         ListView {
             Layout.alignment: Qt.AlignHCenter
             spacing: Padding.small
+            Layout.margins: Padding.normal
             Layout.fillWidth: true
-            Layout.preferredHeight: 80
+            Layout.preferredHeight: 70
             clip: true
-            snapMode: ListView.SnapOneItem
+            snapMode: ListView.SnapToItem
             orientation: Qt.Horizontal
+            displayMarginBeginning: 70
+            displayMarginEnd: 70
+
             model: ["CaffieneToggle", "EasyEffectsToggle", "RecordToggle", "GameModeToggle", "InputToggle", "BacklightToggle"]
             delegate: StyledLoader {
                 anchors.verticalCenter: parent?.verticalCenter
@@ -108,6 +134,7 @@ Item {
     }
 
     component DateUptime: ColumnLayout {
+        Layout.fillWidth: true
         Layout.preferredHeight: 45
         spacing: 0
         Layout.alignment: Qt.AlignTop
