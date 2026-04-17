@@ -212,6 +212,7 @@ JsonAdapter {
             property bool revealOnEmpty: false
             property bool topMode: false
             property bool clearAiChatBeforeSearch: false
+            property bool revealLauncherOnAction: true
         }
     }
 
@@ -397,6 +398,8 @@ JsonAdapter {
         property string horizontalLayout: "Dynamic"
         property string verticalLayout: "VDynamic"
         property string currentLayout: "Dynamic"
+        property list<var> hMapPresets: []
+        property list<var> vMapPresets: []
         property JsonObject vMap: JsonObject {
             property int spacing: 6
             property list<string> topArea: ["materialStatusIcons", "battery", "weather", "tray"]

@@ -98,24 +98,30 @@ Singleton {
             Mem.states.services.timers.timers = updated;
         }
     }
-
-    function addTimer(name: string, duration: int, isPreset: bool) {
+    function addAndStartTimer(name, duration) {
+        const id = addTimer(name, duration, false);
+        Qt.callLater(() => startTimer(id));
+        return id;
+    }
+    function addTimer(name: string, duration: int, isPreset: bool, autoStart = false) {
         const newTimer = {
             id: nextTimerId,
             name: name,
             originalDuration: duration,
             remainingTime: duration,
-            isRunning: false,
-            startTime: 0,
+            isRunning: autoStart,
+            startTime: autoStart ? Date.now() : 0,
             preset: isPreset,
-            icon: root.presets.find(preset => preset.duration === duration)?.icon ?? "timer"
+            icon: root.presets.find(p => p.duration === duration)?.icon ?? "timer"
         };
 
         Mem.states.services.timers.nextTimerId = nextTimerId + 1;
         Mem.states.services.timers.timers = timers.concat([newTimer]);
+
+        if (autoStart)
+            NoonUtils.playSound("record_started");
         return newTimer.id;
     }
-
     function removeTimer(timerId) {
         Mem.states.services.timers.timers = timers.filter(t => t.id !== timerId);
     }

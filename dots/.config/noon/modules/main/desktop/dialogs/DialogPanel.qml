@@ -81,7 +81,6 @@ Scope {
                         },
                         "incubate": {
                             comp: "IncubatorContent",
-                            preload: "category",
                             focus: true,
                             size: Qt.size(Screen.width * 0.8, Screen.height * 0.7)
                         },

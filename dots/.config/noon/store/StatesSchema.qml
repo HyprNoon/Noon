@@ -21,7 +21,11 @@ JsonAdapter {
         property JsonObject appearance
         property JsonObject clock
         property JsonObject shell
+        property JsonObject dialogs
 
+        dialogs: JsonObject {
+            property string lastIncubatedCategory
+        }
         shell: JsonObject {
             property bool deload: false
         }

@@ -96,6 +96,7 @@ Singleton {
             shell: "main",
             componentPath: "beats/Beats",
             expandable: true,
+            incubatable: true,
             detachable: true,
             shape: "Bun",
             enabled: Mem.options.sidebar.content.beats,

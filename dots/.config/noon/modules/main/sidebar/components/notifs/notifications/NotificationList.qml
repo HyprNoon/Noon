@@ -19,12 +19,11 @@ StyledRect {
     // Scrollable window
     NotificationListView {
         id: listview
-
+        hint: true
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: statusRow.top
-        anchors.margins: Padding.normal
         layer.enabled: true
         popup: false
     }
@@ -53,13 +52,13 @@ StyledRect {
         anchors.bottom: parent.bottom
         anchors.margins: Padding.small
         Layout.fillWidth: true
-        implicitHeight: Math.max(controls.implicitHeight, statusText.implicitHeight)
+        implicitHeight: 50
 
         StyledText {
             id: statusText
-            anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.margins: Padding.huge
+            anchors.leftMargin: Padding.huge
+            anchors.verticalCenter: parent.verticalCenter
             horizontalAlignment: Text.AlignHCenter
             text: `${Notifications.list.length} notifications`
             opacity: Notifications.list.length > 0 ? 1 : 0
@@ -76,23 +75,18 @@ StyledRect {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: Padding.large
-            anchors.verticalCenterOffset: -Padding.large
 
             NotificationStatusButton {
                 buttonIcon: "notifications_paused"
                 buttonText: qsTr("Silent")
                 toggled: Notifications.silent
-                onClicked: () => {
-                    return Mem.options.services.notifications.silent = !Notifications.silent;
-                }
+                onClicked: () => Mem.options.services.notifications.silent = !Notifications.silent
             }
 
             NotificationStatusButton {
                 buttonIcon: "clear_all"
                 buttonText: qsTr("Clear")
-                onClicked: () => {
-                    Notifications.discardAllNotifications();
-                }
+                onClicked: () => Notifications.discardAllNotifications()
             }
         }
     }

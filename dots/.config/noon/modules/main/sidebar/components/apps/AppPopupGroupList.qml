@@ -91,7 +91,7 @@ StyledRect {
             focus: true
             model: popup.appsData
             spacing: Padding.small
-            hint: false
+            hint: true
             clip: true
             radius: Rounding.huge
             highlightFollowsCurrentItem: true

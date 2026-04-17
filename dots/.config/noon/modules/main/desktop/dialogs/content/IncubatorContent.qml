@@ -15,15 +15,18 @@ Item {
     clip: true
     anchors.fill: parent
     signal dismiss
-    property string category
+    readonly property string category: Mem.states.desktop.dialogs.lastIncubatedCategory
+
     ContentChild {
         anchors.fill: parent
-        _detached: true
         category: root.category
         anchors.margins: ["View", "Beats", "Notes"].includes(category) ? 0 : Padding.massive
+        _detached: true
+        _expanded: true
         parentRoot: root
         colors: SidebarData.getColors(category)
     }
+
     StyledLoader {
         anchors.fill: parent
         shown: !category

@@ -18,6 +18,7 @@ Item {
     readonly property bool effectiveSearchable: SidebarData.isSearchable(category)
     property string previousCategory: ""
     property bool _detached: false
+    property bool _expanded: parentRoot?.expanded
     property bool _aux: false
     property alias searchInput: searchBar.searchInput
 
@@ -120,7 +121,7 @@ Item {
                 if ("detached" in item)
                     item.detached = Qt.binding(() => _detached);
                 if ("expanded" in item && !_aux)
-                    item.expanded = Qt.binding(() => parentRoot.expanded);
+                    item.expanded = Qt.binding(() => _expanded);
                 if ("panelWindow" in item)
                     item.panelWindow = Qt.binding(() => parentRoot);
 

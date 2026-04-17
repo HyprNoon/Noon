@@ -113,15 +113,12 @@ Item {
         }
         ListView {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Padding.small
+            spacing: Padding.normal
             Layout.margins: Padding.normal
             Layout.fillWidth: true
-            Layout.preferredHeight: 70
-            clip: true
+            Layout.preferredHeight: 60
             snapMode: ListView.SnapToItem
             orientation: Qt.Horizontal
-            displayMarginBeginning: 70
-            displayMarginEnd: 70
 
             model: ["CaffieneToggle", "EasyEffectsToggle", "RecordToggle", "GameModeToggle", "InputToggle", "BacklightToggle"]
             delegate: StyledLoader {

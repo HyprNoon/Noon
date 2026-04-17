@@ -43,6 +43,7 @@ StyledPanel {
         if (SidebarData.isIncubatable(cat)) {
             GlobalStates.main.sysDialogs.mode = "incubate";
             GlobalStates.main.sysDialogs.pendingData = cat;
+            Mem.states.desktop.dialogs.lastIncubatedCategory = cat;
         }
     }
     function detach(cat = selectedCategory) {
