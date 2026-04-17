@@ -52,7 +52,7 @@ Singleton {
             "wdth": 100
         }
         readonly property var title: {
-            "wght": 650
+            "wght": 600
         }
         readonly property var longNumbers: {
             "wght": 600,

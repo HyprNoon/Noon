@@ -11,14 +11,13 @@ import Quickshell.Services.Pipewire
 GroupButton {
     id: button
     required property bool input
-
+    baseHeight: 70
     buttonRadius: Rounding.verylarge
     colBackground: Colors.colLayer2
     colBackgroundHover: Colors.colLayer2Hover
     colBackgroundActive: Colors.colLayer2Active
     clickedWidth: baseWidth + 30
-
-    contentItem: RowLayout {
+    RowLayout {
         anchors.fill: parent
         anchors.margins: 5
         spacing: 10

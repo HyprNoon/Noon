@@ -40,6 +40,12 @@ BarGroup {
             visible: Notifications.silent
         },
         {
+            icon: "shield",
+            visible: PolkitService.interactionAvailable,
+            action: () => NoonUtils.callIpc("sidebar reveal Auth"),
+            tooltip: PolkitService?.flow?.message
+        },
+        {
             icon: "mode_heat",
             visible: ResourcesService.stats.cpu_temp > 85,
             tooltip: "CPU Temp: " + ResourcesService.stats.cpu_temp
@@ -76,9 +82,12 @@ BarGroup {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: if (modelData.dialog !== null) {
-                        GlobalStates.main.dialogs.current = modelData.dialog;
-                        NoonUtils.callIpc("sidebar reveal Notifs");
+                    onClicked: {
+                        if (modelData.dialog) {
+                            GlobalStates.main.dialogs.current = modelData.dialog;
+                            NoonUtils.callIpc("sidebar reveal Notifs");
+                        } else
+                            modelData?.action() ?? null;
                     }
                     StyledLoader {
                         shown: modelData.hoverItem !== null

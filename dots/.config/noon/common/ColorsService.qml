@@ -1,6 +1,7 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 import qs.store
+import qs.common
 import qs.services
 import qs.common.utils
 
@@ -11,13 +12,7 @@ Singleton {
 
     ConfigFileView {
         id: colorsView
-
         path: Mem.options.appearance.colors?.palattePath
         ColorsSchema {}
-        onPathChanged: {
-            Qt.callLater(() => {
-                WallpaperService.changeAccentColor(Colors?.m3.m3primaryContainer);
-            });
-        }
     }
 }

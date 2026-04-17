@@ -4,6 +4,7 @@ import Quickshell
 import qs.common
 import qs.common.widgets
 import qs.services
+import qs.store
 import "quickToggles"
 import "sliders"
 
@@ -46,44 +47,62 @@ Item {
             }
         }
         Group {
-            Layout.preferredHeight: grid.implicitHeight + Padding.massive
-            GridLayout {
+            id: mainGroup
+            Layout.preferredHeight: grid.implicitHeight + Padding.massive * 1.5
+            Layout.fillWidth: true
+            radius: Rounding.massive
+            ColumnLayout {
                 id: grid
-                anchors.centerIn: parent
-                columns: 2
-                rowSpacing: Padding.normal
-                columnSpacing: Padding.normal
-
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.margins: Padding.huge
+                spacing: Padding.normal
                 Repeater {
-                    model: ["NetworkToggle", "BluetoothToggle", "NightLightToggle", "AppearanceToggle", "PhoneToggle", "TransparencyToggle"]
-                    StyledLoader {
+                    model: [
+                        {
+                            items: ["NetworkToggle", "BluetoothToggle"]
+                        },
+                        {
+                            items: ["NightLightToggle", "AppearanceToggle"]
+                        },
+                        {
+                            items: ["PhoneToggle", "TransparencyToggle"]
+                        }
+                    ]
+                    delegate: ButtonGroup {
                         required property var modelData
-                        source: sanitizeSource("quickToggles/", modelData)
-                        onLoaded: if (ready) {
-                            item.showButtonName = true;
+                        required property int index
+                        Layout.fillWidth: true
+                        spacing: Padding.normal
+
+                        Repeater {
+                            model: modelData.items
+                            delegate: StyledLoader {
+                                required property var modelData
+                                Layout.fillWidth: true
+                                source: sanitizeSource("quickToggles/", modelData)
+                                onLoaded: _item.showButtonName = true
+                            }
                         }
                     }
                 }
             }
         }
-
-        Group {
-            implicitHeight: row.implicitHeight + Padding.large
-
-            RowLayout {
-                id: row
-                anchors.centerIn: parent
-                spacing: Padding.small
-                Repeater {
-                    model: ["CaffieneToggle", "EasyEffectsToggle", "RecordToggle", "GameModeToggle", "InputToggle", "BacklightToggle"]
-                    StyledLoader {
-                        required property var modelData
-                        source: sanitizeSource("quickToggles/", modelData)
-                        onLoaded: if (ready) {
-                            item.showButtonName = false;
-                        }
-                    }
-                }
+        ListView {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: Padding.small
+            Layout.fillWidth: true
+            Layout.preferredHeight: 80
+            clip: true
+            snapMode: ListView.SnapOneItem
+            orientation: Qt.Horizontal
+            model: ["CaffieneToggle", "EasyEffectsToggle", "RecordToggle", "GameModeToggle", "InputToggle", "BacklightToggle"]
+            delegate: StyledLoader {
+                anchors.verticalCenter: parent?.verticalCenter
+                required property var modelData
+                source: sanitizeSource("quickToggles/", modelData)
+                onLoaded: _item.showButtonName = false
             }
         }
     }
