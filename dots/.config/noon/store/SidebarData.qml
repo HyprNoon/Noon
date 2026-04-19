@@ -174,6 +174,11 @@ Singleton {
             baseSize: sizePresets.session,
             enabled: Mem.options.sidebar.content.session
         },
+        "Plugins": {
+            icon: "extension",
+            componentPath: "plugins/Plugins",
+            shape: "PixelTriangle"
+        },
         "DMenu": {
             icon: "dashboard",
             componentPath: "etc/DMenu",

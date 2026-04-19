@@ -17,6 +17,7 @@ StyledRect {
     property Component imageComponent: BeamImagePopupItem {}
     property Component iconComponent: BeamIconPopupItem {}
     property Component symbolComponent: BeamSymbolPopupItem {}
+    property Component modelComponent: BeamModelDelegator {}
 
     readonly property var appData: {
         return hintText.length > 0 ? (DesktopEntries.byId(hintText) || null) : null;
@@ -42,8 +43,6 @@ StyledRect {
             "active": true
         }
     }
-    readonly property bool topMode: Mem.options.beam.behavior.topMode ?? false
-    readonly property var currentConf: contentMap[activeState] || contentMap["all"]
 
     z: -1
     visible: opacity > 0
@@ -67,9 +66,8 @@ StyledRect {
             easing.bezierCurve: Animations.curves.standardDecel
         }
     }
-
-    width: Math.max(200, Math.min(hintText.length * 80, mainBg.width))
-    height: Math.max(136, Math.min(500, popupText?.contentHeight + Padding.massive))
+    width: Math.min(Sizes.beamPopupExpanded.width - 200, Math.max(popupText?.contentWidth + Padding.massive, mainBg.implicitWidth + Padding.massive))
+    height: Math.max(136, Math.min(Sizes.beamPopupExpanded.height, popupText?.contentHeight + Padding.massive))
     color: Colors.colLayer0
     enableBorders: true
     radius: Rounding.massive
@@ -96,19 +94,19 @@ StyledRect {
             Layout.fillHeight: true
             Layout.fillWidth: true
             StyledFlickable {
-                id: scrollArea
+                visible: root.hintText.length > 0
                 anchors.fill: parent
                 anchors.topMargin: Padding.massive
                 contentHeight: hintContent.implicitHeight
                 clip: true
                 ColumnLayout {
                     id: hintContent
-                    visible: root.hintText.length > 0
                     anchors.fill: parent
                     spacing: 0
 
                     StyledTextArea {
                         id: popupText
+                        wrapMode: root.width === Sizes.beamPopupExpanded.width ? Text.Wrap : undefined
                         textFormat: Text.PlainText
                         text: root.hintText || ""
                         Layout.fillWidth: true
@@ -120,7 +118,7 @@ StyledRect {
                         SyntaxHighlighter {
                             textEdit: popupText
                             repository: Repository
-                            definition: Repository.definitionForName("bash")
+                            definition: Repository.definitionForName(BeamData.config?.isPlugin ? "bash" : "plaintext")
                             theme: Colors.m3.darkmode ? "Dracula" : "ayu Light"
                         }
                     }

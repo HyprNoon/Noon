@@ -32,7 +32,6 @@ Singleton {
         "battery": "BatteryIndicator",
         "separator": "HSeparator",
         "space": "Spacer",
-        "date": "DateWidget",
         "volume": "VolumeIndicator",
         "tray": "Tray",
         "brightness": "BrightnessIndicator"

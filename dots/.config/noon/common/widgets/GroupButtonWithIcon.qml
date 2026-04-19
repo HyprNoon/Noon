@@ -7,6 +7,7 @@ GroupButton {
     property alias materialIconFill: symb.fill
     property alias materialIcon: symb.text
     property alias animateIcon: symb.animateChange
+    property alias colSymbol: symb.color
     property int implicitSize: 36
     baseWidth: implicitSize
     baseHeight: implicitSize

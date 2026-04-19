@@ -1,3 +1,4 @@
+import "components/plugins"
 import "components/apps"
 import "components/downloads"
 import "components/notes"

@@ -52,7 +52,7 @@ StyledRect {
         highlightMoveDuration: 300
 
         onContentYChanged: {
-            if (contentHeight > 0 && contentY + height >= contentHeight - height * 0.5)
+            if (contentHeight > 0 && contentY + height >= contentHeight - height * 0.25)
                 OnlineWallpaperService.loadMore();
         }
 
@@ -70,15 +70,13 @@ StyledRect {
                 isKeyboardSelected: listView.currentIndex === index
                 isCurrentWallpaper: WallpaperService.currentWallpaper.toString().includes(modelData.id + ".")
                 fileUrl: modelData.thumbUrl
-                applyAction: () => {
-                    OnlineWallpaperService.downloadAndApply(modelData);
-                }
+                applyAction: () => OnlineWallpaperService.downloadAndApply(modelData)
 
                 StyledRect {
                     z: 999
                     anchors {
                         bottom: parent.bottom
-                        left: parent.left
+                        right: parent.right
                         margins: Padding.large
                     }
                     width: resLabel.implicitWidth + Padding.large
@@ -91,7 +89,7 @@ StyledRect {
                         id: resLabel
                         anchors.centerIn: parent
                         text: modelData.resolution
-                        font.pixelSize: 10
+                        font.pixelSize: Fonts.sizes.verysmall
                         color: Colors.colOnPrimary
                     }
                 }
@@ -103,12 +101,10 @@ StyledRect {
                 color: Colors.colLayer0
                 opacity: OnlineWallpaperService.downloadingId === modelData.id ? 0.65 : 0
 
-                Symbol {
+                MaterialLoadingIndicator {
+                    z: 999
+                    loading: parent.opacity > 0
                     anchors.centerIn: parent
-                    text: "downloading"
-                    font.pixelSize: 32
-                    color: Colors.colPrimary
-                    visible: parent.opacity > 0
                 }
             }
 

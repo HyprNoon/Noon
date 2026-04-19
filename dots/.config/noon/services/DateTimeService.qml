@@ -1,36 +1,32 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
-import qs.common
-import qs.common.utils
 import QtQuick
 import Quickshell
+import qs.common
+import qs.common.utils
 
-/**
- * A nice wrapper for date and time strings.
- */
 Singleton {
+    id: root
+    property string uptime: "0h, 0m"
+    readonly property string date: request("dddd, dd/MM")
+    readonly property string day: request("dd")
+    readonly property string month: request("MMMM")
+    readonly property string year: request("yyyy")
+    readonly property string minute: request("mm")
     readonly property alias clock: clock
     readonly property bool twelveHour: Mem.options.services.time.use12HourFormat
-    property string time: twelveHour ? Qt.formatDateTime(clock.date, "hh:mm ap") : Qt.formatDateTime(clock.date, "HH:mm")
-    property string date: Qt.formatDateTime(clock.date, "dddd, dd/MM")
-    property string day: Qt.formatDateTime(clock.date, "dd")
-    property string month: Qt.formatDateTime(clock.date, "MMMM")
-    property string year: Qt.formatDateTime(clock.date, "yyyy")
-    property string hour: twelveHour ? Qt.formatDateTime(clock.date, "hh AP").split(" ")[0] : Qt.formatDateTime(clock.date, "HH")
-    property string minute: Qt.formatDateTime(clock.date, "mm")
+    readonly property string time: twelveHour ? request("hh:mm ap") : request("HH:mm")
+    readonly property string hour: twelveHour ? request("hh AP").split(" ")[0] : request("HH")
+    readonly property string dayTime: twelveHour ? request("hh AP").split(" ")[1] : ""
+    readonly property string collapsedCalendarFormat: request("dd MMMM yyyy")
+    readonly property string arabicDayName: clock.date.toLocaleDateString(Qt.locale("ar_SA"), "dddd")
+    readonly property string gnome_format: twelveHour ? request("hh:mm ap") : request("HH:mm")
 
-    property string dayTime: twelveHour ? Qt.formatDateTime(clock.date, "hh AP").split(" ")[1] : ""
-
-    // Arabic week day name
-    property string arabicDayName: clock.date.toLocaleDateString(Qt.locale("ar_SA"), "dddd")
-    property string uptime: "0h, 0m"
-    property string collapsedCalendarFormat: Qt.formatDateTime(clock.date, "dd MMMM yyyy")
-
-    property string gnome_format: {
-        var timeFormat = twelveHour ? "hh:mm ap" : "HH:mm";
-        return Qt.formatDateTime(clock.date, "dd MMM, ") + Qt.formatDateTime(clock.date, timeFormat);
+    function request(format) {
+        if (format)
+            return Qt.formatDateTime(clock.date, format);
     }
-    // Relative time formatting function
+
     function getRelativeTime(timestamp) {
         var now = new Date();
         var savedTime = new Date(timestamp);
@@ -48,15 +44,6 @@ Singleton {
         }
     }
 
-    /**
-     * Vertical-friendly compact date format (e.g. "25\nOct\n2025")
-     */
-    property string verticalDate: {
-        const dayStr = Qt.formatDateTime(clock.date, "dd");
-        const monthStr = Qt.formatDateTime(clock.date, "MMM");
-        return `${dayStr}\n${monthStr}`;
-    }
-
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
@@ -64,30 +51,30 @@ Singleton {
 
     Timer {
         id: uptimeRefresh
-        interval: 10
+        interval: 60000
         running: true
         repeat: true
+        triggeredOnStart: true
+
         onTriggered: {
             fileUptime.reload();
             const textUptime = fileUptime.text();
-            const uptimeSeconds = Number(textUptime.split(" ")[0] ?? 0);
+            const uptimeSeconds = parseFloat(textUptime.split(" ")[0]) || 0;
 
-            // Convert seconds to days, hours, and minutes
             const days = Math.floor(uptimeSeconds / 86400);
             const hours = Math.floor((uptimeSeconds % 86400) / 3600);
             const minutes = Math.floor((uptimeSeconds % 3600) / 60);
 
-            // Build formatted uptime string
-            let formatted = "";
+            let parts = [];
             if (days > 0)
-                formatted += `${days}d`;
+                parts.push(`${days}d`);
             if (hours > 0)
-                formatted += `${formatted ? ", " : ""}${hours}h`;
-            if (minutes > 0 || !formatted)
-                formatted += `${formatted ? ", " : ""}${minutes}m`;
-            uptime = formatted;
-            // Every 10 min
-            interval = 60 * 1000;
+                parts.push(`${hours}h`);
+
+            if (minutes > 0 || parts.length === 0)
+                parts.push(`${minutes}m`);
+
+            uptime = parts.join(", ");
         }
     }
 

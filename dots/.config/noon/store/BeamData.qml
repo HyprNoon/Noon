@@ -24,7 +24,6 @@ Singleton {
     }
 
     readonly property var config: registry[activeState]
-
     readonly property var subConfig: {
         if (!activeSubState || !config.subStates)
             return null;
@@ -131,6 +130,17 @@ Singleton {
                     NoonUtils.callIpc("sidebar reveal Alarms");
                 }
             }
+        },
+        "find": {
+            prefix: "@",
+            icon: "folder",
+            shape: "PixelCircle",
+            placeholder: "I Can Search Files ..",
+            showHint: true,
+            showOsrButton: false,
+            model: FindService.resultsModel,
+            debounce: 100,
+            executor: () => {}
         },
         "launch": {
             prefix: ".",
@@ -381,7 +391,6 @@ Singleton {
 
         activeSubState = Object.keys(subStates)[0] || "";
     }
-
     function reset() {
         query = "";
         activeState = "ai";
@@ -412,7 +421,7 @@ Singleton {
 
     Timer {
         id: debounceTimer
-        interval: 120
+        interval: config?.debounce ?? 120
         onTriggered: activeHint = config?.hinter ? config.hinter() : ""
     }
 
@@ -446,7 +455,7 @@ Singleton {
         }
     }
 
-    function buildBeamPlugins() {
+    function buildPlugins() {
         const raw = rawBeamPlugins;
         if (!raw || Object.keys(raw).length === 0)
             return {};
@@ -487,7 +496,7 @@ Singleton {
     }
 
     function rebuildRegistry() {
-        registry = Object.assign({}, mainContent, buildBeamPlugins());
+        registry = Object.assign({}, mainContent, buildPlugins());
     }
 
     function executeCommand() {
@@ -503,7 +512,7 @@ Singleton {
 
         const prefix = config?.prefix || "";
 
-        const resultStates = ["calc", "translate"];
+        const resultStates = ["calc", "translate", "find"];
         if (resultStates.includes(activeState))
             return query;
 

@@ -37,7 +37,7 @@ StyledRect {
     ScriptModel {
         id: filteredModel
         values: {
-            const entries = ClipboardService?.entries;
+            const entries = ClipboardService.entries;
             if (!entries.length)
                 return [];
 

@@ -22,12 +22,13 @@ BarGroup {
         spacing: Padding.tiny
 
         Repeater {
-            model: [DateTimeService.hour, DateTimeService.minute]
+            model: [DateTimeService.hour, DateTimeService.minute, DateTimeService.request("ddd")]
             StyledText {
                 required property var modelData
+                required property int index
                 text: modelData
                 font.variableAxes: Fonts.variableAxes.main
-                font.pixelSize: Fonts.sizes.normal
+                font.pixelSize: index === 2 ? Fonts.sizes.small : Fonts.sizes.normal
                 color: Colors.colSecondary
                 Layout.alignment: Qt.AlignHCenter
             }

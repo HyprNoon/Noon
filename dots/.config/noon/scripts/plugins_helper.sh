@@ -2,15 +2,31 @@
 
 PLUGINS_DIR="$HOME/.noon_plugins"
 
-CMD="${1:?Usage: $(basename "$0") <command> [group] [target] [-f]}"
+CMD="${1:?Usage: $(basename "$0") <command> [group] [target] [-f] [-g group]}"
 GROUP="$2"
 TARGET="$3"
 FORCE=0
-[[ "$3" == "-f" || "$4" == "-f" ]] && FORCE=1
-[[ "$3" == "-f" ]] && TARGET=""
+GROUP_OVERRIDE=""
 
-_plugin_dir() {
-    echo "$PLUGINS_DIR/$GROUP/$TARGET"
+for ((i=2; i<=$#; i++)); do
+    case "${!i}" in
+        -f) FORCE=1 ;;
+        -g) next=$((i+1)); GROUP_OVERRIDE="${!next}"; ((i++)) ;;
+    esac
+done
+
+[[ "$CMD" == "install" ]] && TARGET="$2"
+
+_find_plugin_dir() {
+    for dir in "$PLUGINS_DIR/$GROUP"/*/; do
+        local manifest="$dir/manifest.json"
+        [[ -f "$manifest" ]] || continue
+        local name
+        name=$(jq -r '.name' "$manifest")
+        [[ "$name" == "$TARGET" ]] && { echo "$dir"; return; }
+    done
+    local direct="$PLUGINS_DIR/$GROUP/$TARGET"
+    [[ -d "$direct" ]] && echo "$direct"
 }
 
 list() {
@@ -59,23 +75,6 @@ _ensure_qml_setup() {
 
     [[ -f "$manifest" ]] || { echo "  [qml] no manifest at $manifest"; return; }
 
-    local entry
-    entry=$(jq -r '.entry // empty' "$manifest")
-    [[ -n "$entry" ]] || { echo "  [qml] no entry field in manifest"; return; }
-
-    local relative_entry
-    relative_entry="${entry#@plugins/}"
-
-    local entry_file="$plugin_dir/$relative_entry"
-    [[ -f "$entry_file" ]] || { echo "  [qml] entry file not found: $entry_file"; return; }
-
-    if ! grep -qF 'import "./"' "$entry_file"; then
-        local tmp
-        tmp=$(mktemp)
-        { echo 'import "./"'; cat "$entry_file"; } > "$tmp" && mv "$tmp" "$entry_file"
-        echo "  Injected 'import \"./\"' into $relative_entry"
-    fi
-
     local name version singletons_json
     name=$(jq -r '.name' "$manifest")
     version=$(jq -r '.version // "1.0"' "$manifest")
@@ -95,56 +94,73 @@ _ensure_qml_setup() {
 
 enable() {
     local plugin_dir
-    plugin_dir=$(_plugin_dir)
+    plugin_dir=$(_find_plugin_dir)
+    [[ -n "$plugin_dir" && -d "$plugin_dir" ]] || { echo "Plugin '$GROUP/$TARGET' not found"; exit 1; }
     local manifest="$plugin_dir/manifest.json"
-    [[ -f "$manifest" ]] || { echo "Plugin '$GROUP/$TARGET' not found"; exit 1; }
     local tmp
     tmp=$(mktemp)
     jq '.enabled = true' "$manifest" > "$tmp" && mv "$tmp" "$manifest"
     _ensure_qml_setup "$plugin_dir"
-    echo "Enabled $GROUP/$TARGET"
+    echo "Enabled $(jq -r '.name' "$manifest")"
 }
 
 disable() {
     local plugin_dir
-    plugin_dir=$(_plugin_dir)
+    plugin_dir=$(_find_plugin_dir)
+    [[ -n "$plugin_dir" && -d "$plugin_dir" ]] || { echo "Plugin '$GROUP/$TARGET' not found"; exit 1; }
     local manifest="$plugin_dir/manifest.json"
-    [[ -f "$manifest" ]] || { echo "Plugin '$GROUP/$TARGET' not found"; exit 1; }
     local tmp
     tmp=$(mktemp)
     jq '.enabled = false' "$manifest" > "$tmp" && mv "$tmp" "$manifest"
-    echo "Disabled $GROUP/$TARGET"
+    echo "Disabled $(jq -r '.name' "$manifest")"
 }
 
 install() {
-    [[ -n "$GROUP" ]] || { echo "Group required: $(basename "$0") install <group> <source>"; exit 1; }
+    TARGET="${TARGET/#\~/$HOME}"
     [[ -e "$TARGET" ]] || { echo "Source '$TARGET' not found"; exit 1; }
-    local name
-    if [[ -d "$TARGET" ]]; then
-        [[ -f "$TARGET/manifest.json" ]] || { echo "No manifest.json in '$TARGET'"; exit 1; }
-        name=$(jq -r '.name' "$TARGET/manifest.json")
-        cp -r "$TARGET" "$PLUGINS_DIR/$GROUP/$name"
-    elif [[ "$TARGET" == *.tar.gz ]]; then
-        local tmp
-        tmp=$(mktemp -d)
-        tar -xzf "$TARGET" -C "$tmp"
-        local mf
-        mf=$(find "$tmp" -maxdepth 2 -name manifest.json | head -1)
-        [[ -f "$mf" ]] || { echo "No manifest.json in archive"; exit 1; }
-        name=$(jq -r '.name' "$mf")
-        cp -r "$(dirname "$mf")" "$PLUGINS_DIR/$GROUP/$name"
-        rm -rf "$tmp"
-    else
-        echo "Unsupported format. Use a directory or .tar.gz"
-        exit 1
-    fi
-    _ensure_qml_setup "$PLUGINS_DIR/$GROUP/$name"
-    echo "Installed $GROUP/$name"
+
+    local name group tmp mf manifest_file
+    case "$TARGET" in
+        *.tar.gz|*.tar|*.zip)
+            tmp=$(mktemp -d)
+            if [[ "$TARGET" == *.zip ]]; then
+                unzip -q "$TARGET" -d "$tmp"
+            else
+                tar -xf "$TARGET" -C "$tmp"
+            fi
+            mf=$(find "$tmp" -maxdepth 2 -name manifest.json | head -1)
+            [[ -f "$mf" ]] || { rm -rf "$tmp"; echo "No manifest.json in archive"; exit 1; }
+            name=$(jq -r '.name' "$mf")
+            group=$(jq -r '.pluginGroup // empty' "$mf")
+            [[ -n "$GROUP_OVERRIDE" ]] && group="$GROUP_OVERRIDE"
+            [[ -n "$group" ]] || { rm -rf "$tmp"; echo "No pluginGroup in manifest, use -g to specify"; exit 1; }
+            cp -r "$(dirname "$mf")" "$PLUGINS_DIR/$group/$name"
+            rm -rf "$tmp"
+            ;;
+        *)
+            if [[ -d "$TARGET" ]]; then
+                manifest_file="$TARGET/manifest.json"
+                [[ -f "$manifest_file" ]] || { echo "No manifest.json in '$TARGET'"; exit 1; }
+                name=$(jq -r '.name' "$manifest_file")
+                group=$(jq -r '.pluginGroup // empty' "$manifest_file")
+                [[ -n "$GROUP_OVERRIDE" ]] && group="$GROUP_OVERRIDE"
+                [[ -n "$group" ]] || { echo "No pluginGroup in manifest, use -g to specify"; exit 1; }
+                cp -r "$TARGET" "$PLUGINS_DIR/$group/$name"
+            else
+                echo "Unsupported format. Use a directory, .tar, .tar.gz, or .zip"
+                exit 1
+            fi
+            ;;
+    esac
+
+    _ensure_qml_setup "$PLUGINS_DIR/$group/$name"
+    echo "Installed $group/$name"
 }
 
 remove() {
+    [[ -n "$TARGET" ]] || { echo "Usage: $(basename "$0") remove <group> <name>"; exit 1; }
     local plugin_dir
-    plugin_dir=$(_plugin_dir)
+    plugin_dir=$(_find_plugin_dir)
     [[ -d "$plugin_dir" ]] || { echo "Plugin '$GROUP/$TARGET' not found"; exit 1; }
     rm -rf "$plugin_dir"
     echo "Removed $GROUP/$TARGET"
