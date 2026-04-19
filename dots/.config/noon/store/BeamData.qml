@@ -487,6 +487,9 @@ Singleton {
         const result = {};
         for (let key in raw) {
             const p = raw[key];
+            const isEnabled = p.enabled === undefined ? true : p.enabled === true;
+            if (!isEnabled)
+                continue;
             result[key] = Object.assign({}, p, {
                 hinter: wrap(p.hinter) ?? (() => ""),
                 executor: wrap(p.executor) ?? (() => {})
