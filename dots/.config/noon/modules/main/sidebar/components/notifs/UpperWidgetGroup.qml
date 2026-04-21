@@ -35,6 +35,10 @@ Item {
                     buttonRadius: 20
                     materialIcon: "settings"
                     materialIconFill: 1
+                    altAction: () => {
+                        NoonUtils.execDetached([Mem.options.apps.editor, Directories.shellConfigs + "/options.json"]);
+                        NoonUtils.callIpc("sidebar hide");
+                    }
                     releaseAction: () => {
                         NoonUtils.callIpc("sidebar hide");
                         Qt.callLater(() => NoonUtils.callIpc("apps settings"));

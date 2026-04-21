@@ -109,6 +109,7 @@ Item {
             }
         }
         StyledText {
+            visible: Mem.options.desktop.lock.showAzkar
             text: AzkarService?.currentZekr?.content ?? ""
             color: Colors.colSubtext
             Layout.fillWidth: true

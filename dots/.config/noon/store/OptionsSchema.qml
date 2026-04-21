@@ -140,7 +140,7 @@ JsonAdapter {
         property string browser: "zen-browser"
         property string browserAlt: "firefox"
         property string fileManager: "dolphin"
-        property string editor: "codium"
+        property string editor: "zeditor"
     }
 
     property JsonObject services: JsonObject {
@@ -358,6 +358,7 @@ JsonAdapter {
 
         lock: JsonObject {
             property bool enabled: true
+            property bool showAzkar: true
         }
 
         icons: JsonObject {}
