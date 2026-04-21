@@ -3,4 +3,4 @@
   <br>
 </p>
 <h1 align="center">NOON</h1>
-# Check out the documentation for more info [Docs](https://pharmaracist.github.io/Noon-Docs/)
+# Check out the documentation for more info (Docs)[https://pharmaracist.github.io/Noon-Docs/]
