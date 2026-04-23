@@ -108,13 +108,13 @@ BottomDialog {
                 onAccepted: Mem.states.desktop.bg.currentFolder = Qt.resolvedUrl(text.replace("~", Directories.standard.home))
             }
             GroupButton {
-                baseHeight: 45
                 clip: true
                 buttonRadius: Rounding.large
                 buttonRadiusPressed: Rounding.small
 
                 colBackground: colors.colLayer2
-                baseWidth: (text?.contentWidth ?? 50) + Padding.massive
+                baseHeight: 45
+                baseWidth: Math.max(90, text.contentWidth + Padding.huge)
                 releaseAction: () => {
                     OnlineWallpaperService.currentApiIndex = (OnlineWallpaperService.currentApiIndex + 1) % OnlineWallpaperService.apis.length;
                 }

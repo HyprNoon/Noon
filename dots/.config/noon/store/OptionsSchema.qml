@@ -37,7 +37,7 @@ JsonAdapter {
         }
 
         rounding: JsonObject {
-            property real scale: 1
+            property real scale: 1.5
             property real power: 2
         }
 
@@ -368,12 +368,14 @@ JsonAdapter {
             property string externalMonitorProfile: "1680x1050@68"
             property string tilingLayout: "dwindle"
             property int blurPasses: 1
+            property bool unBlurApps: false
             property bool shadows: true
             property int shadowsRange: 1
             property int shadowsPower: 1
             property int gapsOut: 1
             property int gapsIn: 1
             property int borders: 1
+            property real applicationsOpacity: 0.6
             property real layerAlpha: 0.6
             property string cursorTheme: "Breeze"
         }

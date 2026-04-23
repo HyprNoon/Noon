@@ -157,9 +157,10 @@ Singleton {
         NoonUtils.execDetached("killall " + player?.desktopEntry?.toLowerCase());
     }
 
-    // function downloadCurrentSong() {
-    //     downloadSong(root.title + " " + root.artist);
-    // }
+    function downloadCurrentSong() {
+        dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh --download-song "${root.title}" "${root.artist}" "${info.destination}"`];
+        dlpHelperProc.running = true;
+    }
 
     Timer {
         id: positionTimer

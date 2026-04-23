@@ -6,7 +6,9 @@ import qs.common
 import qs.common.widgets
 
 SquareComponent {
-    property var resourcesModel: [
+    id: root
+    readonly property int implicitCircSize: 72
+    readonly property var resourcesModel: [
         {
             iconName: "memory",
             percentage: (ResourcesService.stats.mem_total - ResourcesService.stats.mem_available) / ResourcesService.stats.mem_total
@@ -27,34 +29,38 @@ SquareComponent {
     GridLayout {
         columns: expanded ? 4 : 2
         rows: expanded ? 2 : 1
-        rowSpacing: Padding.large
-        columnSpacing: Padding.large
+        rowSpacing: Padding.huge
+        columnSpacing: Padding.huge
         anchors.centerIn: parent
         Repeater {
-            model: resourcesModel
+            model: ScriptModel {
+                values: resourcesModel
+            }
             delegate: ColumnLayout {
-                spacing: Padding.normal
+                spacing: Padding.huge
                 Item {
                     Layout.topMargin: 5
-                    implicitHeight: 56
-                    implicitWidth: 56
+                    implicitHeight: root.implicitCircSize
+                    implicitWidth: root.implicitCircSize
                     ClippedFilledCircularProgress {
                         anchors.centerIn: parent
                         value: modelData.percentage
-                        implicitSize: 56
+                        implicitSize: root.implicitCircSize
                     }
                     Symbol {
                         anchors.centerIn: parent
                         fill: 1
                         text: modelData.iconName
-                        font.pixelSize: 38
+                        font.pixelSize: root.implicitCircSize * 0.6
                         color: Colors.colOnPrimary
                     }
                 }
                 StyledText {
                     visible: expanded
                     text: 100 * modelData.percentage.toFixed(1) + (modelData.iconName === "thermometer" ? "°C" : "%")
-                    color: Colors.colSubtext
+                    color: Colors.colOnSurfaceDisabled
+                    font.family: Fonts.family.variable
+                    font.variableAxes: Fonts.variableAxes.numbers
                     font.pixelSize: Fonts.sizes.verylarge
                     Layout.alignment: Qt.AlignHCenter
                 }

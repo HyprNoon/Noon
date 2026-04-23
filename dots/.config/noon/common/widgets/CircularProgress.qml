@@ -35,7 +35,7 @@ Item {
         anchors.fill: parent
 
         sourceComponent: Rectangle {
-            radius: 9999
+            radius: Rounding.full
             color: root.secondaryColor
         }
 

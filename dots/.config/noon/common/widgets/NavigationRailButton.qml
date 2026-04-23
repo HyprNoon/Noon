@@ -131,10 +131,12 @@ TabButton {
             visible: root.showText
             text: buttonText
             font.pixelSize: root.fontSize
-            font.letterSpacing: 0.75
-            font.weight: 600
-            font.family: Fonts.family.monospace ?? "Iosevka"
-
+            font.letterSpacing: 0.15
+            font.family: Fonts.family.variable
+            font.variableAxes: ({
+                    "WGHT": 700
+                })
+            font.weight: 700
             color: Colors.colOnLayer1
 
             anchors {

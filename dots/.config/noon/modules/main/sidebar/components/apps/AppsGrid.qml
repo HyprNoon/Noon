@@ -77,8 +77,8 @@ StyledRect {
         anchors.fill: parent
         anchors.margins: Padding.huge
         model: filteredModel
-        cellWidth: 181
-        cellHeight: 200
+        cellWidth: Math.max(180, (parent?.width - (anchors.margins * 2)) / 2)
+        cellHeight: cellWidth + anchors.margins
         opacity: popup.active ? 0 : 1
         Behavior on opacity {
             Anim {}

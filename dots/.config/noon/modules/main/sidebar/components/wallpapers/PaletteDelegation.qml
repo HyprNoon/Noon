@@ -21,7 +21,7 @@ GroupButton {
         color: currentData.primary
         anchors.centerIn: parent
         implicitSize: 50
-        radius: 999
+        radius: Rounding.full
         clip: true
 
         Rectangle {

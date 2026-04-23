@@ -13,7 +13,7 @@ Item {
     property int pinnedCount: 0
 
     readonly property int columns: expanded ? 4 : 2
-    readonly property int cellSize: 180
+    readonly property int cellSize: 200
     readonly property int gridSpacing: 20
     readonly property int unit: cellSize + gridSpacing
 

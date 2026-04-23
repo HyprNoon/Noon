@@ -14,7 +14,6 @@ from pathlib import Path
 
 from pyquickshare import discover_services, receive, send_to
 
-# Stub out firewalld only — stubbing pyquickshare.mdns.receive breaks discovery.
 try:
 
     async def _noop(*a, **kw):
@@ -25,36 +24,45 @@ except Exception:
     pass
 
 
-# ── PID file helpers ─────────────────────────────────────────────────────────
-
 _PID_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "quickshare-backend.pid"
+_LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "quickshare-backend.lock"
 
 
-def _kill_previous():
+def _acquire_lock() -> bool:
     try:
-        pid = int(_PID_FILE.read_text())
-        if pid != os.getpid():
-            os.kill(pid, signal.SIGTERM)
-            for _ in range(20):
-                try:
-                    os.kill(pid, 0)
-                except ProcessLookupError:
-                    break
-                time.sleep(0.1)
-    except (FileNotFoundError, ValueError, ProcessLookupError):
+        fd = os.open(str(_LOCK_FILE), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(fd, str(os.getpid()).encode())
+        os.close(fd)
+        return True
+    except FileExistsError:
+        try:
+            existing_pid = int(_LOCK_FILE.read_text())
+            os.kill(existing_pid, 0)
+            return False
+        except (ValueError, ProcessLookupError):
+            _LOCK_FILE.unlink(missing_ok=True)
+            return _acquire_lock()
+
+
+def _release_lock():
+    try:
+        pid_in_lock = int(_LOCK_FILE.read_text())
+        if pid_in_lock == os.getpid():
+            _LOCK_FILE.unlink(missing_ok=True)
+    except Exception:
         pass
+
+
+def _write_pid():
     _PID_FILE.write_text(str(os.getpid()))
 
 
 def _remove_pid():
     try:
         if int(_PID_FILE.read_text()) == os.getpid():
-            _PID_FILE.unlink()
+            _PID_FILE.unlink(missing_ok=True)
     except Exception:
         pass
-
-
-# ── Utilities ─────────────────────────────────────────────────────────────────
 
 
 def _listening_ports() -> set[int]:
@@ -83,9 +91,6 @@ def local_ip() -> str:
         return ip
     except Exception:
         return socket.gethostbyname(socket.gethostname()) or "127.0.0.1"
-
-
-# ── Bridge ────────────────────────────────────────────────────────────────────
 
 
 class Bridge:
@@ -256,8 +261,6 @@ class Bridge:
         emit("error", message=f"Send failed after retries: {last_err}")
 
 
-# ── Dispatch & main ───────────────────────────────────────────────────────────
-
 _bridge = Bridge()
 
 
@@ -296,13 +299,21 @@ async def main():
 
 
 if __name__ == "__main__":
-    _kill_previous()
+    if not _acquire_lock():
+        emit("error", message="Another instance is already running")
+        sys.exit(1)
+
     import atexit
 
+    atexit.register(_release_lock)
     atexit.register(_remove_pid)
+
+    _write_pid()
+
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
         pass
     finally:
+        _release_lock()
         _remove_pid()

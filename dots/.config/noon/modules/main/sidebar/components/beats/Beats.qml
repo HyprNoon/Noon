@@ -107,8 +107,8 @@ StyledRect {
 
             StyledLoader {
                 anchors.centerIn: parent
-                width: 320
-                height: 320
+                width: root.playing ? 320 : 285
+                height: width
                 fade: true
                 asynchronous: true
                 active: !root.displayingLyrics
@@ -118,6 +118,9 @@ StyledRect {
                     clip: true
                     radius: Rounding.silly
                     enableBorders: false
+                }
+                Behavior on width {
+                    Anim {}
                 }
             }
 

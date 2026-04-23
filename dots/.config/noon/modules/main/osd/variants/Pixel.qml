@@ -53,7 +53,7 @@ StyledPanel {
 
             // StyledRect {
             //     color: root.value > 0 ? Colors.colPrimary : Colors.colLayer2
-            //     radius: 999
+            //     radius: Rounding.full
             //     implicitSize: 35
             //     anchors.centerIn: parent
             // }

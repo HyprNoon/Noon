@@ -124,7 +124,7 @@ Scope {
                             right: parent.right
                             margins: Padding.massive
                         }
-                        buttonRadius: 999
+                        buttonRadius: Rounding.full
                         implicitSize: 36
                         materialIcon: "close"
                         releaseAction: () => {

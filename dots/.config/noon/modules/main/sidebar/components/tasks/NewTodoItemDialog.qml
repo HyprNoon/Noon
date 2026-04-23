@@ -113,7 +113,7 @@ BottomDialog {
     }
     function addTask() {
         if (inputArea.text.length > 0) {
-            TodoService.addTask(inputArea.text, root._pendingTaskStatus, dateInputArea.text);
+            TodoService.addTask(inputArea.text, root._pendingTaskStatus, dateInputArea.text || -1);
             clear();
             root.show = false;
         }

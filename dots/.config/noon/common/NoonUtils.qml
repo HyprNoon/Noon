@@ -268,6 +268,12 @@ Singleton {
         target: Mem.options.desktop.hyprland
         readonly property QtObject conf: Mem.options.desktop.hyprland
 
+        function onApplicationsOpacityChanged() {
+            NoonUtils.setHyprKey("applications_opacity", conf.applicationsOpacity);
+        }
+        function onUnBlurAppsChanged() {
+            NoonUtils.setHyprKey("unblur_apps", conf.unBlurApps);
+        }
         function onExternalMonitorProfileChanged() {
             NoonUtils.setHyprKey("external_monitor_mode", conf.externalMonitorProfile);
         }

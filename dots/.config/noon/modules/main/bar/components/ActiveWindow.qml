@@ -38,7 +38,4 @@ MouseArea {
             horizontalAlignment: Text.AlignLeft
         }
     }
-    WorkspacePopup {
-        hoverTarget: root
-    }
 }

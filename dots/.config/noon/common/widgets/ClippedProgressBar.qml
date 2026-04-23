@@ -5,7 +5,6 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
-
 ProgressBar {
     id: root
     property bool vertical: false
@@ -29,7 +28,7 @@ ProgressBar {
     contentItem: Rectangle {
         id: contentItem
         anchors.fill: parent
-        radius: 9999
+        radius: Rounding.full
         color: root.trackColor
 
         Rectangle {
@@ -68,17 +67,16 @@ ProgressBar {
     }
 
     StyledRect {
-        visible:root.showEndPoint
+        visible: root.showEndPoint
         z: 9999
         anchors {
             top: parent.top
             margins: Padding.normal
             horizontalCenter: parent.horizontalCenter
         }
-        radius: 999
+        radius: Rounding.full
         implicitWidth: parent.width / 4
         implicitHeight: parent.width / 4
         color: progressFill.height === contentItem.height ? Colors.colLayer3 : Colors.colPrimary
     }
-
 }

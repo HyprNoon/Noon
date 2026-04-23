@@ -18,7 +18,7 @@ StyledPanel {
     readonly property bool scrollReveal: Mem.options.beam.behavior.scrollToReveal
     readonly property bool reveal: GlobalStates.main.showBeam || (Mem.options.beam.behavior.revealOnEmpty && !MonitorsInfo.topLevel.activated)
     readonly property int expandedThreshold: 25
-    readonly property int mainRounding: 50
+    readonly property int mainRounding: Rounding.full
     readonly property bool topMode: Mem.options.beam.behavior.topMode ?? false
     readonly property int elevationValue: {
         const pos = Mem.options.bar.behavior.position;
@@ -148,17 +148,8 @@ StyledPanel {
             }
         }
         readonly property real marginOffset: root.reveal && !GlobalStates.main.showOsdValues ? 0 : _hidden_offset
-
-        opacity: anchors.bottomMargin > _hidden_offset ? 1 : 0
         anchors.bottomMargin: !root.topMode ? marginOffset : 0
         anchors.topMargin: root.topMode ? marginOffset : 0
-
-        Behavior on opacity {
-            Anim {
-                duration: Animations.durations.normal
-                easing.bezierCurve: Animations.curves.standardAccel
-            }
-        }
 
         Behavior on anchors.bottomMargin {
             Anim {}

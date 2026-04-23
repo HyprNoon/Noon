@@ -106,7 +106,7 @@ StyledRect {
 
                     StyledTextArea {
                         id: popupText
-                        wrapMode: root.width === Sizes.beamPopupExpanded.width ? Text.Wrap : undefined
+                        wrapMode: root.width === Sizes.beamPopupExpanded.width ? Text.Wrap : Text.NoWrap
                         textFormat: Text.PlainText
                         text: root.hintText || ""
                         Layout.fillWidth: true

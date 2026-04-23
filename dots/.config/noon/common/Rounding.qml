@@ -6,6 +6,7 @@ import qs.common
 
 Singleton {
     property real scale: Mem.options.appearance.rounding.scale
+    property int verytiny: 2 * scale
     property int tiny: 6 * scale
     property int verysmall: 8 * scale
     property int small: 10 * scale
@@ -16,7 +17,7 @@ Singleton {
     property int veryhuge: 26 * scale
     property int massive: 28 * scale
     property int silly: 32 * scale
-    property int full: 999
+    property int full: 999 * scale
 
     onScaleChanged: NoonUtils.setHyprKey("rounding", verylarge)
 }

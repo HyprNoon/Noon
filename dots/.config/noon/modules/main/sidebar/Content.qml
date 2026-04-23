@@ -117,13 +117,13 @@ Item {
         if (isCtrl && ctrlMap[key])
             return ctrlMap[key](), event.accepted = true;
     }
-    Connections {
-        function onTransferRequest() {
-            if (selectedCategory !== "Share")
-                changeContent("Share");
-        }
-        target: QuickShareService
-    }
+    // Connections {
+    //     function onTransferRequest() {
+    //         if (selectedCategory !== "Share")
+    //             changeContent("Share");
+    //     }
+    //     target: QuickShareService
+    // }
 
     Connections {
         function onFlowChanged() {

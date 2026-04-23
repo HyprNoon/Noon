@@ -12,7 +12,7 @@ Button {
     property color colBackgroundHover: Colors.colLayer3Hover
     property color colBackgroundActive: Colors.colLayer3Active
 
-    property int buttonRadius: 999
+    property int buttonRadius: Rounding.full
     implicitWidth: 40
     implicitHeight: 40
 

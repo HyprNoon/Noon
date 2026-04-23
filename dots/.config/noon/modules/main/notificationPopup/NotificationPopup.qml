@@ -10,17 +10,10 @@ import Quickshell.Wayland
 
 StyledPanel {
     id: root
-    // visible: GlobalStates.main.canNotify
     name: "notificationPopup"
     WlrLayershell.layer: WlrLayer.Overlay
     exclusiveZone: 0
-
-    anchors {
-        top: true
-        bottom: true
-        right: true
-    }
-
+    fill: true
     mask: Region {
         item: listview.contentItem
     }
@@ -32,10 +25,10 @@ StyledPanel {
         id: listview
         anchors {
             top: parent.top
-            bottom: parent.bottom
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
             margins: Padding.massive
         }
+        hint: false
         implicitWidth: Sizes.notificationPopupWidth - anchors.rightMargin * 2
         popup: true
         clip: false

@@ -8,7 +8,7 @@ import qs.common.widgets
 import qs.services
 import qs.store
 import qs.modules.main.bar.components
-import qs.modules.main.desktop.widgets
+import "../widgets"
 
 Variants {
     model: MonitorsInfo.all
@@ -16,28 +16,29 @@ Variants {
         id: root
         required property var modelData
         screen: modelData
-        name: "onScreenWidgets"
-        readonly property bool rightMode: Mem.options.bar.behavior.position === "left"
+        name: "desktop_widgets_layer"
         readonly property string widgetsPath: "../widgets/"
         readonly property var mem: Mem.states.sidebar.widgets
         readonly property var desktop: mem.desktop
+
         readonly property var widgetObjects: desktop.map(widgetId => {
             const widgetData = WidgetsData.db.find(item => item.id === widgetId);
             return {
                 id: widgetId,
                 component: widgetData?.component || "",
+                expandable: widgetData?.expandable,
                 expanded: mem.expanded.find(item => item === widgetId),
                 pilled: mem.pilled.find(item => item === widgetId)
             };
         })
+
         exclusiveZone: 0
         WlrLayershell.layer: WlrLayer.Bottom
-        implicitWidth: 380
+        implicitWidth: 600
         anchors {
-            right: rightMode
+            right: true
             top: true
             bottom: true
-            left: !rightMode
         }
         margins {
             top: Sizes.hyprland?.gapsOut ?? Padding.massive
@@ -48,17 +49,22 @@ Variants {
         mask: Region {
             item: flow
         }
-        Flow {
+        StyledFlow {
             id: flow
             spacing: Padding.huge
-            anchors.fill: parent
+            anchors.top: parent.top
+            anchors.right: parent.right
+            width: 400 + spacing
             Repeater {
-                model: root.widgetObjects
+                model: ScriptModel {
+                    values: root.widgetObjects
+                }
                 delegate: Item {
                     id: delegated
                     required property var modelData
-                    width: modelData.expanded ? parent.width : 180
-                    height: 180
+                    width: modelData.expanded ? parent?.width : (parent?.width - parent?.spacing) / 2
+                    height: 200
+
                     WidgetsContextMenu {
                         id: widgetMenu
                         modelData: delegated.modelData
@@ -76,17 +82,19 @@ Variants {
                         }
                     }
                     StyledLoader {
+                        id: loader
                         anchors.fill: parent
+                        asynchronous: true
                         source: root.widgetsPath + modelData.component + ".qml"
-                        onLoaded: if (ready) {
-                            if ("expanded" in item) {
-                                item.expanded = Qt.binding(() => modelData?.expanded ?? false);
+                        onLoaded: {
+                            if ("expanded" in _item) {
+                                _item.expanded = Qt.binding(() => modelData?.expanded ?? false);
                             }
-                            if ("pill" in item) {
-                                item.pill = Qt.binding(() => modelData?.pilled ?? false);
+                            if ("pill" in _item) {
+                                _item.pill = Qt.binding(() => modelData?.pilled ?? false);
                             }
-                            if (!item.pill)
-                                item.radius = 1.25 * Rounding.massive;
+                            if (!_item.pill)
+                                _item.radius = 1.25 * Rounding.massive;
                         }
                     }
                 }

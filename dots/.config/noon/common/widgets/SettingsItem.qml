@@ -201,7 +201,7 @@ StyledRect {
             visible: !root.hideTitle
             Layout.preferredHeight: 40
             Layout.preferredWidth: 40
-            radius: 999
+            radius: Rounding.full
             color: root.dict[type].isActive ? colors.colPrimary : colors.colLayer3
 
             Symbol {

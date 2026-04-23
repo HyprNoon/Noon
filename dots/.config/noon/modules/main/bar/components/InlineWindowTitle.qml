@@ -11,9 +11,7 @@ StyledText {
     property var bar
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(bar?.screen)
     readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
-    WorkspacePopup {
-        hoverTarget: mouse
-    }
+
     MouseArea {
         id: mouse
         anchors.fill: parent

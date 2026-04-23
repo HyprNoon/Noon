@@ -15,6 +15,8 @@ StyledRect {
     color: BeatsService.colors.colSecondaryContainer
     clip: true
     property alias source: coverImage.source
+    property alias tintColor: coverImage.tintColor
+    property alias tintLevel: coverImage.tintLevel
 
     CroppedImage {
         id: coverImage
@@ -25,6 +27,7 @@ StyledRect {
         tintColor: BeatsService.colors.colSecondaryContainer
         visible: true
         anchors.fill: parent
+        sourceSize: Qt.size(root.implicitSize, root.implicitSize)
         source: BeatsService.artUrl
         mipmap: true
         radius: root.radius

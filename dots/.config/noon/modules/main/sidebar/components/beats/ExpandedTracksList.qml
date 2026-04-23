@@ -62,7 +62,8 @@ StyledRect {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.margins: Padding.normal
-            spacing: 6
+            spacing: Padding.verysmall
+            radius: Rounding.verylarge
             clip: true
             reuseItems: false
             model: filteredModel
@@ -75,12 +76,14 @@ StyledRect {
                 readonly property string fileName: modelData.filename ?? ""
                 readonly property string absPath: modelData.filepath
                 readonly property bool currentlyPlaying: absPath === BeatsService.currentTrackPath
+                buttonRadius: Rounding.tiny
+                topRadius: index === 0 ? Rounding.verylarge : Rounding.tiny
+                bottomRadius: index === parent?.count - 1 ? Rounding.verylarge : Rounding.tiny
                 iconSource: Qt.resolvedUrl(modelData?.cover_art) ?? ""
                 implicitHeight: 70
                 title: modelData.title ?? "Unknown Track"
                 subtext: modelData.artist ?? "Unknown Artist"
                 toggled: currentlyPlaying
-                buttonRadius: Rounding.huge
                 colBackground: colors.colLayer3
                 colBackgroundHover: colors.colLayer3Hover
                 colors: root.colors
@@ -141,7 +144,7 @@ StyledRect {
                 }
 
                 StyledToolTip {
-                    extraVisibleCondition: parent.containsMouse
+                    extraVisibleCondition: parent.hovered
                     content: FileUtils.getEscapedFileName(modelData)
                 }
             }

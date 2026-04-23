@@ -100,7 +100,7 @@ StyledRect {
 
             StyledText {
                 id: date
-                visible: text !== -1
+                visible: modelData.due !== -1
                 color: Colors.colSubtext
                 text: modelData.due + " " + daysRemaining
                 font.pixelSize: 14

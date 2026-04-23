@@ -32,49 +32,17 @@ BottomDialog {
             Layout.margins: Padding.verylarge
             spacing: Padding.verylarge
 
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Padding.small
-
-                Symbol {
-                    text: "opacity"
-                    font.pixelSize: Fonts.sizes.verylarge
-                    color: Colors.colOnSurfaceVariant
-                }
-
-                StyledText {
-                    Layout.fillWidth: true
-                    text: qsTr("Enable Transparency")
-                    color: Colors.colOnSurfaceVariant
-                }
-
-                StyledSwitch {
-                    checked: Mem.options.appearance.transparency.enabled
-                    onToggled: Mem.options.appearance.transparency.enabled = checked
-                }
+            OptionsSection {
+                icon: "blur_on"
+                title: "Transparency"
+                checked: Mem.options.appearance.transparency.enabled
+                action: Mem.options.appearance.transparency.enabled = checked
             }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Padding.small
-
-                Symbol {
-                    text: "blur_on"
-                    font.pixelSize: Fonts.sizes.verylarge
-                    color: Colors.colOnSurfaceVariant
-                }
-
-                StyledText {
-                    Layout.fillWidth: true
-                    text: qsTr("Blur Background")
-                    color: Colors.colOnSurfaceVariant
-                }
-
-                StyledSwitch {
-                    checked: Mem.options.appearance.transparency.blur
-                    onToggled: Mem.options.appearance.transparency.blur = checked
-                    enabled: Mem.options.appearance.transparency.enabled
-                }
+            OptionsSection {
+                icon: "rocket_launch"
+                title: "Blur Applications"
+                checked: !Mem.options.desktop.hyprland.unBlurApps
+                action: Mem.options.desktop.hyprland.unBlurApps = !checked
             }
 
             ColumnLayout {
@@ -93,29 +61,46 @@ BottomDialog {
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: qsTr("Transparency Amount")
+                        text: "Shell Alpha"
+                        color: Colors.colOnSurfaceVariant
+                    }
+
+                    StyledSlider {
+                        Layout.minimumWidth: 80
+                        Layout.fillWidth: true
+                        from: 0
+                        to: Mem.options.desktop.hyprland.layerAlpha - 0.01
+                        value: Mem.options.appearance.transparency.scale
+                        onMoved: Mem.options.appearance.transparency.scale = value
+                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Padding.small
+
+                    Symbol {
+                        text: "tune"
+                        font.pixelSize: Fonts.sizes.verylarge
                         color: Colors.colOnSurfaceVariant
                     }
 
                     StyledText {
-                        text: Math.round(Mem.options.appearance.transparency.scale * 100) + "%"
+                        Layout.fillWidth: true
+                        text: "Applications alpha"
                         color: Colors.colOnSurfaceVariant
-                        opacity: 0.7
+                    }
+
+                    StyledSlider {
+                        Layout.minimumWidth: 80
+                        Layout.fillWidth: true
+                        from: 0
+                        to: 1
+                        value: Mem.options.desktop.hyprland.applicationsOpacity
+                        onMoved: Mem.options.desktop.hyprland.applicationsOpacity = value
                     }
                 }
-
-                StyledSlider {
-                    Layout.fillWidth: true
-                    from: 0
-                    to: Mem.options.desktop.hyprland.layerAlpha - 0.01
-                    value: Mem.options.appearance.transparency.scale
-                    onMoved: Mem.options.appearance.transparency.scale = value
-                }
             }
-
-            Item {
-                Layout.fillHeight: true
-            }
+            Spacer {}
         }
 
         RowLayout {
@@ -130,6 +115,30 @@ BottomDialog {
                 buttonText: qsTr("Done")
                 onClicked: root.show = false
             }
+        }
+    }
+    component OptionsSection: RowLayout {
+        property alias icon: symb.text
+        property alias checked: button.checked
+        property alias title: title.text
+        property var action
+        Layout.fillWidth: true
+        spacing: Padding.small
+        Symbol {
+            id: symb
+            font.pixelSize: Fonts.sizes.verylarge
+            color: Colors.colOnSurfaceVariant
+        }
+        StyledText {
+            id: title
+            Layout.fillWidth: true
+            text: qsTr("Enable Transparency")
+            color: Colors.colOnSurfaceVariant
+        }
+
+        StyledSwitch {
+            id: button
+            onToggled: action()
         }
     }
 }

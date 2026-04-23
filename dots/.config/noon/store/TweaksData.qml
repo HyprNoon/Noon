@@ -17,10 +17,10 @@ Singleton {
                 {
                     "icon": "rounded_corner",
                     "name": "Radius",
-                    "key": "Rounding.scale",
+                    "key": "appearance.rounding.scale",
                     "type": "slider",
                     "sliderMinValue": 0,
-                    "sliderMaxValue": 3
+                    "sliderMaxValue": 2.45
                 },
                 {
                     "icon": "tune",

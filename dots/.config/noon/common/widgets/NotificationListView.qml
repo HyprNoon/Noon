@@ -23,6 +23,8 @@ StyledListView {
         anchors.left: parent?.left
         anchors.right: parent?.right
         notificationGroup: popup ? Notifications.popupGroupsByAppName[modelData] : Notifications.groupsByAppName[modelData]
+        dismissOvershoot: popup ? Screen?.width / 2 : 200
+        dragConfirmThreshold: popup ? 40 : 20
         popup: root.popup
     }
 }
