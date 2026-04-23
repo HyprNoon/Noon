@@ -243,6 +243,10 @@ Singleton {
             return "";
         return c.isPlugin ? c.entry : "components/" + c.componentPath + ".qml";
     }
+    function getPreloadData(id) {
+        return _get(id)?.preloadData ?? "";
+    }
+
     function isSearchable(id) {
         return !!_get(id)?.searchable;
     }

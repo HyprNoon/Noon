@@ -16,7 +16,7 @@ Item {
     property color primaryColor: Colors.m3.m3onSecondaryContainer
     property color secondaryColor: Colors.colSecondaryContainer
     property real gapAngle: 180 / 2
-    property bool fill: true
+    property bool fill: false
     property int fillOverflow: 2
     property int animationDuration: 1000
     property var easingType: Easing.OutCubic
@@ -38,7 +38,6 @@ Item {
             radius: Rounding.full
             color: root.secondaryColor
         }
-
     }
 
     Shape {
@@ -64,7 +63,6 @@ Item {
                 startAngle: root.degree === 0 ? root.startAngle : root.startAngle + root.degree + root.gapAngle
                 sweepAngle: root.degree === 0 ? 360 : 360 - root.degree - 2 * root.gapAngle
             }
-
         }
 
         // Primary arc (progress indication)
@@ -84,9 +82,7 @@ Item {
                 startAngle: root.startAngle
                 sweepAngle: root.degree
             }
-
         }
-
     }
 
     Behavior on degree {
@@ -96,7 +92,5 @@ Item {
             duration: root.animationDuration
             easing.type: root.easingType
         }
-
     }
-
 }

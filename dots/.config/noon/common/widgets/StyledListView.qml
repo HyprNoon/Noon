@@ -46,6 +46,7 @@ ListView {
     layer.enabled: root.clip
 
     ScrollEdgeFade {
+        anchors.margins: -parent?.anchors.margins
         visible: root.hint
         target: root
         vertical: true
