@@ -29,12 +29,6 @@ StyledRect {
         anchors.margins: Padding.huge
         spacing: Padding.large
 
-        BottomDialogHeader {
-            title: BeatsService._connected ? "Beats" : "Offline"
-            subTitle: `There are ${filteredModel.values.length} Tracks in your playlist !`
-            showCloseButton: false
-        }
-
         SearchBar {
             id: search
             Layout.fillWidth: true
@@ -44,13 +38,7 @@ StyledRect {
             searchInput.placeholderText: "Search Tracks"
             color: "transparent"
             onSearchTextChanged: searchTimer.restart()
-            Connections {
-                target: search.searchInput
-                function onAccepted() {
-                    if (root.filteredTracks.length > 0)
-                        BeatsService.playTrack(root.filteredTracks[0].playlist_index);
-                }
-            }
+            searchInput.onAccepted: list.currentItem.releaseAction()
             Timer {
                 id: searchTimer
                 interval: 200
@@ -59,6 +47,7 @@ StyledRect {
         }
 
         StyledListView {
+            id: list
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.margins: Padding.normal
