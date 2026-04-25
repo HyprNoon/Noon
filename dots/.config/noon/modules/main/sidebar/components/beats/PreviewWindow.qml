@@ -14,7 +14,6 @@ Item {
     readonly property var player: {
         BeatsServices.meaningfulPlayers.find(p => {
             if (p.dbusName === "mpv" && p.trackTitle === songData?.title);
-            console.log(JSON.stringify(p));
             return p;
         });
     }

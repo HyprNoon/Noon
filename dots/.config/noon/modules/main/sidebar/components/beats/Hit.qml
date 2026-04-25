@@ -32,31 +32,41 @@ StyledRect {
         anchors.left: parent.left
         color: Colors.m3.m3surfaceContainerHigh
         height: 45
-
-        ColumnLayout {
-            height: 45
+        RowLayout {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.rightMargin: Padding.veryhuge
             anchors.leftMargin: Padding.veryhuge
-            spacing: -Padding.normal
-
-            StyledText {
-                font.pixelSize: Fonts.sizes.small
-                font.variableAxes: Fonts.variableAxes.title
-                text: modelData.title
+            spacing: Padding.huge
+            height: 45
+            ColumnLayout {
                 Layout.fillWidth: true
-                truncate: true
-                color: Colors.colOnLayer3
+                Layout.fillHeight: true
+                spacing: -Padding.tiny
+
+                StyledText {
+                    font.pixelSize: Fonts.sizes.small
+                    font.variableAxes: Fonts.variableAxes.title
+                    text: modelData.title
+                    Layout.fillWidth: true
+                    truncate: true
+                    color: Colors.colOnLayer3
+                }
+
+                StyledText {
+                    font.pixelSize: Fonts.sizes.verysmall
+                    text: modelData.artist
+                    Layout.fillWidth: true
+                    truncate: true
+                    color: Colors.colSubtext
+                }
             }
-
-            StyledText {
-                font.pixelSize: Fonts.sizes.verysmall
-                text: modelData.artist
-                Layout.fillWidth: true
-                truncate: true
-                color: Colors.colSubtext
+            Symbol {
+                visible: modelData.isPlaylist
+                font.pixelSize: 20
+                text: "list"
+                color: Colors.colOnLayer3
             }
         }
     }

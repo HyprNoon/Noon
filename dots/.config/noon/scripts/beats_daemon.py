@@ -3,10 +3,12 @@
 import argparse
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
 import time
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 CONF_PATH = os.path.expanduser("~/.config/HyprNoon/beats.json")
 
@@ -110,13 +112,18 @@ class Player:
             "--gapless-audio=yes",
             f"--input-ipc-server={self.socket_path}",
         ]
+
         if self.conf.get("loopPlaylist", False):
             cmd.append("--loop-playlist=inf")
         vn = self.conf.get("volumeNormalization", {})
         if vn.get("enabled", False):
             cmd.append(f"--replaygain={vn.get('replaygain', 'track')}")
         if source.startswith("http"):
-            cmd += ["--ytdl-format=bestaudio", source]
+            cmd += [
+                "--ytdl-format=bestaudio",
+                "--ytdl-raw-options=yes-playlist=",
+                source,
+            ]
         else:
             cmd.append(f"--playlist={source}")
         with open(self.conf["mpvLog"], "a") as log:
@@ -145,9 +152,30 @@ class Player:
         self.ensure_running(source)
         self._send(["loadfile", filepath, "replace"])
 
+    def _normalize_url(self, url: str) -> str:
+
+        parsed = urlparse(url)
+        if "music.youtube.com" in (parsed.hostname or ""):
+            parsed = parsed._replace(netloc="www.youtube.com")
+        qs = parse_qs(parsed.query, keep_blank_values=True)
+        if "list" in qs:
+            qs["list"] = [re.sub(r"^VL", "", qs["list"][0])]
+        new_query = urlencode({k: v[0] for k, v in qs.items()})
+        return urlunparse(parsed._replace(query=new_query))
+
     def play_url(self, url: str):
-        self.ensure_running(url)
-        self._send(["loadfile", url, "replace"])
+        url = self._normalize_url(url)
+        if self.is_running():
+            self._send(["quit"])
+            for _ in range(20):
+                time.sleep(0.1)
+                if not self.is_running():
+                    break
+        if os.path.exists(self.socket_path):
+            os.remove(self.socket_path)
+        success = self.launch(url)
+        if not success:
+            print(f"Failed to launch player for URL: {url}", file=sys.stderr)
 
     def play_pause(self, source: str):
         self.ensure_running(source)
