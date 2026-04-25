@@ -70,6 +70,7 @@ StyledRect {
     }
     StyledImage {
         anchors.fill: parent
-        source: modelData?.thumbnail ?? ""
+        source: Qt.resolvedUrl(modelData?.thumbnail) ?? ""
+        cache: true
     }
 }

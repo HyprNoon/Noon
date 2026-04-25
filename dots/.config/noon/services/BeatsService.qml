@@ -104,12 +104,25 @@ Singleton {
         mpvProc.running = false;
         mpvProc.running = true;
     }
+
     function playTrackByPath(path) {
-        _daemonCmd(["play-file", "--file", path, "--playlist", FileUtils.trimFileProtocol(root._playlistPath)]);
+        _daemonCmd(["--player", "main", "play-file", "--file", path, "--source", FileUtils.trimFileProtocol(root._playlistPath)]);
     }
 
     function playTrack(index) {
-        _daemonCmd(["play-index", "--index", index, "--playlist", FileUtils.trimFileProtocol(root._playlistPath)]);
+        _daemonCmd(["--player", "main", "play-index", "--index", index, "--source", FileUtils.trimFileProtocol(root._playlistPath)]);
+    }
+
+    function stopPlayer() {
+        _daemonCmd(["--player", "main", "stop"]);
+    }
+
+    function previewURL(url) {
+        _daemonCmd(["--player", "preview", "play-url", "--url", url]);
+    }
+
+    function killPreview() {
+        _daemonCmd(["--player", "preview", "stop"]);
     }
 
     function currentTrackProgressRatio() {
@@ -142,21 +155,9 @@ Singleton {
         return player?.desktopEntry?.toLowerCase() === "mpv";
     }
 
-    function stopPlayer() {
-        _daemonCmd(["stop"]);
-    }
-
     function downloadCurrentSong() {
         dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh --download-song "${root.title}" "${root.artist}" "${info.destination}"`];
         dlpHelperProc.running = true;
-    }
-
-    function previewURL(url) {
-        _daemonCmd(["preview-url", "--url", url]);
-    }
-
-    function killPreview() {
-        _daemonCmd(["kill-preview"]);
     }
 
     function downloadSong(downloadURL) {
@@ -178,7 +179,7 @@ Singleton {
 
     Timer {
         id: positionTimer
-        interval: 100
+        interval: 1000
         repeat: true
         running: root.player && root._playing
         onTriggered: root.player.positionChanged()
@@ -200,9 +201,9 @@ Singleton {
     ConfigFileView {
         id: daemonView
         state: false
-        fileName: "beats"
+        fileName: "x"
         BeatsSchema {}
-        onFileChanged: _daemonCmd("refresh-config")
+        onFileChanged: _daemonCmd(["--player", "main", "refresh-config"])
     }
 
     FileView {

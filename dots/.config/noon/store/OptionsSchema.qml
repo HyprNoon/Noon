@@ -295,13 +295,14 @@ JsonAdapter {
     }
 
     property JsonObject mediaPlayer: JsonObject {
+        property int fetchLimit: 24
         property bool useBlur: false
         property bool enableGrad: false
         property bool adaptiveTheme: false
         property string visualizerMode: ""
         property bool showVisualizer: false
         property bool lyrics: false
-        property list<string> excludedPlayers: [".mpd", "playerctld", "beats_preview", "firefox", "chromium", "kdeconnect"]
+        property list<string> excludedPlayers: [".mpd", "playerctld", "mpv", "firefox", "chromium", "kdeconnect"]
     }
     property JsonObject desktop: JsonObject {
         property JsonObject shell

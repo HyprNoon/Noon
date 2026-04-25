@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Services.Mpris
 import qs.services
 import qs.common
 import qs.common.widgets
@@ -8,7 +9,16 @@ Item {
     id: root
     property alias container: bg
     required property var songData
-    readonly property bool isRunning: songData.url === BeatsService.previewData.url
+    readonly property bool _currentSong: player.trackTitle === songData?.title
+    readonly property bool _playing: player?.playbackState === MprisPlaybackState.Playing && _currentSong
+    readonly property var player: {
+        BeatsServices.meaningfulPlayers.find(p => {
+            if (p.dbusName === "mpv" && p.trackTitle === songData?.title);
+            console.log(JSON.stringify(p));
+            return p;
+        });
+    }
+    Component.onCompleted: BeatsService.previewURL(songData?.url)
     width: 390
     height: 180
     signal dismiss
@@ -63,34 +73,26 @@ Item {
                     Layout.fillWidth: false
                     Layout.fillHeight: false
                     Repeater {
-                        model: ScriptModel {
-                            values: {
-                                const l = [
-                                    {
-                                        icon: "close",
-                                        action: () => {
-                                            root.dismiss();
-                                        }
-                                    },
-                                    {
-                                        icon: "download",
-                                        action: () => {
-                                            BeatsService.downloadSong(modelData.url);
-                                            root.dismiss();
-                                        }
-                                    },
-                                    {
-                                        toggled: root.isRunning,
-                                        icon: BeatsService._playing ? "pause" : "play_arrow",
-                                        action: () => {
-                                            if (!isRunning)
-                                                BeatsService.previewURL(songData?.url);
-                                        }
-                                    }
-                                ];
-                                return l.filter(i => i?.visible ?? true);
+                        model:[
+                            {
+                                icon: "close",
+                                action: () => {
+                                    root.dismiss();
+                                }
+                            },
+                            {
+                                icon: "download",
+                                action: () => {
+                                    BeatsService.downloadSong(modelData.url);
+                                    root.dismiss();
+                                }
+                            },
+                            {
+                                toggled: root._playing,
+                                icon: root._playing ? "pause" : "play_arrow",
+                                action: () => root.player.togglePlaying();
                             }
-                        }
+                        ]
 
                         delegate: GroupButtonWithIcon {
                             baseSize: 45

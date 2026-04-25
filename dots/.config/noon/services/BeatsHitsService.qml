@@ -9,7 +9,7 @@ Singleton {
     id: root
     readonly property var hits: Mem.states.services.beats.hits
     readonly property bool isBusy: searchProc.running || fetchProc.running
-    readonly property int searchLimit: Mem.states.services.beats.searchLimit
+    readonly property int searchLimit: Mem.options.mediaPlayer.fetchLimit ?? 18
     property int _limit: searchLimit
     property var searchResults
 
@@ -48,6 +48,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 const out = JSON.parse(text.trim());
+                console.log(text);
                 if (out.length > 0)
                     Mem.states.services.beats.hits = [...Mem.states.services.beats.hits, ...out];
             }

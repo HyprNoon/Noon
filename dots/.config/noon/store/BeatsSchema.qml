@@ -1,6 +1,7 @@
 import qs.common.utils
 
 JsonAdapter {
+    property JsonObject players: JsonObject {}
     property string socketPath: "/tmp/mpv.sock"
     property string mpvLog: "/tmp/beats_daemon_mpv.log"
     property JsonObject volumeNormalization: JsonObject {
