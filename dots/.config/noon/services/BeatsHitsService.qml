@@ -27,16 +27,39 @@ Singleton {
     }
 
     function request(limit = _limit) {
-        var cmd = ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/hits_service.py", "recommend", FileUtils.trimFileProtocol(BeatsService._metadataPath), "--limit", limit];
+        var cmd = ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/hits_service.py"];
+
+        if (BeatsService.daemonOptions.isAuth) {
+            cmd.push("discover");
+        } else {
+            cmd.push("recommend", FileUtils.trimFileProtocol(BeatsService._metadataPath));
+        }
+
+        cmd.push("--limit", limit.toString());
+
         fetchProc.running = false;
         fetchProc.command = cmd;
         fetchProc.running = true;
+    }
+
+    function auth() {
+        if (!BeatsService.daemonOptions.isAuth)
+            _cmd(["auth"]);
+    }
+
+    function _cmd(...arg) {
+        const cmd = ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/hits_service.py"];
+        cmd.push(...arg);
+        actionProc.command = cmd;
+        actionProc.running = true;
     }
     function refresh(limit = _limit) {
         Mem.states.services.beats.hits = [];
         Qt.callLater(() => request(limit));
     }
-
+    Process {
+        id: actionProc
+    }
     Process {
         id: searchProc
         stdout: StdioCollector {

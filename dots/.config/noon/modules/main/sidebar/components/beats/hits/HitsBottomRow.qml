@@ -27,31 +27,43 @@ ButtonGroup {
         onAccepted: BeatsHitsService.search(inputArea.text)
     }
     Repeater {
-        model: [
-            {
-                toggled: root.isSearching,
-                icon: "search",
-                action: () => {
-                    root.isSearching = !root.isSearching;
-                }
-            },
-            {
-                icon: "refresh",
-                action: () => {
-                    root.isSearching = false;
-                    BeatsHitsService.refresh();
-                }
-            },
-            {
-                icon: bg.mode === "options" ? "music_note" : "menu",
-                action: () => {
-                    if (bg.mode === "options")
-                        bg.mode = "preview";
-                    else
-                        bg.mode = "options";
-                }
+        model: ScriptModel {
+            values: {
+                const l = [
+                    {
+                        toggled: root.isSearching,
+                        icon: "search",
+                        action: () => {
+                            root.isSearching = !root.isSearching;
+                        }
+                    },
+                    {
+                        icon: "refresh",
+                        action: () => {
+                            root.isSearching = false;
+                            BeatsHitsService.refresh();
+                        }
+                    },
+                    {
+                        icon: bg.mode === "options" ? "music_note" : "menu",
+                        action: () => {
+                            if (bg.mode === "options")
+                                bg.mode = "preview";
+                            else
+                                bg.mode = "options";
+                        }
+                    },
+                    {
+                        visible: !BeatsService.daemonOptions.isAuth,
+                        icon: BeatsService.daemonOptions.isAuth ? "check" : "login",
+                        action: () => {
+                            BeatsHitsService.auth();
+                        }
+                    }
+                ];
+                return l.filter(b => b?.visible ?? true);
             }
-        ]
+        }
         delegate: GroupButtonWithIcon {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             Layout.fillHeight: false

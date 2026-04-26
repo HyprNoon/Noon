@@ -1,6 +1,7 @@
 import qs.common.utils
 
 JsonAdapter {
+    property bool isAuth: false
     property JsonObject hits: JsonObject {
         property string recommendationsMode: "playlists"
     }

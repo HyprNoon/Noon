@@ -199,6 +199,7 @@ Singleton {
     ConfigFileView {
         id: daemonView
         state: false
+        autoCreateOnError: false
         fileName: "beats"
         BeatsSchema {}
         onFileChanged: _daemonCmd(["refresh-config"])
