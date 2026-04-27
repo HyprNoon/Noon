@@ -11,16 +11,17 @@ Singleton {
     property string distroIcon: "arch-symbolic"
     property string username: "user"
     property string userPfp: Directories.standard.home + "/.face.png"
-
+    readonly property var oauthData: JSON.parse(oauthView.text().trim())
+    Component.onCompleted: console.log(JSON.stringify(oauthData))
     Timer {
         triggeredOnStart: true
         interval: 1
         running: true
         repeat: false
         onTriggered: {
-            getUsername.running = true;
-            fileOsRelease.reload();
-            const textOsRelease = fileOsRelease.text();
+            usernameProc.running = true;
+            osView.reload();
+            const textOsRelease = osView.text();
             // Extract the friendly name (PRETTY_NAME field, fallback to NAME)
             const prettyNameMatch = textOsRelease.match(/^PRETTY_NAME="(.+?)"/m);
             const nameMatch = textOsRelease.match(/^NAME="(.+?)"/m);
@@ -64,20 +65,20 @@ Singleton {
     }
 
     Process {
-        id: getUsername
-
+        id: usernameProc
         command: ["whoami"]
-
         stdout: SplitParser {
-            onRead: data => {
-                username = data.trim();
-            }
+            onRead: data => username = data.trim()
         }
     }
 
     FileView {
-        id: fileOsRelease
+        id: oauthView
+        path: Directories.standard.state + "/user/generated/oauth.json"
+    }
 
+    FileView {
+        id: osView
         path: "/etc/os-release"
     }
 }

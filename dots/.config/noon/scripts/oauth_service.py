@@ -1,8 +1,13 @@
+# oauth_service.py
+import http.server
 import json
 import os
 import subprocess
+import threading
 import time
 import urllib
+import urllib.parse
+import urllib.request
 import webbrowser
 
 from requests_oauth2client import OAuth2Client
@@ -16,20 +21,22 @@ class NoonAuthenticator:
         self.scopes = scopes
 
         env_prefix = f"NOON_{service_name.upper()}"
-        self.cid = client_id or os.environ.get(f"{env_prefix}_ID")
-        self.sec = client_secret or os.environ.get(f"{env_prefix}_SECRET")
+        self.cid = (
+            client_id
+            or os.environ.get(f"{env_prefix}_ID")
+            or os.environ.get("NOON_OAUTH_ID")
+        )
+        self.sec = (
+            client_secret
+            or os.environ.get(f"{env_prefix}_SECRET")
+            or os.environ.get("NOON_OAUTH_SECRET")
+        )
 
         if not self.cid:
             raise ValueError(
                 f"Auth Error: Missing Client ID for service '{service_name}'. "
-                f"Please set {env_prefix}_ID environment variable."
+                f"Set {env_prefix}_ID or NOON_OAUTH_ID environment variable."
             )
-
-        self.client = OAuth2Client(
-            token_endpoint="https://oauth2.googleapis.com/token",
-            client_id=self.cid,
-            client_secret=self.sec,
-        )
 
     def get_token(self) -> dict:
         if not os.path.exists(OAUTH_STATE_PATH):
@@ -37,7 +44,6 @@ class NoonAuthenticator:
         try:
             with open(OAUTH_STATE_PATH, "r") as f:
                 data = json.load(f)
-                # Ensure we return the inner dictionary (the one with access_token)
                 return data.get(self.service)
         except:
             return None
@@ -46,13 +52,42 @@ class NoonAuthenticator:
         token_data = self.get_token()
         return bool(token_data and "access_token" in token_data)
 
+    def get_valid_token(self) -> dict | None:
+        """Returns a valid token, refreshing if expired. None if not authenticated."""
+        token = self.get_token()
+        if not token:
+            return None
+        if time.time() >= token.get("expires_at", 0) - 60:
+            try:
+                resp = urllib.request.urlopen(
+                    urllib.request.Request(
+                        "https://oauth2.googleapis.com/token",
+                        data=urllib.parse.urlencode(
+                            {
+                                "client_id": self.cid,
+                                "client_secret": self.sec,
+                                "refresh_token": token["refresh_token"],
+                                "grant_type": "refresh_token",
+                            }
+                        ).encode(),
+                        method="POST",
+                    )
+                )
+                new_token = json.loads(resp.read())
+                new_token.setdefault("refresh_token", token["refresh_token"])
+                self._save_to_vault(new_token)
+                return new_token
+            except Exception:
+                return None
+        return token
+
     def auth(self, interactive=False):
-        """Executes the Device Authorization Grant flow."""
-        # Note: endpoint can be customized if you ever use non-Google services
+        """Device Authorization Grant flow. Only works with Google-whitelisted scopes."""
         resp = self.client.session.post(
             "https://oauth2.googleapis.com/device/code",
             data={"client_id": self.cid, "scope": self.scopes},
         )
+        print(resp.text)
         resp.raise_for_status()
         data = resp.json()
 
@@ -61,7 +96,6 @@ class NoonAuthenticator:
         url = data["verification_url"]
         interval = data.get("interval", 5)
 
-        # Handle clipboard for Wayland
         try:
             subprocess.run(["wl-copy"], input=user_code.encode(), check=True)
         except FileNotFoundError:
@@ -84,7 +118,6 @@ class NoonAuthenticator:
                 ]
             )
 
-        # Polling for token
         while True:
             token_resp = self.client.session.post(
                 self.client.token_endpoint,
@@ -95,19 +128,84 @@ class NoonAuthenticator:
                     "device_code": device_code,
                 },
             )
-
             token_data = token_resp.json()
             if "error" in token_data:
                 if token_data["error"] == "authorization_pending":
                     time.sleep(interval)
                     continue
                 raise Exception(f"OAuth Error ({self.service}): {token_data['error']}")
-
             self._save_to_vault(token_data)
             return token_data
 
+    def auth_loopback(self, port=8085, interactive=False):
+        """Loopback redirect flow. Use for scopes not supported by device flow (e.g. Tasks, Calendar)."""
+        redirect_uri = f"http://127.0.0.1:{port}"
+        params = urllib.parse.urlencode(
+            {
+                "client_id": self.cid,
+                "redirect_uri": redirect_uri,
+                "response_type": "code",
+                "scope": self.scopes,
+                "access_type": "offline",
+                "prompt": "consent",
+            }
+        )
+        auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
+
+        code_holder = {}
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                code_holder["code"] = urllib.parse.parse_qs(
+                    urllib.parse.urlparse(self.path).query
+                ).get("code", [None])[0]
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Authorized. You can close this tab.")
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.HTTPServer(("localhost", port), Handler)
+        threading.Thread(target=server.handle_request, daemon=True).start()
+        print(f"[DEBUG] auth_url: {auth_url}")
+        print(f"[DEBUG] redirect_uri: {redirect_uri}")
+        webbrowser.open(auth_url)
+        if interactive:
+            print(f"[{self.service.upper()}] Authorize in browser: {auth_url}")
+        else:
+            subprocess.run(
+                [
+                    "notify-send",
+                    f"Noon Auth: {self.service}",
+                    "Authorize in the browser window",
+                ]
+            )
+
+        while "code" not in code_holder:
+            time.sleep(0.5)
+        server.server_close()
+
+        resp = urllib.request.urlopen(
+            urllib.request.Request(
+                "https://oauth2.googleapis.com/token",
+                data=urllib.parse.urlencode(
+                    {
+                        "code": code_holder["code"],
+                        "client_id": self.cid,
+                        "client_secret": self.sec,
+                        "redirect_uri": redirect_uri,
+                        "grant_type": "authorization_code",
+                    }
+                ).encode(),
+                method="POST",
+            )
+        )
+        token_data = json.loads(resp.read())
+        self._save_to_vault(token_data)
+        return token_data
+
     def revoke(self):
-        """Removes the service token from the central vault."""
         if not os.path.exists(OAUTH_STATE_PATH):
             return
         try:
@@ -121,8 +219,6 @@ class NoonAuthenticator:
             pass
 
     def _save_to_vault(self, token_data):
-        import time
-
         os.makedirs(os.path.dirname(OAUTH_STATE_PATH), exist_ok=True)
         state = {}
         if os.path.exists(OAUTH_STATE_PATH):
@@ -131,11 +227,8 @@ class NoonAuthenticator:
                     state = json.load(f)
             except:
                 pass
-
-        # Calculate expires_at from expires_in so ytmusicapi can use it
         if "expires_in" in token_data and "expires_at" not in token_data:
             token_data["expires_at"] = int(time.time()) + int(token_data["expires_in"])
-
         state[self.service] = token_data
         with open(OAUTH_STATE_PATH, "w") as f:
             json.dump(state, f, indent=2)

@@ -15,13 +15,16 @@ Item {
     property alias depth: quantizer.depth
     property alias rescaleSize: quantizer.rescaleSize
     property bool active: source.length > 0
+    // TODO: MAKE real decoding
+    readonly property bool isBase64: source.startsWith("data:") || source.length > 512
 
     ColorQuantizer {
         id: quantizer
-        source: root.source
+        source: isBase64 ? "" : root.source
         depth: root.depth
         rescaleSize: root.rescaleSize
     }
+
     ColorsGenerator {
         id: palette
         active: root.active

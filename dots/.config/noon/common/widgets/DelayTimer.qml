@@ -3,5 +3,5 @@ import Quickshell
 import qs.common
 
 Timer {
-    interval: Mem.options.arbitraryRaceConditionDelay
+    interval: Mem.options.hacks.arbitraryRaceConditionDelay
 }
