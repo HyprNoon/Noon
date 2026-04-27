@@ -11,8 +11,22 @@ STATES_FILE = Path("~/.local/state/noon/states.json").expanduser()
 GID_MAP_FILE = Path("~/.local/state/noon/todo_gid_map.json").expanduser()
 TASKLIST_ID = "@default"
 SCOPES = "https://www.googleapis.com/auth/tasks"
+STATUS_TAGS = ["[todo]", "[wip]", "[final]", "[done]"]
 
-auth = NoonAuthenticator("google_tasks", SCOPES)
+auth = NoonAuthenticator(SCOPES)
+
+
+def status_from_notes(notes):
+    try:
+        return STATUS_TAGS.index(notes)
+    except ValueError:
+        return 0
+
+
+def format_due(due):
+    day, month = due.split("/")
+    year = time.strftime("%Y")
+    return f"{year}-{int(month):02d}-{int(day):02d}T00:00:00.000Z"
 
 
 def load_gid_map():
@@ -39,14 +53,13 @@ def api(method, path, body=None):
     token = auth.get_valid_token()
     if not token:
         raise Exception("No valid auth token")
-    headers = {
-        "Authorization": f"Bearer {token['access_token']}",
-        "Content-Type": "application/json",
-    }
     req = urllib.request.Request(
         f"https://tasks.googleapis.com/tasks/v1{path}",
         data=json.dumps(body).encode() if body else None,
-        headers=headers,
+        headers={
+            "Authorization": f"Bearer {token['access_token']}",
+            "Content-Type": "application/json",
+        },
         method=method,
     )
     try:
@@ -57,6 +70,13 @@ def api(method, path, body=None):
         if e.code == 204:
             return {}
         raise
+
+
+def to_body(task):
+    body = {"title": task["content"], "notes": STATUS_TAGS[task["status"]]}
+    if task.get("due", -1) != -1:
+        body["due"] = format_due(task["due"])
+    return body
 
 
 def sync():
@@ -72,9 +92,7 @@ def sync():
     for task in local_tasks:
         key = task_key(task)
         gid = gid_map.get(key)
-        body = {"title": task["content"], "notes": str(task["status"])}
-        if task.get("due", -1) != -1:
-            body["due"] = task["due"]
+        body = to_body(task)
 
         if not gid:
             gid_map[key] = api("POST", f"/lists/{TASKLIST_ID}/tasks", body)["id"]
@@ -82,8 +100,9 @@ def sync():
             remote = remote_by_id.get(gid)
             if not remote:
                 gid_map[key] = api("POST", f"/lists/{TASKLIST_ID}/tasks", body)["id"]
-            elif remote.get("title") != task["content"] or remote.get("notes") != str(
-                task["status"]
+            elif (
+                remote.get("title") != task["content"]
+                or status_from_notes(remote.get("notes", "")) != task["status"]
             ):
                 api("PATCH", f"/lists/{TASKLIST_ID}/tasks/{gid}", body)
 
