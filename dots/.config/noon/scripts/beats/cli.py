@@ -27,6 +27,7 @@ def main():
             "queue-remove",
             "queue-move",
             "queue-clear",
+            "sync-queue",
             # "session",
         ],
     )
@@ -61,6 +62,7 @@ def main():
         "queue-remove": lambda: p.queue_remove(args.index, args.source),
         "queue-move": lambda: p.queue_move(args.index, args.new_index, args.source),
         "queue-clear": lambda: p.queue_clear(args.source),
+        "sync-queue": lambda: print(json.dumps(p.sync_queue())),
     }
 
     dispatch[args.command]()

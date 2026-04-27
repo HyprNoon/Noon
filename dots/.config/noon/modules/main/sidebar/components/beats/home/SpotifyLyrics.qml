@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import QtQuick.Effects
+import Qt5Compat.GraphicalEffects
 import qs.common.widgets
 import qs.services
 import qs.common
@@ -16,48 +17,22 @@ Item {
     anchors.fill: parent
     opacity: showContent ? 1 : 0
 
-    Behavior on opacity {
-        Anim {}
-    }
-
     readonly property real scale: (parent.height + parent.width) / 1000
     readonly property var displayLines: syncedLines.length > 0 ? syncedLines : plainLines
     readonly property bool loading: LyricsService.state === LyricsService.Loading
-    readonly property bool hasError: LyricsService.state === LyricsService.NetworkError
-    readonly property bool noLyricsFound: LyricsService.state === LyricsService.NoLyricsFound
     readonly property bool showContent: !loading && displayLines.length > 2
     readonly property int currentLineIndex: getCurrentIndex()
 
     property var syncedLines: []
     property var plainLines: []
 
-    Connections {
-        target: BeatsService
-        function onTitleChanged() {
-            syncedLines = [];
-            plainLines = [];
-        }
+    Behavior on opacity {
+        Anim {}
     }
-
-    readonly property var stateTexts: ({
-            [LyricsService.Loading]: "Loading",
-            [LyricsService.NetworkError]: "Network error",
-            [LyricsService.NoLyricsFound]: "No lyrics",
-            [LyricsService.HasSyncedLyrics]: "Synced",
-            [LyricsService.HasPlainLyrics]: "Plain"
-        })
-
-    readonly property var stateIcons: ({
-            [LyricsService.Idle]: "bedtime",
-            [LyricsService.NetworkError]: "cloud_off",
-            [LyricsService.NoLyricsFound]: "music_off",
-            [LyricsService.Loading]: "hourglass_empty"
-        })
 
     function getCurrentIndex() {
         if (!displayLines?.length || !syncedLines.length)
             return -1;
-
         for (let i = displayLines.length - 1; i >= 0; i--) {
             if (BeatsService.player.position >= displayLines[i].lineTime)
                 return i;
@@ -68,7 +43,6 @@ Item {
     function parseLyrics(text, synced) {
         if (!text)
             return [];
-
         return text.split("\n").map(line => {
             if (synced) {
                 const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
@@ -86,7 +60,6 @@ Item {
 
     function updateLyrics() {
         const data = LyricsService.onlineLyricsData;
-
         syncedLines = data?.syncedLyrics ? parseLyrics(data.syncedLyrics, true) : [];
         plainLines = !syncedLines.length && data?.plainLyrics ? parseLyrics(data.plainLyrics, false) : [];
     }
@@ -100,6 +73,14 @@ Item {
         }
     }
 
+    Connections {
+        target: BeatsService
+        function onTitleChanged() {
+            syncedLines = [];
+            plainLines = [];
+        }
+    }
+
     MaterialLoadingIndicator {
         anchors.centerIn: parent
         visible: root.loading
@@ -108,55 +89,108 @@ Item {
         shapeColor: BeatsService.colors.colOnPrimary
     }
 
-    StyledFlickable {
-        id: flick
-
+    Item {
+        id: viewContainer
+        anchors.fill: parent
         visible: showContent
-        anchors {
-            fill: parent
-            leftMargin: Padding.verylarge
-        }
-        boundsBehavior: Flickable.StopAtBounds
-        interactive: false
-
-        Column {
-            id: column
-            width: parent.width
-            spacing: 22
-
-            Repeater {
-                model: displayLines
-
-                delegate: StyledText {
-                    required property int index
-                    required property var modelData
-
-                    width: column.width
-                    font.family: "SF Arabic Rounded"
-                    font.weight: 700
-                    font.variableAxes: Fonts.variableAxes.lyrics
-                    font.pixelSize: Math.max(Fonts.sizes.huge, opacity * Fonts.sizes.title * scale)
-                    text: modelData.lineText
-                    color: BeatsService.colors.colOnLayer2
-                    wrapMode: Text.Wrap
-                    opacity: Math.max(0.15, 1 - Math.abs(index - currentLineIndex) / 4)
-                    Behavior on opacity {
-                        Anim {}
+        layer.enabled: true
+        layer.effect: OpacityMask {
+            maskSource: LinearGradient {
+                width: viewContainer.width
+                height: viewContainer.height
+                gradient: Gradient {
+                    GradientStop {
+                        position: 0.0
+                        color: "transparent"
+                    }
+                    GradientStop {
+                        position: 0.3
+                        color: Colors.colOnLayer0
+                    }
+                    GradientStop {
+                        position: 0.7
+                        color: Colors.colOnLayer0
+                    }
+                    GradientStop {
+                        position: 1.0
+                        color: "transparent"
                     }
                 }
             }
         }
 
-        Timer {
-            interval: 20
-            running: showContent && currentLineIndex >= 0 && column.height > flick.height
-            repeat: true
-            onTriggered: {
-                const lineItem = column.children[currentLineIndex];
-                if (lineItem) {
-                    flick.contentY += (lineItem.y - flick.height / 2 + lineItem.height / 2 - flick.contentY) * 0.4;
+        StyledFlickable {
+            id: flick
+            anchors.fill: parent
+            anchors.leftMargin: Padding.massive
+            contentHeight: column.height
+            interactive: false
+            boundsBehavior: Flickable.StopAtBounds
+            Component.onCompleted: syncCurrentLine()
+
+            Column {
+                id: column
+                width: parent.width - Padding.huge
+                spacing: 30
+
+                topPadding: flick.height / 2
+                bottomPadding: flick.height / 2
+
+                Repeater {
+                    model: displayLines
+                    delegate: Item {
+                        id: lineWrapper
+                        width: column.width
+                        height: lineTextItem.height
+
+                        required property int index
+                        required property var modelData
+                        readonly property bool isCurrent: index === currentLineIndex
+
+                        readonly property int distance: Math.abs(index - currentLineIndex)
+
+                        StyledText {
+                            id: lineTextItem
+                            width: parent.width
+                            text: modelData.lineText
+                            font.family: "SF Arabic Rounded"
+                            font.weight: isCurrent ? 700 : 600
+                            font.pixelSize: Math.max(Fonts.sizes.huge, (isCurrent ? 1.1 : 1.0) * Fonts.sizes.title * scale)
+                            font.letterSpacing: -0.5
+                            color: BeatsService.colors.colOnLayer2
+                            wrapMode: Text.Wrap
+
+                            Behavior on opacity {
+                                Anim {}
+                            }
+
+                            Behavior on font.pixelSize {
+                                Anim {}
+                            }
+
+                            opacity: {
+                                if (isCurrent)
+                                    return 1.0;
+                                return Math.max(0.1, 0.5 - (distance * 0.1));
+                            }
+
+                            layer.enabled: distance > 0
+                            layer.effect: FastBlur {
+                                anchors.fill: parent
+                                radius: Math.max(15, distance * 4)
+                                transparentBorder: true
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+    function syncCurrentLine() {
+        if (currentLineIndex >= 0 && column.children[currentLineIndex]) {
+            const lineItem = column.children[currentLineIndex];
+            flick.contentY = lineItem.y - (flick.height / 2) + (lineItem.height / 2);
+        }
+    }
+    onCurrentLineIndexChanged: syncCurrentLine()
 }

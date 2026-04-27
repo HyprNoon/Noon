@@ -208,12 +208,6 @@ Singleton {
     }
 
     FileView {
-        id: previewFile
-        path: "/tmp/beats_preview.pid"
-        blockWrites: true
-    }
-
-    FileView {
         id: metadataFile
         path: root._metadataPath
         blockWrites: false
@@ -240,6 +234,7 @@ Singleton {
         interval: 200
         onTriggered: player.shuffle = true
     }
+
     FolderListModel {
         folder: root._tracksDir
         showDirs: false

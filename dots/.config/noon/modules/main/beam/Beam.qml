@@ -13,7 +13,6 @@ import qs.store
 StyledPanel {
     id: root
     name: "blurred_layer"
-    property bool isRecording: false // dummy
     readonly property int detectionArea: scrollReveal ? 20 : 4
     readonly property bool scrollReveal: Mem.options.beam.behavior.scrollToReveal
     readonly property bool reveal: GlobalStates.main.showBeam || (Mem.options.beam.behavior.revealOnEmpty && !MonitorsInfo.topLevel.activated)
@@ -32,15 +31,10 @@ StyledPanel {
             return elevation;
     }
     visible: reveal || scrollReveal
-    implicitWidth: Sizes.beamSizeExpanded.width + 999
-    implicitHeight: Sizes.beamSize.height + elevationValue + 999
     kbFocus: true
     exclusiveZone: -1
 
-    anchors.left: true
-    anchors.right: true
-    anchors.top: topMode
-    anchors.bottom: !topMode
+    fill: true
 
     mask: Region {
         item: bg
@@ -174,8 +168,9 @@ StyledPanel {
             }
             StyledRectangularShadow {
                 target: popup
-                intensity: 0.25
-                visible: target.visible
+            }
+            StyledRectangularShadow {
+                target: bg
             }
             StyledRect {
                 id: bg
@@ -347,11 +342,6 @@ StyledPanel {
                         Anim {}
                     }
                 }
-            }
-
-            StyledRectangularShadow {
-                show: root.reveal
-                target: bg
             }
         }
     }

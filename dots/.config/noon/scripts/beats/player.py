@@ -7,7 +7,7 @@ import sys
 import time
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-from .config import get_player_conf
+from .config import get_player_conf, set_player_conf
 
 
 class Player:
@@ -183,7 +183,6 @@ class Player:
         return result
 
     def get_queue(self) -> list:
-        """Returns the current MPV playlist as a list of dicts."""
         count = self.get_property("playlist-count")
         if not count:
             return []
@@ -199,7 +198,8 @@ class Player:
                     "playing": item.get("playing", False),
                 }
             )
-        return queue
+        current_index = next((i for i, t in enumerate(queue) if t["current"]), 0)
+        return queue[current_index:] + queue[:current_index]
 
     def queue_add(self, url_or_path: str, source: str):
         """Appends a track to the end of the playlist."""
@@ -225,3 +225,8 @@ class Player:
         """Clears all tracks except the currently playing one."""
         self.ensure_running(source)
         self._send(["playlist-clear"])
+
+    def sync_queue(self):
+        queue = self.get_queue()
+        set_player_conf("main", "queue", queue)
+        return queue

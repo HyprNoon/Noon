@@ -35,24 +35,18 @@ StyledRect {
             }
         }
 
-        SwipeView {
+        StyledSwipeView {
             id: swipeView
 
             Layout.topMargin: Padding.huge
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Padding.normal
             currentIndex: root.selectedTabIndex
             onCurrentIndexChanged: root.selectedTabIndex = currentIndex
+            spacing: Padding.normal
             clip: true
-            layer.enabled: true
-            layer.effect: OpacityMask {
-                maskSource: Rectangle {
-                    width: swipeView?.width
-                    height: swipeView?.height
-                    radius: Rounding.verylarge
-                }
-            }
+            radius: Rounding.verylarge
+
             Repeater {
                 model: tabButtonList.map(item => item.component)
                 StyledLoader {

@@ -115,7 +115,6 @@ Scope {
             GlobalStates.main.dmenu.action = callback;
             NoonUtils.callIpc("sidebar reveal DMenu");
         }
-
         function toggle_playing(): void {
             MprisController.togglePlaying();
         }

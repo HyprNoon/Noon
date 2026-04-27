@@ -14,43 +14,44 @@ StyledRect {
     colors: parent.colors
     clip: true
 
-    ColumnLayout {
+    StyledListView {
+        id: list
         anchors.fill: parent
         anchors.margins: Padding.huge
-        spacing: Padding.large
 
-        StyledListView {
-            id: list
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.margins: Padding.normal
-            spacing: Padding.verysmall
-            radius: Rounding.verylarge
-            clip: true
-            reuseItems: false
-            model: filteredModel
-            delegate: StyledDelegateItem {
-                required property int index
-                required property var modelData
-
-                readonly property string hash: modelData.hash ?? ""
-                readonly property string fileName: modelData.filename ?? ""
-                readonly property string absPath: modelData.filepath
-                readonly property bool currentlyPlaying: absPath === BeatsService.currentTrackPath
-                buttonRadius: Rounding.tiny
-                topRadius: index === 0 ? Rounding.verylarge : Rounding.tiny
-                bottomRadius: index === parent?.count - 1 ? Rounding.verylarge : Rounding.tiny
-                iconSource: Qt.resolvedUrl(modelData?.cover_art) ?? ""
-                implicitHeight: 70
-                title: modelData.title ?? "Unknown Track"
-                subtext: modelData.artist ?? "Unknown Artist"
-                toggled: currentlyPlaying
-                colBackground: colors.colLayer3
-                colBackgroundHover: colors.colLayer3Hover
-                colors: root.colors
-
-                releaseAction: () => BeatsService.playTrack(modelData?.playlist_index)
-                altAction: () => trackContextMenu.popup()
+        model: BeatsService.daemonOptions.players.main.queue
+        delegate: StyledRect {
+            required property var modelData
+            required property int index
+            readonly property int trackIndex: modelData?.index ?? false
+            readonly property bool isCurrent: modelData?.current ?? false
+            anchors.right: parent?.right
+            anchors.left: parent?.left
+            height: 60
+            topRadius: index === 0 ? Rounding.verylarge : Rounding.tiny
+            bottomRadius: index === list.count - 1 ? Rounding.verylarge : Rounding.tiny
+            color: Colors.colLayer2
+            RLayout {
+                anchors.fill: parent
+                anchors.leftMargin: Padding.huge
+                spacing: Padding.huge
+                Rectangle {
+                    visible: isCurrent
+                    height: 30
+                    radius: 8
+                    width: 4
+                    color: Colors.colPrimaryContainer
+                }
+                StyledText {
+                    text: modelData?.title
+                    truncate: true
+                    opacity: isCurrent ? 1 : 0.4
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    Layout.rightMargin: Padding.massive
+                    color: Colors.colOnLayer2
+                    font.pixelSize: Fonts.sizes.normal
+                }
             }
         }
     }

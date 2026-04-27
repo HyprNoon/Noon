@@ -6,11 +6,11 @@ import qs.common.functions
 
 RectangularGlow {
     property var target
-    property int radius: target.radius || Rounding.verylarge
+    property int radius: target?.radius ?? Rounding.verylarge
     property bool show: !Colors.transparent
     property real intensity: 1
     z: -999
-    opacity: show ? 1 : 0
+    opacity: show ? target?.opacity ?? 1 : 0
     anchors.fill: target
     spread: 0
     cornerRadius: radius

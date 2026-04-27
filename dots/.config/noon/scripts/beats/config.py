@@ -41,3 +41,13 @@ def get_player_conf(name: str) -> dict:
         print(f"Unknown player: {name}")
         sys.exit(1)
     return players[name]
+
+
+def set_player_conf(name: str, key: str, value):
+    conf = load_conf()
+    if name not in conf.get("players", {}):
+        print(f"Unknown player: {name}")
+        sys.exit(1)
+    conf["players"][name][key] = value
+    with open(CONF_PATH, "w") as f:
+        json.dump(conf, f, indent=4, ensure_ascii=False)

@@ -21,7 +21,7 @@ JsonAdapter {
             property string socketPath: "/tmp/beats_main.sock"
             property string mpvLog: "/tmp/beats_main.log"
             property bool loopPlaylist: true
-
+            property var queue: []
             property JsonObject volumeNormalization: JsonObject {
                 property bool enabled: true
                 property string replaygain: "track"
@@ -37,6 +37,7 @@ JsonAdapter {
             property string socketPath: "/tmp/beats_preview.sock"
             property string mpvLog: "/tmp/beats_preview.log"
             property bool loopPlaylist: false
+            property var queue: []
 
             property JsonObject volumeNormalization: JsonObject {
                 property bool enabled: false

@@ -7,15 +7,15 @@ import QtQuick.Layouts
 StyledRect {
     id: root
 
-    Layout.alignment: Qt.AlignHCenter
-    Layout.preferredWidth: playerSelector?.width + Padding.veryhuge
-    Layout.preferredHeight: 36
-    Layout.bottomMargin: -10
+    visible: repeater?.count > 1
     radius: Rounding.full
+    Layout.alignment: Qt.AlignHCenter
+    width: Math.max(iconSize * 2, playerSelector?.width + Padding.massive)
+    height: Math.min(48, iconSize * 1.5)
+    Layout.bottomMargin: -10
     color: root.colors.colLayer2
-    visible: repeater.count > 1
     property QtObject colors: BeatsService.colors
-
+    readonly property int iconSize: 24
     function getPlayerIcon(dbus) {
         if (!dbus)
             return "music_note";
@@ -38,7 +38,7 @@ StyledRect {
     Rectangle {
         id: activeIndicator
         z: 1
-        height: 20
+        height: iconSize
         anchors.verticalCenter: parent.verticalCenter
         radius: Rounding.full
         color: colors.colPrimary
@@ -46,7 +46,7 @@ StyledRect {
         readonly property int selectedIndex: BeatsService?.selectedPlayerIndex
         readonly property var selectedItem: repeater.itemAt(selectedIndex)
         x: (playerSelector?.x ?? 0) + (selectedItem?.x ?? 0)
-        width: 20
+        width: iconSize
 
         Behavior on x {
             Anim {}
@@ -57,13 +57,13 @@ StyledRect {
             Anim {
                 target: activeIndicator
                 property: "width"
-                to: 32
+                to: iconSize * 1.5
                 duration: Animations.durations.verysmall
             }
             Anim {
                 target: activeIndicator
                 property: "width"
-                to: 20
+                to: iconSize
                 duration: Animations.durations.large
             }
         }
@@ -74,6 +74,7 @@ StyledRect {
         id: playerSelector
         anchors.centerIn: parent
         z: 2
+        spacing: Padding.verysmall
         Repeater {
             id: repeater
             model: BeatsService?.meaningfulPlayers
@@ -82,8 +83,8 @@ StyledRect {
                 required property var modelData
                 required property int index
                 readonly property bool isSelected: index === activeIndicator?.selectedIndex
-                height: 20
-                width: 20
+                height: iconSize
+                width: iconSize
                 Symbol {
                     id: symbol
                     anchors.centerIn: parent

@@ -149,7 +149,7 @@ StyledRect {
 
         Item {
             visible: root.expanded
-            Layout.maximumWidth: 360
+            Layout.maximumWidth: 340
             Layout.rightMargin: root.detached ? Padding.massive : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
