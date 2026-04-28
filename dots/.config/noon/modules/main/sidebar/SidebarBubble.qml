@@ -31,6 +31,17 @@ Item {
                 ]
             },
             {
+                "cat": "Tasks",
+                "bubbles": [
+                    {
+                        "icon": "refresh",
+                        "action": () => {
+                            TodoService.pull();
+                        }
+                    }
+                ]
+            },
+            {
                 "cat": "Walls",
                 "bubbles": [
                     {

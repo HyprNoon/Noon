@@ -343,9 +343,9 @@ Singleton {
     function clearMessages() {
         root.messageIDs = [];
         root.messageByID = ({});
-    // root.tokenCount.input = -1;
-    // root.tokenCount.output = -1;
-    // root.tokenCount.total = -1;
+        // root.tokenCount.input = -1;
+        // root.tokenCount.output = -1;
+        // root.tokenCount.total = -1;
     }
 
     FileView {
@@ -635,7 +635,7 @@ Singleton {
                 addFunctionOutputMessage("update_task_status", qsTr("Invalid task index: %1. Valid range: 0-%2").arg(args.index).arg(TodoService.list.length - 1));
                 return;
             }
-            if (args.status < TodoService.status_todo || args.status > TodoService.status_done) {
+            if (args.status < TodoService.Status.Todo || args.status > TodoService.Status.Done) {
                 addFunctionOutputMessage("update_task_status", qsTr("Invalid status: %1. Valid range: 0-3").arg(args.status));
                 return;
             }

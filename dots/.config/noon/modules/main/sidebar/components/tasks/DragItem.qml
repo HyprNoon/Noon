@@ -36,15 +36,15 @@ StyledRect {
                 Layout.fillWidth: true
                 text: taskData.content
                 truncate: true
-                opacity: taskData.status === TodoService.status_done ? 0.7 : 1
-                font.strikeout: taskData.status === TodoService.status_done
+                opacity: taskData.status === TodoService.Status.Done ? 0.7 : 1
+                font.strikeout: taskData.status === TodoService.Status.Done
             }
 
             StyledText {
                 id: state
                 color: Colors.colSubtext
                 text: TodoService.statusNames[taskData.status]
-                opacity: taskData.status === TodoService.status_done ? 0.3 : 0.45
+                opacity: taskData.status === TodoService.Status.Done ? 0.3 : 0.45
                 font.pixelSize: 11
                 Layout.fillWidth: true
             }

@@ -169,9 +169,9 @@ StyledPanel {
             StyledRectangularShadow {
                 target: popup
             }
-            StyledRectangularShadow {
-                target: bg
-            }
+            // StyledRectangularShadow {
+            //     target: bg
+            // }
             StyledRect {
                 id: bg
                 anchors {

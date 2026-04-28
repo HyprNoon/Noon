@@ -13,7 +13,7 @@ BottomDialog {
     hoverHeight: 300
     color: Colors.colLayer2
 
-    property int _pendingTaskStatus: -1
+    property var _pendingTaskStatus: TodoService.Status.Todo
     onShowChanged: show ? inputArea.forceActiveFocus() : null
     contentItem: ColumnLayout {
         anchors.fill: parent
@@ -85,10 +85,10 @@ BottomDialog {
             StyledComboBox {
                 implicitHeight: 45
                 currentIndex: 0
-                model: ["New", "In Progress", "FinalTouches"]
+                model: ["Todo", "InProgress", "FinalTouches"]
                 onActivated: index => {
-                    if (index >= 0 && index < model.length && inputArea.text.length > 0)
-                        root._pendingTaskStatus = index;
+                    if (inputArea.text.length > 0)
+                        root._pendingTaskStatus = TodoService.Status[model[index]];
                 }
             }
         }
@@ -113,13 +113,13 @@ BottomDialog {
     }
     function addTask() {
         if (inputArea.text.length > 0) {
-            TodoService.addTask(inputArea.text, root._pendingTaskStatus, dateInputArea.text || -1);
-            clear();
+            TodoService.addTask(inputArea.text, root?._pendingTaskStatus, dateInputArea?.text || DateTimeService.request("d/M"));
+            Qt.callLater(clear);
             root.show = false;
         }
     }
     function clear() {
-        root._pendingTaskStatus = -1;
+        root._pendingTaskStatus = TodoService.Status.Todo;
         inputArea.text = "";
         dateInputArea.text = "";
     }

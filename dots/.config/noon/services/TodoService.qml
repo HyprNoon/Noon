@@ -8,87 +8,65 @@ import QtQuick
 Singleton {
     id: root
 
-    property var list: []
+    enum Status {
+        Todo,
+        InProgress,
+        FinalTouches,
+        Done
+    }
 
-    readonly property int status_todo: 0
-    readonly property int status_in_progress: 1
-    readonly property int status_final_touches: 2
-    readonly property int status_done: 3
-    readonly property int status_all: 4
+    readonly property var list: store.tasks
+    readonly property var store: Mem.states.services.todo
     readonly property var statusNames: ["Not Started", "In Progress", "Final Touches", "Finished"]
     readonly property var statusLabels: ["todo", "in_progress", "final_touches", "done"]
-    Component.onCompleted: loadFromConfig()
 
-    function saveToConfig() {
-        Mem.states.services.todo.tasks = root.list;
-        debounceSync.restart();
-    }
+    Component.onCompleted: Qt.callLater(pull)
 
-    function loadFromConfig() {
-        const saved = Mem.states.services.todo.tasks;
-        if (saved.length > 0 && saved[0].hasOwnProperty('done')) {
-            root.list = saved.map(item => ({
-                        content: item.content,
-                        status: item.done ? status_done : status_todo,
-                        due: item.due ?? -1
-                    }));
-            saveToConfig();
-        } else {
-            root.list = saved;
-        }
-    }
-
-    function addTask(desc, status = status_todo, date = -1) {
-        list.push({
+    function addTask(desc, status = TodoService.Status.Todo, date = DateTimeService.request("d/M"), children = []) {
+        store.tasks.push({
             content: desc,
             status: status,
-            due: date
+            due: date,
+            children: []
         });
-        root.list = list.slice(0);
-        saveToConfig();
-        NoonUtils.playSound("task_added");
+        Qt.callLater(push);
     }
 
     function editItem(index, newContent) {
-        if (index >= 0 && index < list.length && newContent.trim() !== "") {
-            list[index].content = newContent.trim();
-            root.list = list.slice(0);
-            saveToConfig();
-            return true;
-        }
-        return false;
+        if (!index || index < 0 || !newContent)
+            return;
+        store.tasks[index].content = newContent.trim();
+        Qt.callLater(push);
     }
 
     function setStatus(index, status) {
-        if (index >= 0 && index < list.length && status >= status_todo && status <= status_done) {
-            list[index].status = status;
-            root.list = list.slice(0);
-            saveToConfig();
-        }
+        if (!index || index < 0 || status < 0)
+            return;
+        store.tasks[index].status = status;
+        Qt.callLater(push);
     }
 
     function nextStatus(index) {
-        if (index >= 0 && index < list.length && list[index].status < status_done)
+        if (index >= 0 && index < list.length && list[index].status < TodoService.Status.Done) {
             setStatus(index, list[index].status + 1);
+        }
     }
 
     function previousStatus(index) {
-        if (index >= 0 && index < list.length && list[index].status > status_todo)
+        if (index >= 0 && index < list.length && list[index].status > TodoService.Status.Todo) {
             setStatus(index, list[index].status - 1);
+        }
     }
 
     function deleteItem(index) {
         if (index >= 0 && index < list.length) {
-            list.splice(index, 1);
-            root.list = list.slice(0);
-            saveToConfig();
-            NoonUtils.playSound("task_completed");
+            store.tasks.splice(index, 1).slice(0);
+            Qt.callLater(push);
         }
     }
 
     function removeDone() {
-        root.list = list.filter(item => item.status !== status_done);
-        saveToConfig();
+        store.tasks = store.tasks.filter(item => item.status !== TodoService.Status.Done);
     }
 
     function getTasksByStatus(status) {
@@ -96,14 +74,14 @@ Singleton {
     }
 
     function getProgress() {
-        return list.length === 0 ? 0 : list.filter(i => i.status === status_done).length / list.length;
+        return list.filter(i => i.status === TodoService.Status.Done).length / list.length;
     }
 
     function formatTasks() {
         if (!list || list.length === 0)
-            return "No tasks currently";
+            return "No Current Tasks";
         let output = "Current tasks:\n\n";
-        for (let s = status_todo; s <= status_done; s++) {
+        for (let s = TodoService.Status.Todo; s <= TodoService.Status.Done; s++) {
             const tasks = getTasksByStatus(s);
             if (tasks.length > 0) {
                 output += `## ${statusNames[s]} (${tasks.length})\n`;
@@ -116,16 +94,22 @@ Singleton {
         return output;
     }
 
-    Timer {
-        id: debounceSync
-        interval: 1000
-        onTriggered: {
-            syncProc.running = true;
-        }
+    function push() {
+        _cmd("push");
     }
+
+    function pull() {
+        _cmd("pull");
+    }
+
+    function _cmd(action) {
+        if (mainProc.running)
+            mainProc.running = false;
+        mainProc.command = ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/gtasks_sync.py", action];
+        mainProc.running = true;
+    }
+
     Process {
-        id: syncProc
-        command: ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/gtasks_sync.py"]
-        onStarted: console.log(command.join(" "))
+        id: mainProc
     }
 }

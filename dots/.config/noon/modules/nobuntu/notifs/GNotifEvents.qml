@@ -34,7 +34,7 @@ Item {
         }
     }
     component TaskItemComponent: StyledRect {
-        id:root
+        id: root
         required property var modelData
         width: parent.width
         radius: Rounding.large
@@ -54,7 +54,7 @@ Item {
                     font {
                         pixelSize: Fonts.sizes.small
                         variableAxes: Fonts.variableAxes.title
-                        strikeout: modelData.status === TodoService.status_done
+                        strikeout: modelData.status === TodoService.Status.Done
                     }
 
                     truncate: true
@@ -64,19 +64,19 @@ Item {
                 StyledText {
                     text: {
                         switch (modelData.status) {
-                        case TodoService.status_todo:
+                        case TodoService.Status.Todo:
                             return "Not Started";
-                        case TodoService.status_in_progress:
+                        case TodoService.Status.InProgress:
                             return "In Progress";
-                        case TodoService.status_final_touches:
+                        case TodoService.Status.FinalTouches:
                             return "Final Touches";
-                        case TodoService.status_done:
+                        case TodoService.Status.Done:
                             return "Finished";
                         default:
                             return "Not Started";
                         }
                     }
-                    opacity: modelData.status === TodoService.status_done ? 0.3 : 0.45
+                    opacity: modelData.status === TodoService.Status.Done ? 0.3 : 0.45
                     font.pixelSize: 11
                     color: Colors.colSubtext
                 }

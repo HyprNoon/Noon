@@ -72,13 +72,13 @@ SquareComponent {
                             radius: 4
                             color: {
                                 switch (modelData.status) {
-                                case TodoService.status_todo:
+                                case TodoService.Status.Todo:
                                     return Colors.colPrimaryContainer;
-                                case TodoService.status_in_progress:
+                                case TodoService.Status.InProgress:
                                     return Colors.colPrimaryContainer;
-                                case TodoService.status_final_touches:
+                                case TodoService.Status.FinalTouches:
                                     return Colors.colPrimary;
-                                case TodoService.status_done:
+                                case TodoService.Status.Done:
                                     return Colors.colSuccess;
                                 default:
                                     return Colors.colPrimaryContainer;
@@ -87,8 +87,8 @@ SquareComponent {
                         }
                         StyledText {
                             text: modelData?.content
-                            font.strikeout: modelData.status === TodoService.status_done
-                            color: modelData.status === TodoService.status_done ? Colors.colSubtext : Colors.colOnLayer0
+                            font.strikeout: modelData.status === TodoService.Status.Done
+                            color: modelData.status === TodoService.Status.Done ? Colors.colSubtext : Colors.colOnLayer0
                             font.pixelSize: Fonts.sizes.small
                             font.family: Fonts.family.variable
                             font.variableAxes: Fonts.variableAxes.title

@@ -75,13 +75,13 @@ StyledRect {
             spacing: -1
             TextArea {
                 id: textArea
-                opacity: taskData.status === TodoService.status_done ? 0.7 : 1
+                opacity: taskData.status === TodoService.Status.Done ? 0.7 : 1
                 Layout.fillWidth: true
                 wrapMode: TextEdit.Wrap
                 renderType: Text.NativeRendering
                 readOnly: !root.isEditing
                 font {
-                    strikeout: taskData.status === TodoService.status_done
+                    strikeout: taskData.status === TodoService.Status.Done
                     family: Fonts.family.reading
                     hintingPreference: Font.PreferNoHinting
                     pixelSize: Fonts.sizes.large

@@ -16,25 +16,25 @@ Rectangle {
     property alias listView: listView
     property alias shape: placeHolder.shape
     readonly property var itemApp: ({
-            [TodoService.status_todo]: {
+            [TodoService.Status.Todo]: {
                 icon: "radio_button_unchecked",
                 bg: Colors.colLayer2,
                 col: Colors.colOnLayer1,
                 column: todoColumn
             },
-            [TodoService.status_in_progress]: {
+            [TodoService.Status.InProgress]: {
                 icon: "work_history",
                 bg: Colors.colPrimaryContainer,
                 col: Colors.colPrimary,
                 column: inProgressColumn
             },
-            [TodoService.status_final_touches]: {
+            [TodoService.Status.FinalTouches]: {
                 icon: "auto_fix_high",
                 bg: Colors.colSecondaryContainer,
                 col: Colors.colSecondary,
                 column: finalTouchesColumn
             },
-            [TodoService.status_done]: {
+            [TodoService.Status.Done]: {
                 icon: "check_circle",
                 bg: Colors.colSurfaceContainerHigh,
                 col: Colors.m3.m3success,
@@ -208,8 +208,8 @@ Rectangle {
                                 text: model.content
                                 Layout.fillWidth: true
                                 truncate: true
-                                opacity: model.status === TodoService.status_done ? 0.7 : 1
-                                font.strikeout: model.status === TodoService.status_done
+                                opacity: model.status === TodoService.Status.Done ? 0.7 : 1
+                                font.strikeout: model.status === TodoService.Status.Done
                             }
 
                             Symbol {
@@ -236,7 +236,7 @@ Rectangle {
                             Layout.fillWidth: true
                             truncate: true
                             text: TodoService.statusNames[model.status]
-                            opacity: model.status === TodoService.status_done ? 0.3 : 0.45
+                            opacity: model.status === TodoService.Status.Done ? 0.3 : 0.45
                             font.pixelSize: 11
                         }
                     }
