@@ -101,12 +101,6 @@ AppWindow {
                 running: true
             }
         }
-
-        QuickSettings {
-            searchQuery: searchInput.text
-            anchors.fill: parent
-            anchors.margins: Padding.verylarge
-        }
     }
 
     component ControlButton: RippleButtonWithIcon {

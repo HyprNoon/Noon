@@ -41,9 +41,6 @@ Scope {
         StartMenu {}
     }
     WidgetLoader {
-        ControlPanel {}
-    }
-    WidgetLoader {
         Run {}
     }
 

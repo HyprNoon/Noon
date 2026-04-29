@@ -160,11 +160,8 @@ Singleton {
             icon: "settings",
             activeIcon: "settings_heart",
             shell: "main",
-            componentPath: "settings/QuickSettings",
-            expandable: true,
-            incubatable: true,
+            componentPath: "settings/Tweaks",
             searchable: true,
-            expandSize: sizePresets.threeQuarter,
             shape: "Ghostish",
             enabled: Mem.options.sidebar.content.tweaks
         },
