@@ -33,7 +33,6 @@ Singleton {
     function handle_init(mode) {
         KeyringStorage.reload();
         NightLightService.reload();
-        Hyprland.dispatch("submap " + Mem.options.desktop.hyprland.tilingLayout);
         switch (mode) {
         case "main":
             TimerService.reload();

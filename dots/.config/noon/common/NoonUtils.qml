@@ -306,7 +306,6 @@ Singleton {
         }
         function onTilingLayoutChanged() {
             NoonUtils.setHyprKey("layout", conf.tilingLayout);
-            NoonUtils.execDetached("hyprctl dispatch submap " + conf.tilingLayout);
         }
     }
 
