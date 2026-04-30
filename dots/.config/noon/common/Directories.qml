@@ -37,7 +37,7 @@ Singleton {
     readonly property QtObject services: QtObject {
         readonly property string notifications: FileUtils.trimFileProtocol(standard.cache + "/notifications/notifications.json")
         readonly property string latex: FileUtils.trimFileProtocol(standard.cache + "/media/latex")
-        readonly property string aiChats: FileUtils.trimFileProtocol(standard.state + "/user/generated/ai")
+        readonly property string skills: FileUtils.trimFileProtocol(standard.config + "/opencode/skills")
         readonly property string m3path: FileUtils.trimFileProtocol(standard.state + "/user/generated/colors.json")
         readonly property string gamesCoverArts: FileUtils.trimFileProtocol(standard.state + "/user/generated/gamesCoverArts")
         readonly property string screenshots: FileUtils.trimFileProtocol(standard.pictures + "/Screenshots")
@@ -77,7 +77,7 @@ Singleton {
             // misc
             venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
-            services.notifications, services.latex, services.aiChats, services.gamesCoverArts, services.screenshots,
+            services.notifications, services.latex, services.gamesCoverArts, services.screenshots,
             // wallpapers
             wallpapers.main, wallpapers.switchScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats

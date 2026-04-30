@@ -21,9 +21,10 @@ Singleton {
     readonly property var tokenCount: states.tokenCount
     readonly property var modelList: states.models ?? []
     readonly property string currentModelId: states.model
-
+    readonly property var skills: states.skills
     property var messageIDs: []
     property var messageByID: ({})
+    property string pendingSkillName: ""
     property string pendingFilePath: ""
     property var postResponseHook
 
@@ -87,7 +88,11 @@ Singleton {
             name: root.currentModelId
         };
     }
-
+    function setSkill(skillName) {
+        if (!skillName.includes(skills))
+            return;
+        root.pendingSkillName = skillName.trim();
+    }
     function setModel(modelId) {
         if (!modelId || modelId.length === 0)
             return;
@@ -154,6 +159,18 @@ Singleton {
     }
 
     Process {
+        id: skillsDiscovery
+        running: true
+        command: ["sh", "-c", "grep -rPl '^name:\\s*\\S+' " + Directories.services.skills + " --include='SKILL.md' | xargs -n1 dirname | xargs -n1 basename"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const skillNames = text.trim().split("\n").filter(Boolean);
+                states.skills = skillNames;
+            }
+        }
+    }
+
+    Process {
         id: getModels
         running: states.models.length === 0
         command: ["sh", "-c", "opencode models < /dev/null"]
@@ -181,6 +198,8 @@ Singleton {
 
         function buildCommand(userMessage) {
             let flags = "--format json";
+            if (root.pendingSkillName.length > 0)
+                userMessage += " , using skill " + root.pendingSkillName;
             if (root.pendingFilePath.length > 0)
                 flags += ` -f ${root.pendingFilePath}`;
             if (root.currentModelId.length > 0)

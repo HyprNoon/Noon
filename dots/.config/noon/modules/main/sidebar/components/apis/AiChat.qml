@@ -19,30 +19,6 @@ Item {
     property var suggestionList: []
     signal expandRequested
 
-    Keys.onPressed: event => {
-        messageInputField.forceActiveFocus();
-        if (event.modifiers === Qt.NoModifier) {
-            if (event.key === Qt.Key_PageUp) {
-                messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
-                event.accepted = true;
-            } else if (event.key === Qt.Key_PageDown) {
-                messageListView.contentY = Math.min(messageListView.contentHeight - messageListView.height / 2, messageListView.contentY + messageListView.height / 2);
-                event.accepted = true;
-            }
-        }
-        if ((event.modifiers & Qt.ControlModifier)) {
-            if (event.key === Qt.Key_L)
-                Ai.clearMessages();
-            if (event.key === Qt.Key_R) {
-                Ai.regenerate(Ai.messageIDs.length - 1);
-            }
-            if (event.key === Qt.Key_O) {
-                root.expandRequested();
-            }
-
-            event.accepted = true;
-        }
-    }
     readonly property var allCommands: [
         {
             name: "scale",
@@ -64,6 +40,13 @@ Item {
             execute: args => Ai.setModel(args[0])
         },
         {
+            name: "skill",
+            description: qsTr("Choose Skill"),
+            execute: args => {
+                Ai.setSkill(args[0]);
+            }
+        },
+        {
             name: "load",
             description: qsTr("Load chat"),
             execute: args => {
@@ -79,55 +62,212 @@ Item {
 
     function handleInput(inputText) {
         if (inputText.startsWith(root.commandPrefix)) {
-            // Handle special commands
-            const command = inputText.split(" ")[0].substring(1);
-            const args = inputText.split(" ").slice(1);
-            const commandObj = root.allCommands.find(cmd => cmd.name === `${command}`);
-            if (commandObj) {
-                commandObj.execute(args);
-            } else {
-                Ai.addMessage(qsTr("Unknown command: ") + command, Ai.interfaceRole);
-            }
+            const parts = inputText.split(" ");
+            const command = parts[0].substring(1);
+            const args = parts.slice(1);
+            const cmd = root.allCommands.find(c => c.name === command);
+            cmd ? cmd.execute(args) : Ai.addMessage(qsTr("Unknown command: ") + command, Ai.interfaceRole);
         } else {
             Ai.sendUserMessage(inputText);
         }
-
-        // Always scroll to bottom when user sends a message
         messageListView.positionViewAtEnd();
     }
+
     function decodeImageAndAttach(entry) {
         Ai.attachFile(ClipboardService.getImagePath(entry));
     }
-    component StatusItem: MouseArea {
-        id: statusItem
-        property string icon
-        property string statusText
-        property string description
-        hoverEnabled: true
-        implicitHeight: statusItemRowLayout.implicitHeight
-        implicitWidth: statusItemRowLayout.implicitWidth
 
-        RowLayout {
-            id: statusItemRowLayout
-            spacing: 4
-            Symbol {
-                text: statusItem.icon
-                iconSize: Fonts.sizes.huge
-                color: Colors.colSubtext
-            }
-            StyledText {
-                visible: text.length > 0
-                font.pixelSize: Fonts.sizes.small
-                text: statusItem.statusText
-                color: Colors.colSubtext
-                animateChange: true
-            }
+    function handleCommandSuggestions(query) {
+        const source = root.allCommands.map(cmd => ({
+                    name: cmd.name,
+                    prepared: Fuzzy.prepare(cmd.name)
+                }));
+        const results = query.length === 0 ? root.allCommands.map(cmd => ({
+                    target: cmd.name
+                })) : Fuzzy.go(query, source, {
+            all: true,
+            key: "name"
+        });
+
+        root.suggestionList = results.map(r => ({
+                    name: root.commandPrefix + r.target,
+                    displayName: root.commandPrefix + r.target,
+                    description: root.allCommands.find(c => c.name === r.target)?.description ?? ""
+                }));
+    }
+
+    function handleModelSuggestions() {
+        const query = messageInputField.text.split(" ")[1] ?? "";
+        const source = Ai.modelList.map(m => ({
+                    name: m,
+                    prepared: Fuzzy.prepare(m)
+                }));
+        const results = query.length === 0 ? Ai.modelList.map(m => ({
+                    target: m
+                })) : Fuzzy.go(query, source, {
+            all: true,
+            key: "name"
+        });
+        const isFirst = messageInputField.text.trim().split(" ").length === 1;
+
+        root.suggestionQuery = query;
+        root.suggestionList = results.map(r => ({
+                    name: (isFirst ? root.commandPrefix + "model " : "") + r.target,
+                    displayName: r.target,
+                    description: qsTr("Set model to %1").arg(r.target)
+                }));
+    }
+
+    function handleSkillsSuggestions() {
+        const query = messageInputField.text.split(" ")[1] ?? "";
+
+        const source = Ai.skills.map(f => ({
+                    name: f,
+                    prepared: Fuzzy.prepare(f)
+                }));
+
+        const results = query.length === 0 ? Ai.skills.map(f => ({
+                    target: f
+                })) : Fuzzy.go(query, source, {
+            all: true,
+            key: "name"
+        });
+
+        const isFirst = messageInputField.text.trim().split(" ").length === 1;
+
+        root.suggestionQuery = query;
+        root.suggestionList = results.map(r => ({
+                    name: (isFirst ? root.commandPrefix + "skill " : "") + r.target,
+                    displayName: r.target,
+                    description: qsTr("Load %1 skill").arg(r.target)
+                }));
+    }
+
+    function handleLoadSuggestions() {
+        const query = messageInputField.text.split(" ")[1] ?? "";
+        const source = Mem.states.services.ai.sessions.map(s => ({
+                    name: s.title,
+                    prepared: Fuzzy.prepare(s.title),
+                    obj: s
+                }));
+        const results = query.length === 0 ? Mem.states.services.ai.sessions.map(s => ({
+                    target: s
+                })) : Fuzzy.go(query, source, {
+            all: true,
+            key: "name"
+        }).map(r => ({
+                    target: r.obj
+                }));
+        const isFirst = messageInputField.text.trim().split(" ").length === 1;
+
+        root.suggestionQuery = query;
+        root.suggestionList = results.map(r => ({
+                    name: (isFirst ? root.commandPrefix + "load " : "") + r.target.id,
+                    displayName: r.target.title,
+                    description: qsTr("Load chat from %1").arg(new Date(r.target.updated).toLocaleString())
+                }));
+    }
+
+    // suggestion dispatch table — keyed by command name
+    readonly property var argHandlers: ({
+            "model": handleModelSuggestions,
+            "skill": handleSkillsSuggestions,
+            "load": handleLoadSuggestions
+        })
+
+    function updateSuggestions() {
+        const trimmed = messageInputField.text.trim();
+        const words = trimmed.split(" ");
+        const commandWord = words[0].substring(1);
+        const hasArg = words.length > 1;
+
+        if (!trimmed.startsWith(root.commandPrefix)) {
+            root.suggestionList = [];
+            return;
         }
 
-        StyledToolTip {
-            content: statusItem.description
-            extraVisibleCondition: false
-            alternativeVisibleCondition: statusItem.containsMouse
+        if (hasArg) {
+            const handler = root.argHandlers[commandWord];
+            handler ? handler() : (root.suggestionList = []);
+        } else {
+            const isExact = root.allCommands.some(c => c.name === commandWord);
+            isExact && root.argHandlers[commandWord] ? root.argHandlers[commandWord]() : handleCommandSuggestions(commandWord);
+        }
+    }
+
+    Keys.onPressed: event => {
+        messageInputField.forceActiveFocus();
+        if (event.modifiers === Qt.NoModifier) {
+            if (event.key === Qt.Key_PageUp) {
+                messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
+                event.accepted = true;
+            } else if (event.key === Qt.Key_PageDown) {
+                messageListView.contentY = Math.min(messageListView.contentHeight - messageListView.height / 2, messageListView.contentY + messageListView.height / 2);
+                event.accepted = true;
+            }
+        }
+        if (event.modifiers & Qt.ControlModifier) {
+            if (event.key === Qt.Key_L)
+                Ai.clearMessages();
+            if (event.key === Qt.Key_R)
+                Ai.regenerate(Ai.messageIDs.length - 1);
+            if (event.key === Qt.Key_O)
+                root.expandRequested();
+            event.accepted = true;
+        }
+    }
+
+    function handleInputKeyPress(event) {
+        switch (event.key) {
+        case Qt.Key_Tab:
+            suggestions.acceptSelectedWord();
+            event.accepted = true;
+            break;
+        case Qt.Key_Up:
+            if (suggestions.visible) {
+                suggestions.selectedIndex = Math.max(0, suggestions.selectedIndex - 1);
+                event.accepted = true;
+            }
+            break;
+        case Qt.Key_Down:
+            if (suggestions.visible) {
+                suggestions.selectedIndex = Math.min(root.suggestionList.length - 1, suggestions.selectedIndex + 1);
+                event.accepted = true;
+            }
+            break;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            if (event.modifiers & Qt.ShiftModifier) {
+                messageInputField.insert(messageInputField.cursorPosition, "\n");
+            } else {
+                const text = messageInputField.text;
+                messageInputField.clear();
+                root.handleInput(text);
+            }
+            event.accepted = true;
+            break;
+        case Qt.Key_Escape:
+            if (Ai.pendingFilePath.length > 0) {
+                Ai.attachFile("");
+                event.accepted = true;
+            }
+            break;
+        default:
+            if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_V) {
+                if (event.modifiers & Qt.ShiftModifier) {
+                    messageInputField.text += Quickshell.clipboardText;
+                    event.accepted = true;
+                    return;
+                }
+                const entry = ClipboardService.entries[0];
+                if (ClipboardService.isImage(0)) {
+                    decodeImageAndAttach(entry);
+                    event.accepted = true;
+                } else if (StringUtils.cleanCliphistEntry(entry).startsWith("file://")) {
+                    Ai.attachFile(decodeURIComponent(StringUtils.cleanCliphistEntry(entry)));
+                    event.accepted = true;
+                }
+            }
         }
     }
 
@@ -143,7 +283,6 @@ Item {
             clip: true
             color: "transparent"
             radius: Rounding.small
-
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -157,7 +296,7 @@ Item {
                 }
             }
 
-            StyledListView { // Message list
+            StyledListView {
                 id: messageListView
                 z: 0
                 anchors.fill: parent
@@ -166,32 +305,20 @@ Item {
                 popin: true
                 topMargin: statusBg.implicitHeight + statusBg.anchors.topMargin * 2
                 fasterInteractions: false
-                property int lastResponseLength: 0
-                onContentHeightChanged: {
-                    if (atYEnd)
-                        positionViewAtEnd();
 
-                    // Qt.callLater(positionViewAtEnd);
-                }
-                onCountChanged: {
-                    // Auto-scroll when new messages are added
-                    if (atYEnd)
-                        positionViewAtEnd();
-                }
+                onContentHeightChanged: if (atYEnd)
+                    positionViewAtEnd()
+                onCountChanged: if (atYEnd)
+                    positionViewAtEnd()
 
                 model: ScriptModel {
-                    values: Ai.messageIDs.filter(id => {
-                        const message = Ai.messageByID[id];
-                        return message?.visibleToUser ?? true;
-                    })
+                    values: Ai.messageIDs.filter(id => Ai.messageByID[id]?.visibleToUser ?? true)
                 }
                 delegate: AiMessage {
                     required property var modelData
                     required property int index
                     messageIndex: index
-                    messageData: {
-                        Ai.messageByID[modelData];
-                    }
+                    messageData: Ai.messageByID[modelData]
                     messageInputField: root.inputField
                 }
             }
@@ -216,12 +343,25 @@ Item {
             showArrows: root.suggestionList.length > 1
         }
 
-        FlowButtonGroup { // Suggestions
+        FlowButtonGroup {
             id: suggestions
             visible: root.suggestionList.length > 0 && messageInputField.text.length > 0
             property int selectedIndex: 0
             Layout.fillWidth: true
             spacing: 5
+
+            function acceptSuggestion(word) {
+                const words = messageInputField.text.trim().split(/\s+/);
+                words[words.length - 1] = word;
+                messageInputField.text = words.join(" ") + " ";
+                messageInputField.cursorPosition = messageInputField.text.length;
+                messageInputField.forceActiveFocus();
+            }
+
+            function acceptSelectedWord() {
+                if (suggestions.selectedIndex >= 0 && suggestions.selectedIndex < suggestionRepeater.count)
+                    suggestions.acceptSuggestion(root.suggestionList[suggestions.selectedIndex].name);
+            }
 
             Repeater {
                 id: suggestionRepeater
@@ -239,40 +379,14 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         text: modelData.displayName ?? modelData.name
                     }
-
-                    onHoveredChanged: {
-                        if (commandButton.hovered) {
-                            suggestions.selectedIndex = index;
-                        }
-                    }
-                    onClicked: {
-                        suggestions.acceptSuggestion(modelData.name);
-                    }
-                }
-            }
-
-            function acceptSuggestion(word) {
-                const words = messageInputField.text.trim().split(/\s+/);
-                if (words.length > 0) {
-                    words[words.length - 1] = word;
-                } else {
-                    words.push(word);
-                }
-                const updatedText = words.join(" ") + " ";
-                messageInputField.text = updatedText;
-                messageInputField.cursorPosition = messageInputField.text.length;
-                messageInputField.forceActiveFocus();
-            }
-
-            function acceptSelectedWord() {
-                if (suggestions.selectedIndex >= 0 && suggestions.selectedIndex < suggestionRepeater.count) {
-                    const word = root.suggestionList[suggestions.selectedIndex].name;
-                    suggestions.acceptSuggestion(word);
+                    onHoveredChanged: if (commandButton.hovered)
+                        suggestions.selectedIndex = index
+                    onClicked: suggestions.acceptSuggestion(modelData.name)
                 }
             }
         }
 
-        Rectangle { // Input area
+        Rectangle {
             id: inputWrapper
             property real spacing: 5
             Layout.fillWidth: true
@@ -280,7 +394,6 @@ Item {
             color: Colors.colLayer1
             implicitHeight: Math.max(inputFieldRowLayout.implicitHeight + inputFieldRowLayout.anchors.topMargin + commandButtonsRow.implicitHeight + commandButtonsRow.anchors.bottomMargin + spacing, 45) + (attachedFileIndicator.implicitHeight + spacing + attachedFileIndicator.anchors.topMargin)
             clip: true
-
             Behavior on implicitHeight {
                 Anim {}
             }
@@ -297,7 +410,7 @@ Item {
                 onRemove: Ai.attachFile("")
             }
 
-            RowLayout { // Input field and send button
+            RowLayout {
                 id: inputFieldRowLayout
                 anchors {
                     top: attachedFileIndicator.bottom
@@ -316,184 +429,16 @@ Item {
                     placeholderText: qsTr('Message the model... "%1" for commands').arg(root.commandPrefix)
                     background: null
 
-                    function handleCommandSuggestions(query) {
-                        const source = root.allCommands.map(cmd => ({
-                                    name: cmd.name,
-                                    prepared: Fuzzy.prepare(cmd.name)
-                                }));
-
-                        const results = query.length === 0 ? root.allCommands.map(cmd => ({
-                                    target: cmd.name
-                                })) : Fuzzy.go(query, source, {
-                            all: true,
-                            key: "name"
-                        });
-
-                        root.suggestionList = results.map(result => ({
-                                    name: root.commandPrefix + result.target,
-                                    displayName: root.commandPrefix + result.target,
-                                    description: root.allCommands.find(c => c.name === result.target)?.description ?? ""
-                                }));
-                    }
-
-                    function handleModelSuggestions() {
-                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-
-                        const results = root.suggestionQuery.length === 0 ? Ai.modelList.map(model => ({
-                                    target: model
-                                })) : Fuzzy.go(root.suggestionQuery, Ai.modelList.map(model => ({
-                                    name: model,
-                                    prepared: Fuzzy.prepare(model)
-                                })), {
-                            all: true,
-                            key: "name"
-                        });
-
-                        root.suggestionList = results.map(result => ({
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "model ") : ""}${result.target}`,
-                                    displayName: result.target,
-                                    description: qsTr("Set model to %1").arg(result.target)
-                                }));
-                    }
-
-                    function handlePromptSuggestions() {
-                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-
-                        const results = root.suggestionQuery.length === 0 ? Ai.promptFiles.map(file => ({
-                                    target: file
-                                })) : Fuzzy.go(root.suggestionQuery, Ai.promptFiles.map(file => ({
-                                    name: file,
-                                    prepared: Fuzzy.prepare(file)
-                                })), {
-                            all: true,
-                            key: "name"
-                        });
-
-                        root.suggestionList = results.map(result => ({
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "prompt ") : ""}${result.target}`,
-                                    displayName: FileUtils.trimFileExt(FileUtils.fileNameForPath(result.target)),
-                                    description: qsTr("Load prompt from %1").arg(result.target)
-                                }));
-                    }
-
-                    function handleLoadSuggestions() {
-                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-
-                        const results = root.suggestionQuery.length === 0 ? Mem.states.services.ai.sessions.map(session => ({
-                                    target: session
-                                })) : Fuzzy.go(root.suggestionQuery, Mem.states.services.ai.sessions.map(session => ({
-                                    name: session.title,
-                                    prepared: Fuzzy.prepare(session.title),
-                                    obj: session
-                                })), {
-                            all: true,
-                            key: "name"
-                        }).map(result => ({
-                                    target: result.obj
-                                }));
-
-                        root.suggestionList = results.map(result => {
-                            const session = result.target;
-                            return {
-                                name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "load ") : ""}${session.id}`,
-                                displayName: session.title,
-                                description: qsTr("Load chat from %1").arg(new Date(session.updated).toLocaleString())
-                            };
-                        });
-                    }
-
                     onTextChanged: {
-                        if (messageInputField.text.length === 0) {
+                        if (text.length === 0) {
                             root.suggestionQuery = "";
                             root.suggestionList = [];
                             return;
                         }
-
-                        const trimmed = messageInputField.text.trim();
-                        const words = trimmed.split(" ");
-
-                        if (!trimmed.startsWith(root.commandPrefix)) {
-                            root.suggestionList = [];
-                            return;
-                        }
-
-                        const commandWord = words[0].substring(1);
-                        const hasArgument = words.length > 1;
-
-                        const argHandlers = {
-                            "model": handleModelSuggestions,
-                            "prompt": handlePromptSuggestions,
-                            "load": handleLoadSuggestions
-                        };
-
-                        if (hasArgument) {
-                            if (argHandlers[commandWord]) {
-                                argHandlers[commandWord]();
-                            } else {
-                                root.suggestionList = [];
-                            }
-                        } else {
-                            const isExactCommand = root.allCommands.some(cmd => cmd.name === commandWord);
-                            if (isExactCommand && argHandlers[commandWord]) {
-                                argHandlers[commandWord]();
-                            } else {
-                                handleCommandSuggestions(commandWord);
-                            }
-                        }
+                        root.updateSuggestions();
                     }
 
-                    function accept() {
-                        root.handleInput(text);
-                        text = "";
-                    }
-
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Tab) {
-                            suggestions.acceptSelectedWord();
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Up && suggestions.visible) {
-                            suggestions.selectedIndex = Math.max(0, suggestions.selectedIndex - 1);
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Down && suggestions.visible) {
-                            suggestions.selectedIndex = Math.min(root.suggestionList.length - 1, suggestions.selectedIndex + 1);
-                            event.accepted = true;
-                        } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                            if (event.modifiers & Qt.ShiftModifier) {
-                                messageInputField.insert(messageInputField.cursorPosition, "\n");
-                                event.accepted = true;
-                            } else {
-                                const inputText = messageInputField.text;
-                                messageInputField.clear();
-                                root.handleInput(inputText);
-                                event.accepted = true;
-                            }
-                        } else if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_V) {
-                            if (event.modifiers & Qt.ShiftModifier) {
-                                messageInputField.text += Quickshell.clipboardText;
-                                event.accepted = true;
-                                return;
-                            }
-                            const currentClipboardEntry = ClipboardService.entries[0];
-                            const cleanCliphistEntry = StringUtils.cleanCliphistEntry(currentClipboardEntry);
-                            if (ClipboardService.isImage(0)) {
-                                decodeImageAndAttach(currentClipboardEntry);
-                                event.accepted = true;
-                                return;
-                            } else if (cleanCliphistEntry.startsWith("file://")) {
-                                Ai.attachFile(decodeURIComponent(cleanCliphistEntry));
-                                event.accepted = true;
-                                return;
-                            }
-                            event.accepted = false;
-                        } else if (event.key === Qt.Key_Escape) {
-                            if (Ai.pendingFilePath.length > 0) {
-                                Ai.attachFile("");
-                                event.accepted = true;
-                            } else {
-                                event.accepted = false;
-                            }
-                        }
-                    }
+                    Keys.onPressed: event => root.handleInputKeyPress(event)
                 }
 
                 Item {
@@ -506,13 +451,11 @@ Item {
                         id: loadingAnimation
                         loops: Animation.Infinite
                         running: Ai.isResponding || root.isRecording
-
                         PropertyAction {
                             target: shape
                             property: "rotation"
                             value: 0
                         }
-
                         Anim {
                             target: shape
                             property: "rotation"
@@ -520,7 +463,6 @@ Item {
                             to: 360
                             duration: 4500
                         }
-
                         onStopped: shape.rotation = 0
                     }
 
@@ -529,14 +471,11 @@ Item {
                         implicitSize: 38
                         anchors.centerIn: parent
                         shape: {
-                            let shape;
-                            if (messageInputField.text.length === 0 && !Ai.isResponding) {
-                                shape = "Cookie6Sided";
-                            } else if (Ai.isResponding) {
-                                shape = "Cookie12Sided";
-                            } else
-                                shape = "Clover8Leaf";
-                            return MaterialShape.Shape[shape];
+                            if (!Ai.isResponding && messageInputField.text.length === 0)
+                                return MaterialShape.Shape.Cookie6Sided;
+                            if (Ai.isResponding)
+                                return MaterialShape.Shape.Cookie12Sided;
+                            return MaterialShape.Shape.Clover8Leaf;
                         }
                         color: Colors.colPrimary
                         Behavior on rotation {
@@ -547,32 +486,27 @@ Item {
 
                     Symbol {
                         text: {
-                            if (messageInputField.text.length === 0 && !Ai.isResponding) {
+                            if (!Ai.isResponding && messageInputField.text.length === 0)
                                 return "mic";
-                            } else if (Ai.isResponding) {
+                            if (Ai.isResponding)
                                 return "stop";
-                            } else
-                                return "arrow_upward";
+                            return "arrow_upward";
                         }
                         fill: 1
                         font.pixelSize: 18
                         anchors.centerIn: parent
                         color: Colors.colOnPrimary
-                        // rotation: -shape.rotation
                     }
 
                     MouseArea {
-                        id: eventArea
-                        enabled: sendButton.toggled
                         anchors.fill: parent
+                        enabled: sendButton.toggled
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (messageInputField.text.length === 0 && !Ai.isResponding) {
-                                // Ai.record();
-                            } else if (Ai.isResponding) {
+                            if (Ai.isResponding)
                                 Ai.stop();
-                            } else {
+                            else if (messageInputField.text.length > 0) {
                                 root.handleInput(messageInputField.text);
                                 messageInputField.clear();
                             }
@@ -581,27 +515,17 @@ Item {
                 }
             }
 
-            RowLayout { // Controls
+            RowLayout {
                 id: commandButtonsRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 5
-                anchors.leftMargin: 10
-                anchors.rightMargin: 5
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                    bottomMargin: 5
+                    leftMargin: 10
+                    rightMargin: 5
+                }
                 spacing: 4
-
-                property var commandsShown: [
-                    {
-                        name: "",
-                        sendDirectly: false,
-                        dontAddSpace: true
-                    },
-                    {
-                        name: "clear",
-                        sendDirectly: true
-                    },
-                ]
 
                 ApiInputBoxIndicator {
                     icon: "api"
@@ -620,25 +544,30 @@ Item {
                 }
 
                 ButtonGroup {
-                    // Command buttons
                     padding: 0
-
                     Repeater {
-                        // Command buttons
-                        model: commandButtonsRow.commandsShown
+                        model: [
+                            {
+                                name: "",
+                                sendDirectly: false,
+                                dontAddSpace: true
+                            },
+                            {
+                                name: "clear",
+                                sendDirectly: true
+                            }
+                        ]
                         delegate: ApiCommandButton {
-                            property string commandRepresentation: `${root.commandPrefix}${modelData.name}`
-                            buttonText: commandRepresentation
+                            property string cmd: root.commandPrefix + modelData.name
+                            buttonText: cmd
                             downAction: () => {
                                 if (modelData.sendDirectly) {
-                                    root.handleInput(commandRepresentation);
+                                    root.handleInput(cmd);
+                                    messageInputField.text = "";
                                 } else {
-                                    messageInputField.text = commandRepresentation + (modelData.dontAddSpace ? "" : " ");
+                                    messageInputField.text = cmd + (modelData.dontAddSpace ? "" : " ");
                                     messageInputField.cursorPosition = messageInputField.text.length;
                                     messageInputField.forceActiveFocus();
-                                }
-                                if (modelData.name === "clear") {
-                                    messageInputField.text = "";
                                 }
                             }
                         }
