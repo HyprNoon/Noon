@@ -1,9 +1,7 @@
 import QtQuick
-import QtQuick.Controls
-import qs.common
-import qs.store
-import qs.common.widgets
 import QtQuick.Layouts
+import qs.common
+import qs.common.widgets
 
 BottomDialog {
     id: root
@@ -13,71 +11,63 @@ BottomDialog {
     enableStagedReveal: false
     bottomAreaReveal: true
     hoverHeight: 200
+    color: Colors.colLayer3
+
+    bgAnchors {
+        rightMargin: Padding.veryhuge
+        leftMargin: Padding.veryhuge
+    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Padding.verylarge
-        spacing: Padding.normal
+        anchors.margins: Padding.huge
+        spacing: Padding.large
 
         BottomDialogHeader {
-            title: "Squares"
-            subTitle: Mem.states.sidebar.widgets.enabled.length + " of " + root.db.length + " enabled"
-            target: root
+            title: "Your Widgets"
+            subTitle: "You Have " + (root.db.length - Mem.states.sidebar.widgets.enabled.length) + " disabled widgets !"
+            showCloseButton: false
         }
 
         BottomDialogSeparator {}
 
-        ScrollView {
+        StyledListView {
+            clip: true
+            hint: false
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
+            spacing: Padding.small
+            _model: root.db
+            delegate: StyledDelegateItem {
+                anchors.right: parent?.right
+                anchors.left: parent?.left
+                height: 72
+                title: modelData.component.replace(/_/g, " ")
+                subtext: {
+                    let props = [];
+                    if (modelData.expandable)
+                        props.push("Expandable");
+                    if (Mem.states.sidebar.widgets.pilled.indexOf(modelData.id) !== -1)
+                        props.push("Pill");
+                    else
+                        props.push("Square");
+                    if (Mem.states.sidebar.widgets.pinned.indexOf(modelData.id) !== -1)
+                        props.push("Pinned");
+                    if (Mem.states.sidebar.widgets.expanded.indexOf(modelData.id) !== -1)
+                        props.push("Expanded");
+                    return props.length > 0 ? props.join(" • ") : "Standard widget";
+                }
+                colSubtext: Colors.colSubtext
+                colTitle: Colors.colOnLayer2
+                materialIcon: modelData.materialIcon || "widgets"
+                enabled: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) === -1
+                opacity: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) !== -1 ? 0.5 : 1
 
-            ColumnLayout {
-                width: parent.width
-                spacing: Padding.normal
-
-                Repeater {
-                    id: dialogRepeater
-                    model: root.db
-
-                    delegate: StyledDelegateItem {
-                        Layout.preferredWidth: parent.width
-                        Layout.preferredHeight: 72
-                        Layout.fillWidth: true
-                        title: modelData.component.replace(/_/g, " ")
-                        subtext: {
-                            let props = [];
-                            if (modelData.expandable)
-                                props.push("Expandable");
-                            if (Mem.states.sidebar.widgets.pilled.indexOf(modelData.id) !== -1)
-                                props.push("Pill");
-                            else
-                                props.push("Square");
-                            if (Mem.states.sidebar.widgets.pinned.indexOf(modelData.id) !== -1)
-                                props.push("Pinned");
-                            if (Mem.states.sidebar.widgets.expanded.indexOf(modelData.id) !== -1)
-                                props.push("Expanded");
-                            return props.length > 0 ? props.join(" • ") : "Standard widget";
-                        }
-                        colSubtext: Colors.colSubtext
-                        colTitle: Colors.colOnLayer2
-                        materialIcon: modelData.materialIcon || "widgets"
-                        enabled: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) === -1
-                        opacity: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) !== -1 ? 0.5 : 1
-
-                        onClicked: {
-                            let list = Mem.states.sidebar.widgets.enabled;
-                            let idx = list.indexOf(modelData.id);
-                            if (idx === -1) {
-                                list.push(modelData.id);
-                                Mem.states.sidebar.widgets.enabled = list.slice();
-                            }
-                        }
-                    }
+                releaseAction: () => {
+                    if (enabled)
+                        Mem.states.sidebar.widgets.enabled.push(modelData.id);
                 }
             }
         }
-
-        Spacer {}
     }
 }

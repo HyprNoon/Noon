@@ -23,6 +23,7 @@ ListView {
     property bool animateMovement: false
     property bool reverseRemoveDirection: false
     property bool fasterInteractions: Mem.options.interactions.scrolling.fasterTouchpadScroll
+    property var _model
     // Accumulated scroll destination so wheel deltas stack while animating
     property real scrollTargetY: 0
     property real touchpadScrollFactor: Mem.options.interactions.scrolling.touchpadScrollFactor ?? 100
@@ -34,7 +35,11 @@ ListView {
         root.dragIndex = -1;
         root.dragDistance = 0;
     }
-
+    ScriptModel {
+        id: scripted
+        values: _model
+    }
+    model: _model ? scripted : null
     spacing: 5
     maximumFlickVelocity: 1000
     boundsBehavior: Flickable.StopAtBounds

@@ -6,6 +6,12 @@ import Quickshell
 Singleton {
     id: root
     readonly property var db: [
+        // {
+        //     id: "note",
+        //     expandable: true,
+        //     component: "StickyNote",
+        //     materialIcon: "draft"
+        // },
         {
             id: "resources",
             expandable: true,

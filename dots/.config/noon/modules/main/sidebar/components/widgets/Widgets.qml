@@ -6,7 +6,7 @@ import qs.common.widgets
 import QtQuick.Layouts
 import qs.modules.main.desktop.widgets
 
-StyledRect {
+Item {
     id: root
     property bool expanded: false
     property int pinnedCount: 0
@@ -16,8 +16,6 @@ StyledRect {
     readonly property int gridSpacing: Padding.small
     readonly property int unit: cellSize + gridSpacing
     readonly property var db: WidgetsData.db
-    color: Colors.colLayer1
-    radius: Rounding.verylarge
 
     function initOrder() {
         if (root.db.length === 0)
@@ -182,7 +180,9 @@ StyledRect {
 
             Repeater {
                 id: widgetRepeater
-                model: root.db
+                model: ScriptModel {
+                    values: root.db
+                }
 
                 delegate: StyledLoader {
                     id: loader
