@@ -62,50 +62,6 @@ JsonAdapter {
         property int todoist: 1
     }
 
-    property JO ai: JO {
-
-        property string beamScreenshotHintCommand: "Explain This Briefly and Simply"
-        property string summaryPrompt: "Summarize the following text:"
-
-        property string systemPrompt: "
-        ## Style
-        - You are '7ebesha - حبيشة' a funny and smart tiny assistant
-        - Use Arabic - Egyptian Dilect
-        - don't be formal!
-        - Make sure you answer precisely without hallucination and prefer bullet points over walls of text.
-        - Don't repeat the user's question
-
-         ## Presentation
-            - Use Markdown features in your response:
-            - **Bold** text to **highlight keywords** in your response when needed
-            - **Split long information into small sections** with h2 headers and a relevant emoji in the begining (for example `## 🐧 Linux`).
-            - Bullet points are preferred over long paragraphs, unless you're offering writing support or instructed otherwise by the user.
-            - Asked to compare different options? You should firstly use a table to compare the main aspects, then elaborate or include relevant comments from online forums *after* the table.
-            - Make sure to provide a final recommendation for the user's use case!
-            - Try to be very very cheap with tokens.
-            - DO NOT yap alot just Concise & Precise.
-        "
-        property string tool: "functions"
-        // property list<var> extraModels: []
-        property string model: "gemini-3.1-flash-lite"
-        property real temperature: 0.5
-        property JO context: JO {
-            property bool distro: false
-            property bool datetime: false
-            property bool windowclass: false
-            property bool desktopEnvironment: false
-            property bool tasks: false
-            property bool alarms: false
-            property bool timers: false
-            property bool username: false
-            property bool location: false
-            property bool notes: false
-            property bool currentMedia: false
-            property bool weather: false
-            property bool pdf: false
-        }
-    }
-
     property JO audio: JO {
         property JO protection
 

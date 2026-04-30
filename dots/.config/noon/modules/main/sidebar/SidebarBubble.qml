@@ -91,27 +91,9 @@ Item {
                         }
                     },
                     {
-                        "icon": "restart_alt",
+                        "icon": "globe",
                         "action": () => {
-                            Ai.regenerate(Ai.messageIDs.length - 1);
-                        }
-                    },
-                    {
-                        "icon": "save",
-                        "action": () => {
-                            Ai.saveChat("lastSession");
-                        }
-                    },
-                    {
-                        "icon": "upload",
-                        "action": () => {
-                            Ai.loadChat("lastSession");
-                        }
-                    },
-                    {
-                        "icon": TtsService.status !== "daemon_stopped" ? "close" : "arrow_upload_progress",
-                        "action": () => {
-                            TtsService.status === "daemon_stopped" ? TtsService.load() : TtsService.unload();
+                            Ai.resumeInWeb(Ai.currentSessionId);
                         }
                     }
                 ]

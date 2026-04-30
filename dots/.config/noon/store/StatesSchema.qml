@@ -113,6 +113,10 @@ JsonAdapter {
         }
 
         ai: JO {
+            property list<var> models: []
+            property string model: ""
+            property string currentSessionId: ""
+            property list<var> sessions: []
             property JO tokenCount: JO {
                 property int input
                 property int output

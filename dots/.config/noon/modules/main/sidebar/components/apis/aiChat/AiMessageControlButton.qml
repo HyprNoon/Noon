@@ -19,11 +19,7 @@ GroupButton {
         color: button.activated ? Colors.m3.m3onPrimary : button.enabled ? Colors.m3.m3onSurface : Colors.colOnLayer1Inactive
 
         Behavior on color {
-            CAnim {
-            }
-
+            CAnim {}
         }
-
     }
-
 }

@@ -6,10 +6,10 @@ import qs.store
 Singleton {
     id: root
 
-    property bool ready: optionsView.loaded && statesView.loaded
-    property alias states: statesView.data
-    property alias options: optionsView.data
-    property alias store: storeView.data
+    readonly property bool ready: optionsView.loaded && statesView.loaded
+    readonly property alias states: statesView.data
+    readonly property alias options: optionsView.data
+    readonly property alias store: storeView.data
 
     ConfigFileView {
         id: optionsView

@@ -13,7 +13,7 @@ Singleton {
 
     property string query: ""
     property string activeState: "ai"
-    property string modelName: Ai?.getModel(Mem.options.ai?.model ?? "")?.name ?? "AI"
+    property string modelName: Ai?.currentModelId ?? ""
     property string activeSubState: ""
     property var suggestedApp: null
     readonly property string cleanQuery: {

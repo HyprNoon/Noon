@@ -8,7 +8,7 @@ import qs.common.widgets
 import qs.services
 
 Singleton {
-    property var tweaks: [
+    readonly property var tweaks: [
         {
             "section": "Appearance",
             "icon": "palette",
@@ -440,40 +440,6 @@ Singleton {
             ]
         },
         {
-            "section": "AI Instructions",
-            "icon": "neurology",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "text_fields",
-                    "name": "System Prompt",
-                    "key": "ai.systemPrompt",
-                    "type": "field",
-                    "textPlaceholder": "",
-                    "fillHeight": true
-                }
-            ]
-        },
-        {
-            "section": "AI",
-            "icon": "neurology",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "neurology",
-                    "name": "AI Policy",
-                    "key": "policies.ai",
-                    "type": "spin"
-                },
-                {
-                    "icon": "neurology",
-                    "name": "Translator Policy",
-                    "key": "policies.translator",
-                    "type": "spin"
-                }
-            ]
-        },
-        {
             "section": "Beam",
             "icon": "api",
             "shell": "Main",
@@ -497,78 +463,6 @@ Singleton {
                     "icon": "height",
                     "name": "Reveal on Empty",
                     "key": "beam.behavior.revealOnEmpty"
-                }
-            ]
-        },
-        {
-            "section": "AI Context",
-            "icon": "neurology",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "computer",
-                    "name": "Distro",
-                    "key": "ai.context.distro"
-                },
-                {
-                    "icon": "schedule",
-                    "name": "Date & Time",
-                    "key": "ai.context.datetime"
-                },
-                {
-                    "icon": "window",
-                    "name": "Window Class",
-                    "key": "ai.context.windowclass"
-                },
-                {
-                    "icon": "desktop_windows",
-                    "name": "Desktop Environment",
-                    "key": "ai.context.desktopEnvironment"
-                },
-                {
-                    "icon": "task",
-                    "name": "Tasks",
-                    "key": "ai.context.tasks"
-                },
-                {
-                    "icon": "timer",
-                    "name": "Timers",
-                    "key": "ai.context.timers"
-                },
-                {
-                    "icon": "person",
-                    "name": "User",
-                    "key": "ai.context.user"
-                },
-                {
-                    "icon": "location_on",
-                    "name": "Location",
-                    "key": "ai.context.location"
-                },
-                {
-                    "icon": "note",
-                    "name": "Notes",
-                    "key": "ai.context.notes"
-                },
-                {
-                    "icon": "play_circle",
-                    "name": "Playing",
-                    "key": "ai.context.playing"
-                },
-                {
-                    "icon": "wb_sunny",
-                    "name": "Weather",
-                    "key": "ai.context.weather"
-                },
-                {
-                    "icon": "draft",
-                    "name": "PDF",
-                    "key": "ai.context.pdf"
-                },
-                {
-                    "icon": "alarm",
-                    "name": "Alarms",
-                    "key": "ai.context.alarms"
                 }
             ]
         },

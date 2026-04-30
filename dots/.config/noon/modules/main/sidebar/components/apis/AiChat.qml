@@ -6,7 +6,6 @@ import "aiChat"
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import Quickshell
 import Noon.Services
 
@@ -19,14 +18,6 @@ Item {
     property var suggestionQuery: ""
     property var suggestionList: []
     signal expandRequested
-    Component.onCompleted: if (messageListView.count === 0 && Ai.savedChats.length > 0) {
-        Ai.loadChat("lastSession");
-    }
-    onFocusChanged: focus => {
-        if (focus) {
-            root.inputField.forceActiveFocus();
-        }
-    }
 
     Keys.onPressed: event => {
         messageInputField.forceActiveFocus();
@@ -52,7 +43,7 @@ Item {
             event.accepted = true;
         }
     }
-    property var allCommands: [
+    readonly property var allCommands: [
         {
             name: "scale",
             description: qsTr("Change response's font scale by decimal."),
@@ -70,148 +61,20 @@ Item {
         {
             name: "model",
             description: qsTr("Choose model"),
-            execute: args => {
-                Ai.setModel(args[0]);
-            }
-        },
-        {
-            name: "tool",
-            description: qsTr("Set the tool to use for the model."),
-            execute: args => {
-                // console.log(args)
-                if (args.length == 0 || args[0] == "get") {
-                    Ai.addMessage(qsTr("Usage: %1tool TOOL_NAME").arg(root.commandPrefix), Ai.interfaceRole);
-                } else {
-                    const tool = args[0];
-                    const switched = Ai.setTool(tool);
-                    if (switched) {
-                        Ai.addMessage(qsTr("Tool set to: %1").arg(tool), Ai.interfaceRole);
-                    }
-                }
-            }
-        },
-        {
-            name: "prompt",
-            description: qsTr("Set the system prompt for the model."),
-            execute: args => {
-                if (args.length === 0 || args[0] === "get") {
-                    Ai.printPrompt();
-                    return;
-                }
-                Ai.loadPrompt(args.join(" ").trim());
-            }
-        },
-        {
-            name: "key",
-            description: qsTr("Set API key"),
-            execute: args => {
-                if (args[0] == "get") {
-                    Ai.printApiKey();
-                } else {
-                    Ai.setApiKey(args[0]);
-                }
-            }
-        },
-        {
-            name: "save",
-            description: qsTr("Save chat"),
-            execute: args => {
-                const joinedArgs = args.join(" ");
-                if (joinedArgs.trim().length == 0) {
-                    Ai.addMessage(qsTr("Usage: %1save CHAT_NAME").arg(root.commandPrefix), Ai.interfaceRole);
-                    return;
-                }
-                Ai.saveChat(joinedArgs);
-            }
+            execute: args => Ai.setModel(args[0])
         },
         {
             name: "load",
             description: qsTr("Load chat"),
             execute: args => {
-                const joinedArgs = args.join(" ");
-                if (joinedArgs.trim().length == 0) {
-                    Ai.addMessage(qsTr("Usage: %1load CHAT_NAME").arg(root.commandPrefix), Ai.interfaceRole);
-                    return;
-                }
-                Ai.loadChat(joinedArgs);
+                Ai.loadChat(args.join(" ").trim());
             }
         },
         {
             name: "clear",
             description: qsTr("Clear chat history"),
-            execute: () => {
-                Ai.clearMessages();
-            }
-        },
-        {
-            name: "temp",
-            description: qsTr("Set temperature (randomness) of the model. Values range between 0 to 2 for Gemini, 0 to 1 for other models. Default is 0.5."),
-            execute: args => {
-                // console.log(args)
-                if (args.length == 0 || args[0] == "get") {
-                    Ai.printTemperature();
-                } else {
-                    const temp = parseFloat(args[0]);
-                    Ai.setTemperature(temp);
-                }
-            }
-        },
-        {
-            name: "test",
-            description: qsTr("Markdown test"),
-            execute: () => {
-                Ai.addMessage(`
-<think>
-A longer think block to test revealing animation
-OwO wem ipsum dowo sit amet, consekituwet awipiscing ewit, sed do eiuwsmod tempow inwididunt ut wabowe et dowo mawa. Ut enim ad minim weniam, quis nostwud exeucitation uwuwamcow bowowis nisi ut awiquip ex ea commowo consequat. Duuis aute iwuwe dowo in wepwependewit in wowuptate velit esse ciwwum dowo eu fugiat nuwa pawiatuw. Excepteuw sint occaecat cupidatat non pwowoident, sunt in cuwpa qui officia desewunt mowit anim id est wabowum. Meouw! >w<
-Mowe uwu wem ipsum!
-</think>
-## ✏️ Markdown test
-### Formatting
-
-- *Italic*, \`Monospace\`, **Bold**, [Link](https://example.com)
-- Arch lincox icon <img src="${Quickshell.shellPath("assets/icons/arch-symbolic.svg")}" height="${Fonts.sizes.small}"/>
-
-### Table
-
-Quickshell vs AGS/Astal
-
-|                          | Quickshell       | AGS/Astal         |
-|--------------------------|------------------|-------------------|
-| UI Toolkit               | Qt               | Gtk3/Gtk4         |
-| Language                 | QML              | Js/Ts/Lua         |
-| Reactivity               | Implied          | Needs declaration |
-| Widget placement         | Mildly difficult | More intuitive    |
-| Bluetooth & Wifi support | ❌               | ✅                |
-| No-delay keybinds        | ✅               | ❌                |
-| Development              | New APIs         | New syntax        |
-
-### Code block
-
-Just a hello world...
-
-\`\`\`cpp
-#include <bits/stdc++.h>
-// This is intentionally very long to test scrolling
-const std::string GREETING = \"UwU\";
-int main(int argc, char* argv[]) {
-    std::cout << GREETING;
-}
-\`\`\`
-
-### LaTeX
-
-
-Inline w/ dollar signs: $\\frac{1}{2} = \\frac{2}{4}$
-
-Inline w/ double dollar signs: $$\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$
-
-Inline w/ backslash and square brackets \\[\\int_0^\\infty \\frac{1}{x^2} dx = \\infty\\]
-
-Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
-`, Ai.interfaceRole);
-            }
-        },
+            execute: () => Ai.clearMessages()
+        }
     ]
 
     function handleInput(inputText) {
@@ -233,10 +96,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         messageListView.positionViewAtEnd();
     }
     function decodeImageAndAttach(entry) {
-        if (entry && ClipboardService.isImage(entry)) {
-            const filePath = ClipboardService.decodeImageEntry(entry);
-            Ai.attachFile(filePath);
-        }
+        Ai.attachFile(ClipboardService.getImagePath(entry));
     }
     component StatusItem: MouseArea {
         id: statusItem
@@ -271,13 +131,6 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         }
     }
 
-    component StatusSeparator: Rectangle {
-        implicitWidth: 4
-        implicitHeight: 4
-        radius: implicitWidth / 2
-        color: Colors.colOutlineVariant
-    }
-
     ColumnLayout {
         id: columnLayout
         anchors {
@@ -286,18 +139,13 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         }
         spacing: root.padding
 
-        Item {
-            // Messages
+        StyledRect {
+            clip: true
+            color: "transparent"
+            radius: Rounding.small
+
             Layout.fillWidth: true
             Layout.fillHeight: true
-            layer.enabled: true
-            layer.effect: OpacityMask {
-                maskSource: Rectangle {
-                    width: columnLayout.width
-                    height: columnLayout.height
-                    radius: Rounding.small
-                }
-            }
 
             StyledRectangularShadow {
                 z: 1
@@ -306,45 +154,6 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 visible: opacity > 0
                 Behavior on opacity {
                     Anim {}
-                }
-            }
-            Rectangle {
-                id: statusBg
-                z: 2
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.top
-                    topMargin: 4
-                }
-                implicitWidth: statusRowLayout.implicitWidth + 10 * 2
-                implicitHeight: Math.max(statusRowLayout.implicitHeight, 38)
-                radius: Rounding.normal - root.padding
-                color: Colors.colLayer2
-                RowLayout {
-                    id: statusRowLayout
-                    anchors.centerIn: parent
-                    spacing: 10
-
-                    StatusItem {
-                        icon: Ai.currentModelHasApiKey ? "key" : "key_off"
-                        statusText: ""
-                        description: Ai.currentModelHasApiKey ? qsTr("API key is set\nChange with /key YOUR_API_KEY") : qsTr("No API key\nSet it with /key YOUR_API_KEY")
-                    }
-                    StatusSeparator {}
-                    StatusItem {
-                        icon: "device_thermostat"
-                        statusText: Ai.temperature.toFixed(1)
-                        description: qsTr("Temperature\nChange with /temp VALUE")
-                    }
-                    StatusSeparator {
-                        visible: Ai.tokenCount.total > 0
-                    }
-                    StatusItem {
-                        visible: Ai.tokenCount.total > 0
-                        icon: "token"
-                        statusText: Ai.tokenCount.total
-                        description: qsTr("Total token count\nInput: %1\nOutput: %2").arg(Ai.tokenCount.input).arg(Ai.tokenCount.output)
-                    }
                 }
             }
 
@@ -498,123 +307,138 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 }
                 spacing: 0
 
-                StyledTextArea { // The actual TextArea
+                StyledTextArea {
                     id: messageInputField
                     wrapMode: TextArea.Wrap
                     Layout.fillWidth: true
                     padding: 10
                     color: activeFocus ? Colors.m3.m3onSurface : Colors.m3.m3onSurfaceVariant
                     placeholderText: qsTr('Message the model... "%1" for commands').arg(root.commandPrefix)
-
                     background: null
 
+                    function handleCommandSuggestions(query) {
+                        const source = root.allCommands.map(cmd => ({
+                                    name: cmd.name,
+                                    prepared: Fuzzy.prepare(cmd.name)
+                                }));
+
+                        const results = query.length === 0 ? root.allCommands.map(cmd => ({
+                                    target: cmd.name
+                                })) : Fuzzy.go(query, source, {
+                            all: true,
+                            key: "name"
+                        });
+
+                        root.suggestionList = results.map(result => ({
+                                    name: root.commandPrefix + result.target,
+                                    displayName: root.commandPrefix + result.target,
+                                    description: root.allCommands.find(c => c.name === result.target)?.description ?? ""
+                                }));
+                    }
+
+                    function handleModelSuggestions() {
+                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
+
+                        const results = root.suggestionQuery.length === 0 ? Ai.modelList.map(model => ({
+                                    target: model
+                                })) : Fuzzy.go(root.suggestionQuery, Ai.modelList.map(model => ({
+                                    name: model,
+                                    prepared: Fuzzy.prepare(model)
+                                })), {
+                            all: true,
+                            key: "name"
+                        });
+
+                        root.suggestionList = results.map(result => ({
+                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "model ") : ""}${result.target}`,
+                                    displayName: result.target,
+                                    description: qsTr("Set model to %1").arg(result.target)
+                                }));
+                    }
+
+                    function handlePromptSuggestions() {
+                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
+
+                        const results = root.suggestionQuery.length === 0 ? Ai.promptFiles.map(file => ({
+                                    target: file
+                                })) : Fuzzy.go(root.suggestionQuery, Ai.promptFiles.map(file => ({
+                                    name: file,
+                                    prepared: Fuzzy.prepare(file)
+                                })), {
+                            all: true,
+                            key: "name"
+                        });
+
+                        root.suggestionList = results.map(result => ({
+                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "prompt ") : ""}${result.target}`,
+                                    displayName: FileUtils.trimFileExt(FileUtils.fileNameForPath(result.target)),
+                                    description: qsTr("Load prompt from %1").arg(result.target)
+                                }));
+                    }
+
+                    function handleLoadSuggestions() {
+                        root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
+
+                        const results = root.suggestionQuery.length === 0 ? Mem.states.services.ai.sessions.map(session => ({
+                                    target: session
+                                })) : Fuzzy.go(root.suggestionQuery, Mem.states.services.ai.sessions.map(session => ({
+                                    name: session.title,
+                                    prepared: Fuzzy.prepare(session.title),
+                                    obj: session
+                                })), {
+                            all: true,
+                            key: "name"
+                        }).map(result => ({
+                                    target: result.obj
+                                }));
+
+                        root.suggestionList = results.map(result => {
+                            const session = result.target;
+                            return {
+                                name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "load ") : ""}${session.id}`,
+                                displayName: session.title,
+                                description: qsTr("Load chat from %1").arg(new Date(session.updated).toLocaleString())
+                            };
+                        });
+                    }
+
                     onTextChanged: {
-                        // Handle suggestions
                         if (messageInputField.text.length === 0) {
                             root.suggestionQuery = "";
                             root.suggestionList = [];
                             return;
-                        } else if (messageInputField.text.startsWith(`${root.commandPrefix}model`)) {
-                            root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-                            const modelResults = Fuzzy.go(root.suggestionQuery, Ai.modelList.map(model => {
-                                return {
-                                    name: Fuzzy.prepare(model),
-                                    obj: model
-                                };
-                            }), {
-                                all: true,
-                                key: "name"
-                            });
-                            root.suggestionList = modelResults.map(model => {
-                                return {
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "model ") : ""}${model.target}`,
-                                    displayName: `${Ai.models[model.target].name}`,
-                                    description: `${Ai.models[model.target].description}`
-                                };
-                            });
-                        } else if (messageInputField.text.startsWith(`${root.commandPrefix}prompt`)) {
-                            root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-                            const promptFileResults = Fuzzy.go(root.suggestionQuery, Ai.promptFiles.map(file => {
-                                return {
-                                    name: Fuzzy.prepare(file),
-                                    obj: file
-                                };
-                            }), {
-                                all: true,
-                                key: "name"
-                            });
-                            root.suggestionList = promptFileResults.map(file => {
-                                return {
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "prompt ") : ""}${file.target}`,
-                                    displayName: `${FileUtils.trimFileExt(FileUtils.fileNameForPath(file.target))}`,
-                                    description: qsTr("Load prompt from %1").arg(file.target)
-                                };
-                            });
-                        } else if (messageInputField.text.startsWith(`${root.commandPrefix}save`)) {
-                            root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-                            const promptFileResults = Fuzzy.go(root.suggestionQuery, Ai.savedChats.map(file => {
-                                return {
-                                    name: Fuzzy.prepare(file),
-                                    obj: file
-                                };
-                            }), {
-                                all: true,
-                                key: "name"
-                            });
-                            root.suggestionList = promptFileResults.map(file => {
-                                const chatName = FileUtils.trimFileExt(FileUtils.fileNameForPath(file.target)).trim();
-                                return {
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "save ") : ""}${chatName}`,
-                                    displayName: `${chatName}`,
-                                    description: qsTr("Save chat to %1").arg(chatName)
-                                };
-                            });
-                        } else if (messageInputField.text.startsWith(`${root.commandPrefix}load`)) {
-                            root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-                            const promptFileResults = Fuzzy.go(root.suggestionQuery, Ai.savedChats.map(file => {
-                                return {
-                                    name: Fuzzy.prepare(file),
-                                    obj: file
-                                };
-                            }), {
-                                all: true,
-                                key: "name"
-                            });
-                            root.suggestionList = promptFileResults.map(file => {
-                                const chatName = FileUtils.trimFileExt(FileUtils.fileNameForPath(file.target)).trim();
-                                return {
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "load ") : ""}${chatName}`,
-                                    displayName: `${chatName}`,
-                                    description: qsTr(`Load chat from %1`).arg(file.target)
-                                };
-                            });
-                        } else if (messageInputField.text.startsWith(`${root.commandPrefix}tool`)) {
-                            root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
-                            const toolResults = Fuzzy.go(root.suggestionQuery, Ai.availableTools.map(tool => {
-                                return {
-                                    name: Fuzzy.prepare(tool),
-                                    obj: tool
-                                };
-                            }), {
-                                all: true,
-                                key: "name"
-                            });
-                            root.suggestionList = toolResults.map(tool => {
-                                const toolName = tool.target;
-                                return {
-                                    name: `${messageInputField.text.trim().split(" ").length == 1 ? (root.commandPrefix + "tool ") : ""}${tool.target}`,
-                                    displayName: toolName,
-                                    description: Ai.toolDescriptions[toolName]
-                                };
-                            });
-                        } else if (messageInputField.text.startsWith(root.commandPrefix)) {
-                            root.suggestionQuery = messageInputField.text;
-                            root.suggestionList = root.allCommands.filter(cmd => cmd.name.startsWith(messageInputField.text.substring(1))).map(cmd => {
-                                return {
-                                    name: `${root.commandPrefix}${cmd.name}`,
-                                    description: `${cmd.description}`
-                                };
-                            });
+                        }
+
+                        const trimmed = messageInputField.text.trim();
+                        const words = trimmed.split(" ");
+
+                        if (!trimmed.startsWith(root.commandPrefix)) {
+                            root.suggestionList = [];
+                            return;
+                        }
+
+                        const commandWord = words[0].substring(1);
+                        const hasArgument = words.length > 1;
+
+                        const argHandlers = {
+                            "model": handleModelSuggestions,
+                            "prompt": handlePromptSuggestions,
+                            "load": handleLoadSuggestions
+                        };
+
+                        if (hasArgument) {
+                            if (argHandlers[commandWord]) {
+                                argHandlers[commandWord]();
+                            } else {
+                                root.suggestionList = [];
+                            }
+                        } else {
+                            const isExactCommand = root.allCommands.some(cmd => cmd.name === commandWord);
+                            if (isExactCommand && argHandlers[commandWord]) {
+                                argHandlers[commandWord]();
+                            } else {
+                                handleCommandSuggestions(commandWord);
+                            }
                         }
                     }
 
@@ -633,43 +457,35 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                         } else if (event.key === Qt.Key_Down && suggestions.visible) {
                             suggestions.selectedIndex = Math.min(root.suggestionList.length - 1, suggestions.selectedIndex + 1);
                             event.accepted = true;
-                        } else if ((event.key === Qt.Key_Enter || event.key === Qt.Key_Return)) {
+                        } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                             if (event.modifiers & Qt.ShiftModifier) {
-                                // Insert newline
                                 messageInputField.insert(messageInputField.cursorPosition, "\n");
                                 event.accepted = true;
                             } else {
-                                // Accept text
                                 const inputText = messageInputField.text;
                                 messageInputField.clear();
                                 root.handleInput(inputText);
                                 event.accepted = true;
                             }
                         } else if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_V) {
-                            // Intercept Ctrl+V to handle image/file pasting
                             if (event.modifiers & Qt.ShiftModifier) {
-                                // Let Shift+Ctrl+V = plain paste
                                 messageInputField.text += Quickshell.clipboardText;
                                 event.accepted = true;
                                 return;
                             }
-                            // Try image paste first
                             const currentClipboardEntry = ClipboardService.entries[0];
                             const cleanCliphistEntry = StringUtils.cleanCliphistEntry(currentClipboardEntry);
-                            if (ClipboardService.isImage(currentClipboardEntry)) {
+                            if (ClipboardService.isImage(0)) {
                                 decodeImageAndAttach(currentClipboardEntry);
                                 event.accepted = true;
                                 return;
                             } else if (cleanCliphistEntry.startsWith("file://")) {
-                                // First entry = currently copied entry = image?
-                                const fileName = decodeURIComponent(cleanCliphistEntry);
-                                Ai.attachFile(fileName);
+                                Ai.attachFile(decodeURIComponent(cleanCliphistEntry));
                                 event.accepted = true;
                                 return;
                             }
-                            event.accepted = false; // No image, let text pasting proceed
+                            event.accepted = false;
                         } else if (event.key === Qt.Key_Escape) {
-                            // Esc to detach file
                             if (Ai.pendingFilePath.length > 0) {
                                 Ai.attachFile("");
                                 event.accepted = true;
@@ -753,7 +569,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (messageInputField.text.length === 0 && !Ai.isResponding) {
-                                Ai.record();
+                                // Ai.record();
                             } else if (Ai.isResponding) {
                                 Ai.stop();
                             } else {
@@ -788,17 +604,15 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 ]
 
                 ApiInputBoxIndicator {
-                    // Model indicator
                     icon: "api"
                     text: Ai.getModel().name
                     tooltipText: qsTr("Current model: %1\nSet it with %2model MODEL").arg(Ai.getModel().name).arg(root.commandPrefix)
                 }
 
                 ApiInputBoxIndicator {
-                    // Tool indicator
-                    icon: "service_toolbox"
-                    text: Ai.currentTool.charAt(0).toUpperCase() + Ai.currentTool.slice(1)
-                    tooltipText: qsTr("Current tool: %1\nSet it with %2tool TOOL").arg(Ai.currentTool).arg(root.commandPrefix)
+                    icon: "token"
+                    text: Ai.tokenCount.total
+                    tooltipText: qsTr("Total token count\nInput: %1\nOutput: %2").arg(Ai.tokenCount.input).arg(Ai.tokenCount.output)
                 }
 
                 Item {
