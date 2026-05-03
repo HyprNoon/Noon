@@ -35,7 +35,7 @@ def main():
     device = config.get("device", "pipewire")
 
     log("info", "loading_model")
-    voice = PiperVoice.load(model)
+    voice = PiperVoice.load(model, use_cuda=True)
     log("ok", "ready")
 
     q = queue.Queue()

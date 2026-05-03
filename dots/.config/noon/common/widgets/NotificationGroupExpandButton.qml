@@ -44,21 +44,15 @@ RippleButton {
             }
 
             Symbol {
-                text: "keyboard_arrow_down"
+                icon: "keyboard_arrow_down"
                 font.pixelSize: root.iconSize
                 color: Colors.colOnLayer2
                 rotation: expanded ? 180 : 0
 
                 Behavior on rotation {
-                    Anim {
-                    }
-
+                    Anim {}
                 }
-
             }
-
         }
-
     }
-
 }

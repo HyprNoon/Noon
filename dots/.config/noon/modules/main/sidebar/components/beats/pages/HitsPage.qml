@@ -11,7 +11,7 @@ StyledRect {
     color: Colors.colLayer1
     radius: Rounding.verylarge
     property bool expanded
-    property bool isSearching: false
+    property bool isSearching: BeatsHitsService.lastQuery.length > 0
     property rect previewOrigin: Qt.rect(0, 0, 0, 0)
 
     onIsSearchingChanged: controls.inputArea.forceActiveFocus()

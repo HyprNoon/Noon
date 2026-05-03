@@ -76,7 +76,12 @@ Singleton {
 
             if (remaining === 0) {
                 NoonUtils.playSound("record_stopped");
-                NoonUtils.toast(`'Timer Complete , ${timer.name} finished!'`, "timer", "success");
+                NoonUtils.toast({
+                    id: 15,
+                    content: `'Timer Complete , ${timer.name} finished!'`,
+                    icon: "timer",
+                    status: "success"
+                });
                 timerFinished(timer.id, timer.name);
                 changed = true;
             } else {

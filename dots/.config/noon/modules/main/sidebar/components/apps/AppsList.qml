@@ -5,11 +5,10 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
     visible: opacity > 0
     opacity: width > 320 ? 1 : 0
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
     readonly property int columns: 3

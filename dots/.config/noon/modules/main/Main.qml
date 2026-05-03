@@ -90,6 +90,9 @@ Scope {
     WidgetLoader {
         Screenshot {}
     }
+    WidgetLoader {
+        DesktopIcons {}
+    }
 
     NIPC {}
 }

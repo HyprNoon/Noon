@@ -18,9 +18,6 @@ BarGroup {
         font.pixelSize: Fonts.sizes.normal
         color: Colors.colSecondary
         Layout.alignment: Qt.AlignHCenter
-        onTextChanged: {
-            NoonUtils.toast("Keyboard layout changed to " + HyprlandService.keyboardLayoutShortName, "keyboard_command_key");
-        }
     }
     MouseArea {
         anchors.fill: parent

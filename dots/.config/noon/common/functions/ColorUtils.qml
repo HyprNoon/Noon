@@ -155,4 +155,8 @@ Singleton {
         var a = Math.max(0, Math.min(1, alpha));
         return Qt.rgba(c.r, c.g, c.b, a);
     }
+
+    function getAlpha(color) {
+        return Qt.color(color).a;
+    }
 }

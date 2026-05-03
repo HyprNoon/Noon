@@ -55,9 +55,11 @@ DialogListItem {
                     color: Colors.colSubtext
                     elide: Text.ElideRight
                     text: {
-                        if (!root.device?.paired) return "";
+                        if (!root.device?.paired)
+                            return "";
                         let statusText = root.device?.connected ? qsTr("Connected") : qsTr("Paired");
-                        if (!root.device?.batteryAvailable) return statusText;
+                        if (!root.device?.batteryAvailable)
+                            return statusText;
                         statusText += ` • ${Math.round(root.device?.battery * 100)}%`;
                         return statusText;
                     }
@@ -65,7 +67,7 @@ DialogListItem {
             }
 
             Symbol {
-                text: "keyboard_arrow_down"
+                icon: "keyboard_arrow_down"
                 font.pixelSize: Fonts.sizes.verylarge
                 color: Colors.colOnLayer3
                 rotation: root.expanded ? 180 : 0

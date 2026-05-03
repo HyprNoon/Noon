@@ -21,7 +21,7 @@ Item {
     property bool _expanded: parentRoot?.expanded
     property bool _aux: false
     property alias searchInput: searchBar.searchInput
-
+    property int selectedTabIndex: 0
     property var parentRoot: GlobalStates.main.sidebar
     readonly property var contentItem: contentStack.currentItem
 
@@ -56,10 +56,9 @@ Item {
                 const b = b => Qt.binding(() => b);
                 if (!item)
                     return;
-                // if ("preloadData" in item)
-                //     item.preloadData = Qt.binding(() => SidebarData.getPreloadData(panel.category));
-                if ("web_view" in item)
-                    GlobalStates.web_session = Qt.binding(() => item.web_view);
+
+                if ("selectedTabIndex" in item)
+                    item.selectedTabIndex = Qt.binding(() => panel.selectedTabIndex);
                 if ("searchQuery" in item)
                     item.searchQuery = Qt.binding(() => searchBar.searchText);
                 if ("detached" in item)

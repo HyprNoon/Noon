@@ -24,18 +24,6 @@ TEMP_FRAME = (
 COLOR_CACHE = Path(XDG_STATE_HOME) / "quickshell" / "user" / "generated" / "color.txt"
 THUMBNAIL_SCRIPT = SCRIPT_DIR / "thumbnails_service.py"
 
-SCHEME_VARIANT_MAP = {
-    "scheme-content": 0,
-    "scheme-expressive": 1,
-    "scheme-fidelity": 2,
-    "scheme-monochrome": 3,
-    "scheme-neutral": 4,
-    "scheme-tonal-spot": 5,
-    "scheme-vibrant": 6,
-    "scheme-rainbow": 7,
-    "scheme-fruit-salad": 8,
-}
-
 
 class WallpaperSwitcher:
     def __init__(self):
@@ -64,8 +52,6 @@ class WallpaperSwitcher:
                     "isBright": False,
                 },
                 "bg": {"currentBg": "", "currentVideo": "", "isLive": False},
-                "icons": {"currentIconTheme": "Tela"},
-                "colors": {"chroma": 1.0, "tone": 1.0},
             }
         }
 
@@ -90,21 +76,6 @@ class WallpaperSwitcher:
             return value if value != "null" else default
         except (KeyError, TypeError):
             return default
-
-    def get_icon_theme(self):
-        return self._get_state_value("desktop.icons.currentIconTheme", "Tela")
-
-    def get_chroma_multiplier(self):
-        try:
-            return float(self._get_state_value("desktop.colors.chroma", 1.0))
-        except (ValueError, TypeError):
-            return 1.0
-
-    def get_tone_multiplier(self):
-        try:
-            return float(self._get_state_value("desktop.colors.tone", 1.0))
-        except (ValueError, TypeError):
-            return 1.0
 
     def get_current_shell_mode(self):
         mode = self.state_data["desktop"]["appearance"]["mode"]
@@ -146,25 +117,6 @@ class WallpaperSwitcher:
             self.state_data["desktop"]["appearance"]["scheme"] = scheme
         if is_bright is not None:
             self.state_data["desktop"]["appearance"]["isBright"] = bool(is_bright)
-        self._save_state()
-
-    def update_colors(self, chroma=None, tone=None):
-        if chroma is not None:
-            try:
-                self.state_data["desktop"]["colors"]["chroma"] = float(chroma)
-            except (ValueError, TypeError):
-                print(f"ERROR: Invalid chroma value: {chroma}")
-                return
-        if tone is not None:
-            try:
-                self.state_data["desktop"]["colors"]["tone"] = float(tone)
-            except (ValueError, TypeError):
-                print(f"ERROR: Invalid tone value: {tone}")
-                return
-        self._save_state()
-
-    def update_icon_theme(self, theme):
-        self.state_data["desktop"]["icons"]["currentIconTheme"] = theme
         self._save_state()
 
     def update_bg(self, image_path="", video_path="", is_live=False):
@@ -308,43 +260,6 @@ class WallpaperSwitcher:
             print("WARNING: matugen not found")
 
         time.sleep(0.2)
-
-        if shutil.which("kde-material-you-colors"):
-            self.shell_run("killall kde-material-you-colors 2>/dev/null")
-            time.sleep(0.1)
-
-            sv_num = SCHEME_VARIANT_MAP.get(curr_scheme, 5)
-            mode_flag = "-d" if shell_mode == "dark" else "-l"
-            icon_theme = self.get_icon_theme()
-            chroma = self.get_chroma_multiplier()
-            tone = self.get_tone_multiplier()
-
-            cmd_list = [
-                "kde-material-you-colors",
-                mode_flag,
-                "--color",
-                f"#{hex_color}",  # needs # prefix
-                "--manual-fetch",  # skip plasmashell DBus wallpaper read
-                "--scheme-variant",
-                str(sv_num),
-                "--iconslight",
-                icon_theme,
-                "--iconsdark",
-                icon_theme,
-                "--chroma-multiplier",
-                str(chroma),
-                "--tone-multiplier",
-                str(tone),
-            ]
-
-            with open(os.devnull, "w") as devnull:
-                subprocess.Popen(
-                    cmd_list, stdout=devnull, stderr=devnull, start_new_session=True
-                )
-
-            print(f"KDE theme applied (chroma: {chroma}, tone: {tone})")
-        else:
-            print("WARNING: kde-material-you-colors not found")
 
         return True
 
@@ -500,24 +415,6 @@ class WallpaperSwitcher:
             return self.get_current_scheme()
 
         return requested_scheme or self.get_current_scheme()
-
-    def needs_icon_update(self, target_mode):
-        if self.get_current_shell_mode() == target_mode:
-            return False
-        return any(
-            shutil.which(t)
-            for t in ["lookandfeeltool", "kicontool", "gtk-update-icon-cache"]
-        )
-
-    def update_icons_if_needed(self, mode):
-        if not self.needs_icon_update(mode):
-            return
-        print(f"Updating icons for {mode} mode")
-        current_theme = self.get_icon_theme()
-        if shutil.which("lookandfeeltool"):
-            self.shell_run(f"lookandfeeltool -i {current_theme}")
-        elif shutil.which("gtk-update-icon-cache"):
-            self.shell_run(f"gtk-update-icon-cache -f /usr/share/icons/{current_theme}")
 
     def setup_gnome_theme(self, mode=None):
         if not mode:
@@ -739,7 +636,6 @@ class WallpaperSwitcher:
                 self.apply_colors(color=color, mode=current_mode, scheme=current_scheme)
                 self.update_appearance(current_mode, current_scheme, is_bright=False)
                 self.setup_gnome_theme(current_mode)
-                self.update_icons_if_needed(current_mode)
                 print("Color mode complete\n")
                 return
 
@@ -823,7 +719,6 @@ class WallpaperSwitcher:
             )
             self.update_appearance(current_mode, current_scheme, is_bright=is_bright)
             self.setup_gnome_theme(current_mode)
-            self.update_icons_if_needed(current_mode)
             print("Wallpaper switch complete\n")
 
         except Exception as e:

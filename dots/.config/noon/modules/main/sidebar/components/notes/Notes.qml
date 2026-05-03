@@ -6,12 +6,12 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
 
     property bool editing: false
     property int autoSaveInterval: 5000
-    color: Colors.colLayer1
+
     radius: Rounding.verylarge
     Layout.fillWidth: true
     Layout.fillHeight: true

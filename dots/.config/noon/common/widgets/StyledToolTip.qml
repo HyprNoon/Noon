@@ -8,6 +8,7 @@ ToolTip {
     id: root
     property string content
     property alias textArea: tooltipTextObject
+    property alias bg: backgroundRectangle
     property alias color: backgroundRectangle.color
     property bool extraVisibleCondition: true
     property bool alternativeVisibleCondition: false
@@ -40,12 +41,6 @@ ToolTip {
             radius: Rounding.small ?? 7
             width: internalVisibleCondition ? (tooltipTextObject.width + 2 * root.horizontalPadding) : 0
             height: internalVisibleCondition ? (tooltipTextObject.height + 2 * root.verticalPadding) : 0
-            Behavior on width {
-                Anim {}
-            }
-            Behavior on height {
-                Anim {}
-            }
 
             StyledText {
                 id: tooltipTextObject

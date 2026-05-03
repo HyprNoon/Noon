@@ -59,7 +59,7 @@ SquareComponent {
             Layout.fillWidth: true
 
             Symbol {
-                text: BluetoothService.getDeviceStatusIcon(root.currentDevice)
+                icon: BluetoothService.getDeviceStatusIcon(root.currentDevice)
                 color: Colors.m3.m3onSurfaceVariant
                 font.pixelSize: Fonts.sizes.large
             }

@@ -32,7 +32,11 @@ Singleton {
         })
     readonly property string keyboardLayoutShortName: keyboardLayoutShortNames[currentKeyboardLayout] ?? currentKeyboardLayout.substring(0, 2).toUpperCase()
     Component.onCompleted: updateAll()
-
+    onKeyboardLayoutShortNameChanged: NoonUtils.toast({
+        id: 7,
+        content: "Keyboard layout changed to " + root.keyboardLayoutShortName,
+        icon: "keyboard_command_key"
+    })
     function updateWindowList() {
         getClients.running = true;
     }

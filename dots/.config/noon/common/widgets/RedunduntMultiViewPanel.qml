@@ -12,7 +12,7 @@ StyledRect {
     color: "transparent"
     radius: Rounding.small
     signal expandRequested
-
+    readonly property int totalTabs: tabButtonList.length
     property int selectedTabIndex: -1
     property bool lazy: true
     readonly property var item: swipeView.currentItem._item

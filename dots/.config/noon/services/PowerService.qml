@@ -46,6 +46,10 @@ Singleton {
     onCurrentModeChanged: {
         modeName = getModeDisplayName(currentMode);
         icon = getModeIcon(currentMode);
-        NoonUtils.toast(`Power mode changed to ${modeName}`, icon);
+        NoonUtils.toast({
+            id: 9,
+            content: `Power mode changed to ${modeName}`,
+            icon: icon
+        });
     }
 }

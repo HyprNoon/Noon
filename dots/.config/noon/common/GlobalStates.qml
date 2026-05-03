@@ -1,6 +1,5 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
-import Noon.Services
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -27,8 +26,8 @@ Singleton {
         name: "superHeld"
     }
     Component.onCompleted: {
-        ClipboardService.init();
-        ClipboardService.parent = root;
+        ClipboardService.manager.init();
+        ClipboardService.manager.parent = root;
     }
     function handle_init(mode) {
         KeyringStorage.reload();
@@ -37,6 +36,9 @@ Singleton {
         case "main":
             TimerService.reload();
             AlarmService.reload();
+            NoonUtils.playSound("device_unlocked");
+            break;
+        case "zen":
             NoonUtils.playSound("device_unlocked");
             break;
         case "nobuntu":
@@ -66,7 +68,7 @@ Singleton {
         }
     }
     toasts: QtObject {
-        property ListModel data: ListModel {}
+        property var data: []
     }
     main: QtObject {
         id: main

@@ -27,9 +27,28 @@ StyledRect {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         anchors.fill: parent
-        onClicked: action()
+        onClicked: {
+            feedAnim.running = true;
+            if (action)
+                action();
+        }
     }
-
+    SequentialAnimation {
+        id: feedAnim
+        running: false
+        NumberAnimation {
+            target: root
+            property: "scale"
+            to: 0.94
+            duration: 150
+        }
+        NumberAnimation {
+            target: root
+            property: "scale"
+            to: 1
+            duration: 200
+        }
+    }
     StyledRect {
         id: footer
         z: 999

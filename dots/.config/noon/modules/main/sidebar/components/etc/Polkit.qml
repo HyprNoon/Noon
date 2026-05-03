@@ -5,12 +5,12 @@ import qs.services
 import qs.common
 import qs.common.widgets
 
-StyledRect {
+LayerRect {
     id: root
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     focus: true
     Component.onCompleted: Qt.callLater(() => inputField.forceActiveFocus())
+
     function submit() {
         PolkitService.submit(inputField.text);
     }

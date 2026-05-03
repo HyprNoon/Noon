@@ -7,15 +7,5 @@ RippleButtonWithIcon {
     colBackground: root.colors.colLayer3
     materialIcon: "match_case"
     materialIconFill: true
-    property alias value: fontDialog.selectedFont.family
-
-    FontDialog {
-        id: fontDialog
-        title: "Select a Font"
-        onFontSelected: NoonUtils.callIpc("sidebar unpin")
-    }
-    onClicked: {
-        fontDialog.open();
-        NoonUtils.callIpc("sidebar pin");
-    }
+    releaseAction: () => NoonUtils.pickGlobalFont()
 }

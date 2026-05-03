@@ -117,7 +117,7 @@ RippleButton {
             active: root.menuEntry.hasChildren
 
             sourceComponent: Symbol {
-                text: "chevron_right"
+                icon: "chevron_right"
                 font.pixelSize: 20
             }
         }

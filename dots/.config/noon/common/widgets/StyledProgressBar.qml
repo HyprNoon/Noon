@@ -131,8 +131,8 @@ ProgressBar {
         }
 
         Rectangle {
-            visible:root.showProgressIndicator
             id: gapIndicator
+            visible: root.showProgressIndicator
             z: 9999
             radius: root.rounding
             color: root.indicatorColor

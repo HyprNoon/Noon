@@ -5,11 +5,10 @@ import qs.common
 import qs.common.utils
 import qs.common.widgets
 
-StyledRect {
+LayerRect {
     id: root
     property bool expanded: false
     property bool readyToReceive: false
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
 

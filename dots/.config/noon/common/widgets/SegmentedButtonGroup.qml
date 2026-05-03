@@ -55,7 +55,7 @@ StyledRect {
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: -4
             Symbol {
-                text: isActive ? "check" : ""
+                icon: isActive ? "check" : ""
                 fill: root.isActive
                 color: text.color
                 font.pixelSize: 20

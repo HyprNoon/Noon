@@ -35,7 +35,7 @@ BarGroup {
         }
     }
 
-    PrayerPopup {
+    ClockPopup {
         hoverTarget: event_area
     }
 }

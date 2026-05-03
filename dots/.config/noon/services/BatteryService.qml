@@ -29,9 +29,19 @@ Singleton {
         function onDegradationReasonChanged() {
             const reason = PowerProfiles.degradationReason;
             if (reason === PerformanceDegradationReason.HighTemperature)
-                NoonUtils.toast("High Temperature", "emergency_heat", "warn");
+                NoonUtils.toast({
+                    id: 3,
+                    content: "High Temperature",
+                    icon: "emergency_heat",
+                    status: "warn"
+                });
             if (reason === PerformanceDegradationReason.LapDetected)
-                NoonUtils.toast("Move the laptop away from your body", "heat", "warn");
+                NoonUtils.toast({
+                    id: 3,
+                    content: "Move the laptop away from your body",
+                    icon: "heat",
+                    status: "warn"
+                });
         }
     }
 
@@ -39,19 +49,38 @@ Singleton {
         NoonUtils.playSound("power_low")
     onIsChargingChanged: if (isCharging) {
         NoonUtils.playSound("power_plugged");
-        NoonUtils.toast("Charging", "battery_charging_full", "success");
+        NoonUtils.toast({
+            id: 3,
+            content: "Charging",
+            icon: "battery_charging_full",
+            status: "success"
+        });
     } else {
         NoonUtils.playSound("power_unplugged");
-        NoonUtils.toast("Discharging", "battery_error");
+        NoonUtils.toast({
+            id: 3,
+            content: "Discharging",
+            icon: "battery_error"
+        });
     }
     onIsLowAndNotChargingChanged: {
         if (available && isLowAndNotCharging)
-            NoonUtils.toast("Low Battery Plug in your device", "battery_error", "warn");
+            NoonUtils.toast({
+                id: 3,
+                content: "Low Battery Plug in your device",
+                icon: "battery_error",
+                status: "warn"
+            });
     }
 
     onIsCriticalAndNotChargingChanged: {
         if (available && isCriticalAndNotCharging)
-            NoonUtils.toast("Critical Battery Percentage", "battery_error", "error");
+            NoonUtils.toast({
+                id: 3,
+                content: "Critical Battery Percentage",
+                icon: "battery_error",
+                status: "error"
+            });
     }
 
     onIsSuspendingAndNotChargingChanged: {

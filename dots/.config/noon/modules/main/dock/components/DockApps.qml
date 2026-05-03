@@ -18,83 +18,112 @@ Item {
 
     property Item lastHoveredButton
     property bool buttonHovered: false
-    property bool requestDockShow: previewPopup.show
+    property bool requestDockShow: false
     property bool verticalMode: false
     property var pinnedApps: Mem.states.favorites.apps
+
+    property string draggingAppId: ""
+    property string dropTargetAppId: ""
+    property string draggingFromGroup: ""
+
     Layout.preferredWidth: listView.implicitWidth
     Layout.preferredHeight: listView.implicitHeight
     Layout.margins: Padding.normal
 
-    StyledListView {
+    ListView {
         id: listView
-        spacing: height / 10
+        clip: true
+        spacing: height / 12
         orientation: ListView.Horizontal
         implicitWidth: contentWidth
         implicitHeight: Mem.options.dock.appearance.iconSize
         model: ScriptModel {
             objectProp: "appId"
             values: {
-                var map = new Map();
+                var toplevelMap = new Map();
                 var pinnedAppIds = new Set();
                 var runningAppIds = new Set();
 
-                for (const appId of root.pinnedApps) {
-                    const normalizedAppId = appId.toLowerCase();
-                    pinnedAppIds.add(normalizedAppId);
-                    if (!map.has(normalizedAppId)) {
-                        map.set(normalizedAppId, {
-                            appId: appId,
-                            pinned: true,
-                            toplevels: []
-                        });
-                    }
+                for (const entry of root.pinnedApps) {
+                    pinnedAppIds.add(entry.appId.toLowerCase());
                 }
 
                 for (const toplevel of ToplevelManager.toplevels.values) {
-                    const originalAppId = toplevel.appId;
-                    const normalizedAppId = originalAppId.toLowerCase();
-                    runningAppIds.add(normalizedAppId);
-                    if (!map.has(normalizedAppId)) {
-                        map.set(normalizedAppId, {
-                            appId: originalAppId,
-                            pinned: false,
-                            toplevels: []
-                        });
-                    }
-                    map.get(normalizedAppId).toplevels.push(toplevel);
+                    const key = toplevel.appId.toLowerCase();
+                    runningAppIds.add(key);
+                    if (!toplevelMap.has(key))
+                        toplevelMap.set(key, []);
+                    toplevelMap.get(key).push(toplevel);
                 }
 
-                const hasUnpinnedRunningApps = Array.from(runningAppIds).some(appId => !pinnedAppIds.has(appId));
-                const shouldAddSeparator = root.pinnedApps.length > 0 && hasUnpinnedRunningApps;
+                var groupMap = new Map();
+                var order = [];
+
+                for (const entry of root.pinnedApps) {
+                    const key = entry.appId.toLowerCase();
+                    const gid = entry.gid;
+
+                    if (gid) {
+                        if (!groupMap.has(gid)) {
+                            groupMap.set(gid, {
+                                appId: gid,
+                                gid: gid,
+                                isGroup: true,
+                                pinned: true,
+                                entries: [],
+                                toplevels: []
+                            });
+                            order.push({
+                                type: "group",
+                                gid: gid
+                            });
+                        }
+                        const grp = groupMap.get(gid);
+                        grp.entries.push(entry);
+                        if (toplevelMap.has(key))
+                            grp.toplevels.push(...toplevelMap.get(key));
+                    } else {
+                        order.push({
+                            type: "app",
+                            appId: entry.appId,
+                            pinned: true,
+                            toplevels: toplevelMap.get(key) ?? []
+                        });
+                    }
+                }
+
                 var values = [];
+                var seen = new Set();
 
-                for (const appId of root.pinnedApps) {
-                    const normalizedAppId = appId.toLowerCase();
-                    if (map.has(normalizedAppId)) {
-                        const appData = map.get(normalizedAppId);
-                        values.push({
-                            appId: appData.appId,
-                            toplevels: appData.toplevels,
-                            pinned: appData.pinned
-                        });
-                        map.delete(normalizedAppId);
+                for (const item of order) {
+                    if (item.type === "group") {
+                        if (!seen.has(item.gid)) {
+                            seen.add(item.gid);
+                            values.push(groupMap.get(item.gid));
+                        }
+                    } else {
+                        values.push(item);
                     }
                 }
 
-                if (shouldAddSeparator) {
+                const hasUnpinnedRunning = Array.from(runningAppIds).some(id => !pinnedAppIds.has(id));
+                if (root.pinnedApps.length > 0 && hasUnpinnedRunning) {
                     values.push({
                         appId: "SEPARATOR",
-                        toplevels: [],
-                        pinned: false
+                        isGroup: false,
+                        pinned: false,
+                        toplevels: []
                     });
                 }
 
-                for (const [normalizedKey, appData] of map) {
-                    if (appData.toplevels.length > 0) {
+                for (const [key, toplevels] of toplevelMap) {
+                    if (!pinnedAppIds.has(key)) {
                         values.push({
-                            appId: appData.appId,
-                            toplevels: appData.toplevels,
-                            pinned: appData.pinned
+                            appId: toplevels[0].appId,
+                            gid: null,
+                            isGroup: false,
+                            pinned: false,
+                            toplevels: toplevels
                         });
                     }
                 }
@@ -103,160 +132,21 @@ Item {
             }
         }
 
-        delegate: DockAppButton {
-            required property var modelData
-            appToplevel: modelData
-            appListRoot: root
-        }
-    }
-
-    PopupWindow {
-        id: previewPopup
-        visible: false
-        property var appTopLevel: root.lastHoveredButton?.appToplevel
-        property bool allPreviewsReady: false
-        property int readyCount: 0
-        property int totalCount: 0
-
-        Connections {
-            target: root
-            function onLastHoveredButtonChanged() {
-                previewPopup.allPreviewsReady = false;
-                previewPopup.readyCount = 0;
-                previewPopup.totalCount = 0;
-            }
-        }
-
-        function notifyViewReady() {
-            readyCount++;
-            if (totalCount > 0 && readyCount >= totalCount)
-                allPreviewsReady = true;
-        }
-
-        function registerView(alreadyHasContent) {
-            totalCount++;
-            if (alreadyHasContent)
-                notifyViewReady();
-        }
-
-        property bool shouldShow: (popupMouseArea.containsMouse || root.buttonHovered) && allPreviewsReady
-        property bool show: false
-
-        onShouldShowChanged: updateTimer.restart()
-
-        Timer {
-            id: updateTimer
-            interval: 100
-            onTriggered: previewPopup.show = previewPopup.shouldShow
-        }
-        anchor {
-            window: root.QsWindow.window
-            adjustment: PopupAdjustment.None
-            gravity: Edges.Top | Edges.Right
-            edges: Edges.Top | Edges.Right
-        }
-        // visible: popupBackground.visible
-        color: "transparent"
-        implicitWidth: Screen.width
-        implicitHeight: popupMouseArea.implicitHeight + root.windowControlsHeight + Sizes.elevationMargin * 2
-
-        MouseArea {
-            id: popupMouseArea
-            anchors.bottom: parent.bottom
-            implicitWidth: popupBackground.implicitWidth + Sizes.elevationMargin * 2
-            implicitHeight: root.maxWindowPreviewHeight + root.windowControlsHeight + Sizes.elevationMargin * 2
-            hoverEnabled: true
-            x: {
-                if (!root.lastHoveredButton || root.lastHoveredButton.window === null)
-                    return 0;
-                var itemCenter = root.QsWindow.mapFromItem(root.lastHoveredButton, root.lastHoveredButton.width / 2, 0);
-                return itemCenter.x - width / 2;
-            }
-
-            StyledRectangularShadow {
-                target: popupBackground
-                opacity: previewPopup.show ? 1 : 0
-                visible: opacity > 0
-                Behavior on opacity {
-                    Anim {}
+        delegate: DelegateChooser {
+            role: "isGroup"
+            DelegateChoice {
+                roleValue: true
+                DockGroupButton {
+                    required property var modelData
+                    appToplevel: modelData
+                    appListRoot: root
                 }
             }
-
-            StyledRect {
-                id: popupBackground
-                readonly property real padding: Padding.large
-                opacity: previewPopup.show ? 1 : 0
-                visible: opacity > 0
-                clip: true
-                color: Colors.colSurfaceContainer
-                radius: Rounding.normal
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: Sizes.elevationMargin
-                anchors.horizontalCenter: parent.horizontalCenter
-                implicitHeight: previewRowLayout.implicitHeight + padding * 2
-                implicitWidth: previewRowLayout.implicitWidth + padding * 2
-
-                RowLayout {
-                    id: previewRowLayout
-                    anchors.centerIn: parent
-                    Repeater {
-                        model: previewPopup.appTopLevel?.toplevels
-                        RippleButton {
-                            id: windowButton
-                            required property var modelData
-                            padding: 0
-                            middleClickAction: () => windowButton.modelData?.close()
-                            releaseAction: () => windowButton.modelData?.activate()
-
-                            contentItem: ColumnLayout {
-                                implicitWidth: screencopyView.implicitWidth
-                                implicitHeight: screencopyView.implicitHeight
-
-                                ButtonGroup {
-                                    contentWidth: parent.width - anchors.margins * 2
-                                    WrapperRectangle {
-                                        Layout.fillWidth: true
-                                        color: ColorUtils.transparentize(Colors.colSurfaceContainer)
-                                        radius: Rounding.small
-                                        margin: 5
-                                        StyledText {
-                                            Layout.fillWidth: true
-                                            font.pixelSize: Fonts.sizes.small
-                                            text: windowButton.modelData?.title
-                                            elide: Text.ElideRight
-                                            color: Colors.m3.m3onSurface
-                                        }
-                                    }
-                                    GroupButton {
-                                        id: closeButton
-                                        colBackground: ColorUtils.transparentize(Colors.colSurfaceContainer)
-                                        baseWidth: windowControlsHeight
-                                        baseHeight: windowControlsHeight
-                                        buttonRadius: Rounding.full
-                                        contentItem: Symbol {
-                                            anchors.centerIn: parent
-                                            horizontalAlignment: Text.AlignHCenter
-                                            text: "close"
-                                            font.pixelSize: Fonts.sizes.normal
-                                            color: Colors.m3.m3onSurface
-                                        }
-                                        onClicked: windowButton.modelData?.close()
-                                    }
-                                }
-
-                                StyledScreencopyView {
-                                    id: screencopyView
-                                    captureSource: windowButton?.modelData ?? null
-                                    constraintSize: Qt.size(root.maxWindowPreviewWidth, root.maxWindowPreviewHeight)
-                                    Component.onCompleted: previewPopup.registerView(hasContent)
-                                    onHasContentChanged: {
-                                        if (hasContent)
-                                            previewPopup.notifyViewReady();
-                                    }
-                                }
-                            }
-                        }
-                    }
+            DelegateChoice {
+                DockAppButton {
+                    required property var modelData
+                    appToplevel: modelData
+                    appListRoot: root
                 }
             }
         }

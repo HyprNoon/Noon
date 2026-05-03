@@ -48,7 +48,7 @@ Scope {
                 id: mainContainer
                 anchors.fill: parent
 
-                StyledRect {
+                ShaderRect {
                     id: bg
 
                     anchors {
@@ -63,7 +63,7 @@ Scope {
 
                     topRadius: 40
                     enableBorders: true
-                    color: Colors.colLayer0
+
                     implicitWidth: Math.min(Screen.width, currentSize.width)
                     implicitHeight: Math.min(Screen.height, currentSize.height)
 

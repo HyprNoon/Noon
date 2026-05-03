@@ -12,10 +12,9 @@ ColumnLayout {
     property bool enableIndicatorAnimation: false
     property color colIndicator: Colors.colPrimary ?? "#65558F"
     property bool centerTabBar: parent.width > 500
+    property alias currentIndex: tabBar.currentIndex
 
-    signal currentIndexChanged(int index)
-
-    spacing: 0
+    spacing: Padding.tiny
     Layout.fillWidth: !centerTabBar
     Layout.alignment: Qt.AlignHCenter
     implicitWidth: Math.max(tabBar.implicitWidth, 600)
@@ -25,9 +24,6 @@ ColumnLayout {
 
         Layout.fillWidth: true
         currentIndex: root.externalTrackedTab
-        onCurrentIndexChanged: {
-            root.onCurrentIndexChanged(currentIndex);
-        }
 
         Repeater {
             model: root.tabButtonList

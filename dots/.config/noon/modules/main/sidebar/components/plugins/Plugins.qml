@@ -8,9 +8,8 @@ import qs.common.functions
 import qs.store
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
-    color: Colors.colLayer1
     radius: Rounding.verylarge
 
     property string currentCat: "sidebar"
@@ -114,12 +113,11 @@ StyledRect {
             count: swipeView.contentModel.count
             onCurrentIndexChanged: swipeView.currentIndex = currentIndex
         }
-        StyledRect {
+        LayerRect {
             Layout.fillWidth: true
             radius: Rounding.large
             Layout.preferredHeight: 100
-            color: Colors.colPrimary
-
+            toggled: true
             ColumnLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.leftMargin: Padding.massive

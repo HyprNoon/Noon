@@ -1,8 +1,8 @@
+import qs.services
 import qs.common
 import qs.common.widgets
 import QtQuick
 import QtQuick.Layouts
-import Noon.Services
 
 RowLayout {
     id: root
@@ -10,24 +10,28 @@ RowLayout {
     property int messageIndex
     property var messageData
     property bool editing: false
-
+    property bool copied: false
     spacing: Padding.small
 
     Repeater {
         model: [
             {
-                icon: "content_copy",
-                action: () => ClipboardService.copy(root.messageData.content)
+                icon: copied ? "check" : "content_copy",
+                action: () => {
+                    ClipboardService.manager.copy(root.messageData.content);
+                    root.copied = true;
+                }
             },
             {
+                visible: messageData.role === "user",
+                icon: "refresh",
+                action: () => Ai.regenerate(root.messageIndex)
+            },
+            {
+                visible: messageData.role === "user",
                 icon: root.editing ? "check" : "stylus",
                 action: () => {
-                    if (root.editing) {
-                        root.editingChanged(false);
-                        Ai.regenerate(root.messageIndex);
-                    } else {
-                        root.editingChanged(true);
-                    }
+                    root.editing = !root.editing;
                 }
             },
             {
@@ -37,6 +41,7 @@ RowLayout {
         ]
         delegate: Symbol {
             required property var modelData
+            visible: modelData?.visible ?? true
             text: modelData.icon
             font.pixelSize: 18
             color: Colors.colSubtext

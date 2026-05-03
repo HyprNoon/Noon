@@ -1,5 +1,4 @@
 import QtQuick
-import Noon.Services
 import Quickshell
 import Quickshell.Services.Mpris
 import qs.common

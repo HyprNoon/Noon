@@ -22,6 +22,7 @@ Singleton {
     readonly property bool transparent: Mem.options.appearance.transparency.enabled
     readonly property real transparency: transparent ? Mem.options.appearance.transparency.scale : 0
 
+    readonly property color colBackground: t(m3.m3background, 1)
     readonly property color colOnBackground: WallpaperService.isBright ? colLayer0 : colOnLayer0
     readonly property color colSubtext: m3.m3outline
 

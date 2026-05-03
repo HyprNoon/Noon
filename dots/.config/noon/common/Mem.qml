@@ -1,5 +1,6 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
+import Noon.Utils
 import qs.common.utils
 import qs.store
 
@@ -10,6 +11,7 @@ Singleton {
     readonly property alias states: statesView.data
     readonly property alias options: optionsView.data
     readonly property alias store: storeView.data
+    readonly property alias hypr: hyprView.variables
 
     ConfigFileView {
         id: optionsView
@@ -32,5 +34,10 @@ Singleton {
         watchChanges: false
         fileName: "store"
         StoreSchema {}
+    }
+
+    HyprParser {
+        id: hyprView
+        path: Directories.hyprConfigs + "/lua/variables.lua"
     }
 }

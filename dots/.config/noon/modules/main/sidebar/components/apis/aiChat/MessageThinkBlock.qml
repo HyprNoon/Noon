@@ -1,4 +1,3 @@
-
 import qs.services
 import qs.common
 import qs.common.widgets
@@ -9,7 +8,6 @@ import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
-    // These are needed on the parent loader
     property bool editing: parent?.editing ?? false
     property bool renderMarkdown: parent?.renderMarkdown ?? true
     property bool enableMouseSelection: parent?.enableMouseSelection ?? false
@@ -23,10 +21,10 @@ Item {
     property real thinkBlockHeaderPaddingHorizontal: 10
     property real thinkBlockComponentSpacing: 2
 
-    property bool collapsed: true /* should be root.completed but its kinda buggy rn so nope */
+    property bool collapsed: completed
 
     Layout.fillWidth: true
-    implicitHeight: collapsed ? header.implicitHeight : columnLayout.implicitHeight
+    implicitHeight: columnLayout.implicitHeight
     layer.enabled: true
     layer.effect: OpacityMask {
         maskSource: Rectangle {
@@ -138,19 +136,17 @@ Item {
                 implicitHeight: messageTextBlock.implicitHeight
                 color: Colors.colLayer2
 
-                // Load data for the message at the correct scope
-                property bool editing: root.editing
-                property bool renderMarkdown: root.renderMarkdown
-                property bool enableMouseSelection: root.enableMouseSelection
-                property string segmentContent: root.segmentContent
-                property var messageData: root.messageData
-                property bool done: root.done
-
                 MessageTextBlock {
                     id: messageTextBlock
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
+                    editing: root.editing
+                    renderMarkdown: root.renderMarkdown
+                    enableMouseSelection: root.enableMouseSelection
+                    segmentContent: root.segmentContent
+                    messageData: root.messageData
+                    done: root.done
                 }
             }
         }

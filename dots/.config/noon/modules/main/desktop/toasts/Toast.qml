@@ -96,7 +96,7 @@ Item {
         }
     ]
 
-    StyledRect {
+    ShaderRect {
         id: bg
         anchors.fill: parent
         enableBorders: true
@@ -147,8 +147,9 @@ Item {
         onTriggered: dismiss()
     }
     function dismiss() {
-        GlobalStates.toasts.data.remove(modelData);
+        GlobalStates.toasts.data = GlobalStates.toasts.data.filter(item => item.id !== modelData.id);
     }
+
     MouseArea {
         z: 999
         anchors.fill: parent

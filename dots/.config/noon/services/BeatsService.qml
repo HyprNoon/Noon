@@ -11,49 +11,36 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Qt.labs.folderlistmodel
+import Noon.Utils
 
 Singleton {
     id: root
-    property int selectedPlayerIndex: defaultPlayerIndex
-    property string currentTrackPath: ""
-    property var tracksMetadata: ({})
-    readonly property int defaultPlayerIndex: getCurrentPlayerIndex()
-    readonly property alias daemonOptions: daemonView.data
-    readonly property list<string> excludedPlayers: Mem.options.mediaPlayer?.excludedPlayers ?? []
-    readonly property QtObject colors: palette.colors
-    readonly property bool filterPlayersEnabled: true
 
-    readonly property bool _downloading: dlpHelperProc.running
-    readonly property bool _playing: player && player.playbackState === MprisPlaybackState.Playing
+    readonly property QtObject colors: palette.colors
+    readonly property alias daemonOptions: daemonView.data
+
+    readonly property string tracksDir: Qt.resolvedUrl(getCurrentLibraryPath())
+    readonly property alias library: libraryFetcher.data
+    readonly property alias queue: queueFetcher.data
+
+    readonly property int defaultPlayerIndex: getCurrentPlayerIndex()
+    property int selectedPlayerIndex: defaultPlayerIndex
+
+    readonly property bool filterPlayersEnabled: true
+    readonly property list<string> excludedPlayers: Mem.options.mediaPlayer?.excludedPlayers ?? []
+
     readonly property string artUrl: player ? StringUtils.cleanMusicTitle(player.trackArtUrl) : ""
     readonly property string title: player ? StringUtils.cleanMusicTitle(player.trackTitle) : "No Title"
     readonly property string artist: player ? StringUtils.cleanMusicTitle(player.trackArtist) : "No Artist"
-    readonly property string _tracksDir: Qt.resolvedUrl(Mem.states.mediaPlayer?.currentTrackPath ?? Directories.beats.tracks)
-    readonly property string _metadataPath: _tracksDir + "/.metadata"
-    readonly property string _playlistPath: _tracksDir + "/.playlist.m3u"
-    readonly property string _daemonScript: Directories.scriptsDir + "/beats_daemon.py"
-    readonly property var tracksList: Object.values(root.tracksMetadata)
-    readonly property var tracksInfo: {
-        const map = {};
-        for (const key in root.tracksMetadata) {
-            const entry = root.tracksMetadata[key];
-            if (entry?.filename)
-                map[entry.filename] = entry;
-        }
-        return map;
-    }
 
-    readonly property var currentTrackMeta: {
-        if (!root.currentTrackPath)
-            return null;
-        const fileName = root.currentTrackPath.split("/").pop();
-        return root.tracksInfo[fileName] ?? null;
-    }
-
+    readonly property var players: Mpris?.players.values ?? []
     readonly property MprisPlayer player: meaningfulPlayers[selectedPlayerIndex] ?? null
 
+    readonly property bool _downloading: dlpHelperProc.running
+    readonly property bool _playing: player && player.playbackState === MprisPlaybackState.Playing
+
     readonly property var meaningfulPlayers: {
-        const source = Mpris.players.values;
+        const source = root.players;
         if (!source)
             return [];
 
@@ -75,47 +62,59 @@ Singleton {
         return Array.from(map.values());
     }
 
+    onPlayersChanged: handleOverlappingPlayers()
+
     function getCurrentPlayerIndex() {
         const players = meaningfulPlayers;
         const currentlyActivePlayer = players.find(player => player.playbackState === MprisPlaybackState.Playing);
         return Math.max(0, players?.indexOf(currentlyActivePlayer)) ?? 0;
     }
-    function rebuildMetadata() {
-        rebuildMetaProc.running = false;
-        rebuildMetaProc.running = true;
+
+    function fetchLibrary() {
+        libraryFetcher.running = true;
     }
 
-    function getTrackMeta(fileName) {
-        return root.tracksInfo[fileName] ?? null;
+    function handleOverlappingPlayers() {
+        const players = meaningfulPlayers;
+        const currentlyActivePlayers = players.filter(p => p.playbackState === MprisPlaybackState.Playing);
+
+        if (currentlyActivePlayers.length > 1) {
+            let activeCount = 0;
+
+            for (let i = players.length - 1; i >= 0; i--) {
+                const p = players[i];
+                if (p.playbackState === MprisPlaybackState.Playing) {
+                    activeCount++;
+                    if (activeCount > 1) {
+                        p.togglePlayback();
+                    }
+                }
+            }
+        }
+    }
+    function playTrackByFile(file) {
+        _daemonCmd(["--player", "main", "play-by-name", "--name", `${file}`]);
     }
 
-    function coverArtUrl(entry) {
-        if (!entry?.cover_art)
-            return "";
-        return "file://" + root._tracksDir + "/" + entry.cover_art.replace(/^\.\//, "");
+    function playCustomPlaylist(...args) {
+        _daemonCmd(["--player", "main", "build-playlist", "--list", args.join(",")]);
     }
 
     function _daemonCmd(args) {
-        mpvProc.command = ["python3", root._daemonScript].concat(args);
-        mpvProc.running = false;
-        mpvProc.running = true;
+        mainProc.running = false;
+        mainProc.command = ["python3", Directories.scriptsDir + "/beats_daemon.py"].concat(args);
+        mainProc.running = true;
+    }
+    function getCurrentLibraryPath() {
+        return "/mnt/Data/General_Archive/Music";
     }
 
-    function playTrackByPath(path) {
-        _daemonCmd(["--player", "main", "play-file", "--file", path, "--source", FileUtils.trimFileProtocol(root._playlistPath)]);
+    function terminatePlayer() {
+        if (root.player)
+            NoonUtils.execDetached(["killall", root.player.dbusName]);
     }
-
-    function playTrack(index) {
-        if (player && (player?.shuffle)) {
-            player.shuffle = false;
-            shuffleHandleTimer.restart();
-        }
-        _daemonCmd(["--player", "main", "play-index", "--index", index, "--source", FileUtils.trimFileProtocol(root._playlistPath)]);
-    }
-
     function stopPlayer() {
-        _daemonCmd(["--player", "preview", "stop"]);
-        _daemonCmd(["--player", "main", "stop"]);
+        root.player.stop();
     }
 
     function previewURL(url) {
@@ -129,7 +128,17 @@ Singleton {
     function currentTrackProgressRatio() {
         const pos = player?.position ?? 0;
         const len = player?.length ?? 0;
-        return len > 0 ? Math.max(0.0, Math.min(1.0, pos / len)) : 0.0;
+        const ratio = len > 0 ? Math.max(0.0, Math.min(1.0, pos / len)) : 0.0;
+        if (ratio >= 1) {
+            getQueue();
+        }
+        return ratio;
+    }
+
+    function getQueue() {
+        if (queueFetcher.running || !root.player.dbusName.includes("mpd"))
+            return;
+        queueFetcher.running = true;
     }
 
     function cycleRepeat() {
@@ -164,7 +173,7 @@ Singleton {
     function downloadSong(downloadURL) {
         downloadWithDLP({
             parameters: "bestaudio/best|-x --audio-format mp3 --audio-quality 0  --embed-thumbnail --add-metadata",
-            destination: FileUtils.trimFileProtocol(Mem.states.mediaPlayer?.currentTrackPath),
+            destination: FileUtils.trimFileProtocol(root.tracksDir),
             url: downloadURL
         });
     }
@@ -174,8 +183,15 @@ Singleton {
         dlpHelperProc.running = true;
     }
 
-    function addNewFolder() {
-        folderPicker.open();
+    Connections {
+        target: player
+        enabled: false // root.player && root.player.dbusName.includes("mpd")
+        function onTrackTitleChanged() {
+            root.getQueue();
+        }
+        function onShuffleChanged() {
+            root.getQueue();
+        }
     }
 
     Timer {
@@ -187,12 +203,18 @@ Singleton {
     }
 
     Process {
-        id: mpvProc
+        id: mainProc
+        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "--player", "main", ""]
     }
 
-    Process {
-        id: rebuildMetaProc
-        command: ["python3", Directories.scriptsDir + "/build_metadata.py", FileUtils.trimFileProtocol(_tracksDir)]
+    Fetcher {
+        id: libraryFetcher
+        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "--player", "main", "library"]
+    }
+
+    Fetcher {
+        id: queueFetcher
+        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "queue", "--player", "main"]
     }
 
     Process {
@@ -203,46 +225,14 @@ Singleton {
         id: daemonView
         state: false
         fileName: "beats"
+        onContentChanged: _daemonCmd(["refresh-config"])
         BeatsSchema {}
-        onFileChanged: _daemonCmd(["refresh-config"])
     }
 
-    FileView {
-        id: metadataFile
-        path: root._metadataPath
-        blockWrites: false
-        onTextChanged: root.tracksMetadata = JSON.parse(metadataFile.text())
-        onLoadFailed: err => {
-            if (err === FileViewError.FileNotFound) {
-                rebuildMetadata();
-            }
-        }
-    }
-
-    FolderDialog {
-        id: folderPicker
-        onAccepted: {
-            let currentFolders = Mem.states.mediaPlayer.folders;
-            if (!currentFolders.includes(selectedFolder)) {
-                currentFolders.push(selectedFolder);
-                Mem.states.mediaPlayer.folders = currentFolders;
-            }
-        }
-    }
-    Timer {
-        id: shuffleHandleTimer
-        interval: 200
-        onTriggered: player.shuffle = true
-    }
-
-    FolderListModel {
-        folder: root._tracksDir
-        showDirs: false
-        showFiles: true
-        onCountChanged: {
-            NoonUtils.toast(`Songs Count Changed`, "music_note");
-            rebuildMetadata();
-        }
+    FileSystemWatcher {
+        folder: root.tracksDir
+        onContentsChanged: if (!libraryFetcher.running)
+            libraryFetcher.running = true
     }
 
     SourceDownloader {

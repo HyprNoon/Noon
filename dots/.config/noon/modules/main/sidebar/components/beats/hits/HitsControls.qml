@@ -75,5 +75,6 @@ StyledRect {
     }
     HitsBottomRow {
         id: bottomRow
+        inputArea.text: BeatsHitsService.lastQuery
     }
 }

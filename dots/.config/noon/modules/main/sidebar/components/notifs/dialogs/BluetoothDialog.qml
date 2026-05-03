@@ -90,7 +90,7 @@ BottomDialog {
                 onClicked: {
                     root.show = false;
                     NoonUtils.execDetached(Mem.options.apps.bluetooth);
-                    GlobalStates.main.sidebar.visible = false;
+                    NoonUtils.callIpc("sidebar hide");
                 }
             }
 

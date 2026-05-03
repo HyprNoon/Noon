@@ -32,7 +32,7 @@ Item {
     property string selectedCategory: ""
     property string auxCategory: ""
     property string auxSearchText: ""
-
+    property int selectedTabIndex: 0
     function focusMainSearchInput() {
         if (mainLoader._item && mainLoader._item.searchInput && effectiveSearchable)
             mainLoader._item.searchInput.forceActiveFocus();
@@ -111,7 +111,7 @@ Item {
             [Qt.Key_O]: () => SidebarData.isExpandable(selectedCategory) && !auxVisible && (panelWindow.expanded = !panelWindow.expanded),
             [Qt.Key_P]: () => panelWindow.pinned = !panelWindow.pinned,
             [Qt.Key_Q]: () => Qt.callLater(closeAux),
-            [Qt.Key_R]: () => selectedCategory === "History" && ClipboardService.wipe()
+            [Qt.Key_R]: () => selectedCategory === "History" && ClipboardService.manager.wipe()
         };
 
         if (isCtrl && ctrlMap[key])
@@ -162,6 +162,7 @@ Item {
             property Component content: ContentChild {
                 colors: root?.colors
                 category: root?.selectedCategory
+                selectedTabIndex: root?.selectedTabIndex
             }
             property Component placeholder: PagePlaceholder {
                 colors: root.colors

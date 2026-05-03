@@ -22,13 +22,31 @@ Singleton {
     readonly property bool useGoogleTasks: true
     Component.onCompleted: Qt.callLater(pull)
 
-    function addTask(desc, status = TodoService.Status.Todo, date = DateTimeService.request("d/M"), children = []) {
-        store.tasks.push({
+    function _insertTask(desc, status, date, children) {
+        return {
             content: desc,
             status: status,
             due: date,
             children: []
-        });
+        };
+    }
+
+    function addTask(desc, status = TodoService.Status.Todo, date = DateTimeService.request("d/M"), children = []) {
+        var trimmed = desc.trim();
+        if (trimmed.length === 0)
+            return;
+        var updated = store.tasks.slice();
+        var match = trimmed.match(/\[([0-9]+)-([0-9]+)\]/);
+        if (match) {
+            var start = parseInt(match[1], 10);
+            var end = parseInt(match[2], 10);
+            for (var i = start; i <= end; i++) {
+                updated.push(_insertTask(trimmed.replace(/\[[0-9]+-[0-9]+\]/, i), status, date, children));
+            }
+        } else {
+            updated.push(_insertTask(trimmed, status, date, children));
+        }
+        store.tasks = updated;
         Qt.callLater(push);
     }
 

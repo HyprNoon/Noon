@@ -127,7 +127,7 @@ ColumnLayout {
 
             onLinkActivated: link => {
                 Qt.openUrlExternally(link);
-                GlobalStates.main.sidebar.visible = false;
+                NoonUtils.callIpc("sidebar hide");
             }
 
             MouseArea {

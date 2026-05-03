@@ -24,7 +24,7 @@ Singleton {
                             "icon": "palette",
                             "name": "Shell Mode",
                             "type": "combobox",
-                            "comboBoxValues": ["main", "xp", "nobuntu"],
+                            "comboBoxValues": ["main", "zen", "xp", "nobuntu"],
                             "key": "desktop.shell.mode"
                         },
                         {
@@ -152,94 +152,6 @@ Singleton {
                         }
                     ]
                 }
-            ]
-        },
-        {
-            "section": "Hyprland",
-            "icon": "water_drop",
-            "shell": "Global",
-            "subsections": [
-                {
-                    "name": "Decorations",
-                    "items": [
-                        {
-                            "icon": "border_all",
-                            "name": "Gaps In",
-                            "key": "desktop.hyprland.gapsIn",
-                            "type": "spin"
-                        },
-                        {
-                            "icon": "border_outer",
-                            "name": "Gaps Out",
-                            "key": "desktop.hyprland.gapsOut",
-                            "type": "spin"
-                        },
-                        {
-                            "icon": "line_weight",
-                            "name": "Border Width",
-                            "key": "desktop.hyprland.borders",
-                            "type": "spin"
-                        },
-                        {
-                            "icon": "blur_on",
-                            "name": "Blur Passes",
-                            "key": "desktop.hyprland.blurPasses",
-                            "type": "spin"
-                        },
-                        {
-                            "icon": "dark_mode",
-                            "name": "Shadows",
-                            "key": "desktop.hyprland.shadows"
-                        },
-                        {
-                            "icon": "star",
-                            "name": "Shadow Power",
-                            "key": "desktop.hyprland.shadowsPower",
-                            "type": "spin"
-                        }
-                    ]
-                },
-                {
-                    "name": "Default Apps",
-                    "items": [
-                        {
-                            "icon": "terminal",
-                            "name": "Terminal",
-                            "key": "apps.terminal",
-                            "type": "text"
-                        },
-                        {
-                            "icon": "web",
-                            "name": "Browser",
-                            "key": "apps.browser",
-                            "type": "text"
-                        },
-                        {
-                            "icon": "folder",
-                            "name": "File Manager",
-                            "key": "apps.fileManager",
-                            "type": "text"
-                        },
-                        {
-                            "icon": "code",
-                            "name": "Editor",
-                            "key": "apps.editor",
-                            "type": "text"
-                        }
-                    ]
-                },
-                {
-                    "name": "Tiling & Layout",
-                    "items": [
-                        {
-                            "icon": "dashboard",
-                            "name": "Tiling Layout",
-                            "key": "desktop.hyprland.tilingLayout",
-                            "type": "combobox",
-                            "comboBoxValues": ["dwindle", "scrolling", "master"]
-                        },
-                    ]
-                },
             ]
         },
         {

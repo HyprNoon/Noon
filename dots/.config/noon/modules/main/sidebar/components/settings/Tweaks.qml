@@ -52,13 +52,15 @@ StyledRect {
             required property int index
             anchors.right: parent?.right
             anchors.left: parent?.left
-
             StyledText {
                 text: modelData?.section ?? ""
                 color: Colors.colOnLayer1
-                font.weight: 600
+                font.pixelSize: Fonts.sizes.normal
+                font.variableAxes: Fonts.variableAxes.title
                 leftPadding: Padding.huge
+                Layout.bottomMargin: Padding.small
             }
+
             Repeater {
                 id: itemsRepeater
                 model: ScriptModel {
@@ -67,6 +69,8 @@ StyledRect {
                 delegate: SettingsItem {
                     required property var modelData
                     required property int index
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
                     topRadius: index === 0 ? Rounding.large : Rounding.tiny
                     bottomRadius: index === itemsRepeater.count - 1 ? Rounding.large : Rounding.tiny
@@ -74,18 +78,13 @@ StyledRect {
                     name: modelData?.name ?? ""
                     key: modelData?.key ?? ""
                     type: modelData?.type ?? "switch"
-                    hint: modelData?.hint ?? ""
-                    useStates: modelData?.state ?? false
+                    store: modelData?.store ?? false
                     sliderMinValue: modelData?.sliderMinValue ?? 0.0
                     sliderMaxValue: modelData?.sliderMaxValue ?? 100.0
-                    // realValue: modelData?.sliderValue ?? 0.5
                     reloadOnChange: modelData?.reloadOnChange ?? false
-                    // customItemHeight: modelData?.customItemHeight ?? 65
                     actionName: modelData?.actionName ?? ""
                     comboBoxValues: modelData?.comboBoxValues ?? []
                     fillHeight: modelData?.fillHeight ?? false
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
                     visible: modelData?.visible ?? true
                     colors: root.colors
                 }

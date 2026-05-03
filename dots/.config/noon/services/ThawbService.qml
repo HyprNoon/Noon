@@ -22,13 +22,31 @@ Singleton {
         command: ["python3", Directories.scriptsDir + "/thawb_service.py", root.url]
 
         onStarted: {
-            NoonUtils.toast("Installation Started", "apparel", "normal", "Thawb");
+            NoonUtils.toast({
+                id: 11,
+                content: "Installation Started",
+                icon: "apparel",
+                status: "normal",
+                title: "Thawb"
+            });
         }
         onExited: code => {
             if (code === 0)
-                NoonUtils.toast("Installation Finished", "apparel", "success", "Thawb");
+                NoonUtils.toast({
+                    id: 11,
+                    content: "Installation Finished",
+                    icon: "apparel",
+                    status: "success",
+                    title: "Thawb"
+                });
             else
-                NoonUtils.toast("Installation Failed", "close", "error", "Thawb");
+                NoonUtils.toast({
+                    id: 11,
+                    content: "Installation Failed",
+                    icon: "close",
+                    status: "error",
+                    title: "Thawb"
+                });
         }
     }
 }

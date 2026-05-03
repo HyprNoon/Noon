@@ -50,6 +50,7 @@ BarGroup {
     }
 
     MediaPopup {
+        id: mediaPopup
         hoverTarget: mouse
     }
 

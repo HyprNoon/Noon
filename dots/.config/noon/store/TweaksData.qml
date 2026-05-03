@@ -15,6 +15,18 @@ Singleton {
             "shell": "Global",
             "items": [
                 {
+                    "icon": "blur_on",
+                    "name": "Use Shaders",
+                    "key": "appearance.effects.shaders"
+                },
+                {
+                    "icon": "blur_on",
+                    "name": "Shader Type",
+                    "key": "appearance.effects.currentShader",
+                    "type": "combobox",
+                    "comboBoxValues": Shaders.available
+                },
+                {
                     "icon": "rounded_corner",
                     "name": "Radius",
                     "key": "appearance.rounding.scale",
@@ -42,13 +54,14 @@ Singleton {
                     "key": "desktop.icons.currentIconTheme",
                     "type": "combobox",
                     "reloadOnChange": true,
-                    "state": true,
+                    "store": "state",
                     "comboBoxValues": IconThemesService.availableIconThemeIds
                 },
                 {
                     "icon": "arrow_selector_tool",
                     "name": "Cursor Theme",
-                    "key": "desktop.hyprland.cursorTheme",
+                    "store": "hypr",
+                    "key": "cursor_theme",
                     "type": "combobox",
                     "comboBoxValues": CursorsService.cursors
                 }
@@ -78,65 +91,101 @@ Singleton {
             "shell": "Global",
             "items": [
                 {
+                    "icon": "ads_click",
+                    "name": "Cursor Size",
+                    "store": "hypr",
+                    "key": "cursor_size",
+                    "type": "spin"
+                },
+                {
+                    "icon": "rounded_corner",
+                    "name": "Window Rounding",
+                    "store": "hypr",
+                    "key": "rounding",
+                    "type": "spin"
+                },
+                {
+                    "icon": "rounded_corner",
+                    "name": "Sync Rounding",
+                    "key": "appearance.rounding.syncCompositor"
+                },
+                {
                     "icon": "blur_on",
                     "name": "Blur Passes",
-                    "key": "desktop.hyprland.blurPasses",
+                    "store": "hypr",
+                    "key": "blur_passes",
                     "type": "spin"
                 },
                 {
                     "icon": "blur_on",
-                    "name": "X Ray",
-                    "key": "desktop.hyprland.xray"
-                },
-                {
-                    "icon": "dark_mode",
-                    "name": "Shadows",
-                    "key": "desktop.hyprland.shadows"
+                    "name": "Blur Size",
+                    "store": "hypr",
+                    "key": "blur_size",
+                    "type": "spin"
                 },
                 {
                     "icon": "collapse_content",
                     "name": "Shadows Range",
-                    "key": "desktop.hyprland.shadowsRange",
-                    "type": "text"
+                    "store": "hypr",
+                    "key": "shadows_range",
+                    "type": "spin"
                 },
                 {
                     "icon": "collapse_content",
                     "name": "Shadows Power",
-                    "key": "desktop.hyprland.shadowsPower",
+                    "store": "hypr",
+                    "key": "shadows_power",
                     "type": "spin"
                 },
                 {
                     "icon": "expand_content",
                     "name": "Gaps Out",
-                    "key": "desktop.hyprland.gapsOut",
-                    "type": "text"
+                    "store": "hypr",
+                    "key": "gaps_out",
+                    "type": "spin"
                 },
                 {
                     "icon": "collapse_content",
                     "name": "Gaps In",
-                    "key": "desktop.hyprland.gapsIn",
-                    "type": "text"
+                    "store": "hypr",
+                    "key": "gaps_in",
+                    "type": "spin"
                 },
                 {
                     "icon": "border_all",
                     "name": "Border Width",
-                    "key": "desktop.hyprland.borders",
+                    "store": "hypr",
+                    "key": "borders",
                     "type": "spin"
+                },
+                {
+                    "icon": "blur_on",
+                    "name": "X Ray",
+                    "store": "hypr",
+                    "key": "xray"
+                },
+                {
+                    "icon": "dark_mode",
+                    "name": "Shadows",
+                    "store": "hypr",
+                    "key": "shadows"
                 },
                 {
                     "icon": "dashboard",
                     "name": "Tiling Layout",
                     "type": "combobox",
-                    "comboBoxValues": ["master", "dwindle", "scrolling"],
-                    "key": "desktop.hyprland.tilingLayout"
+                    "store": "hypr",
+                    "comboBoxValues": ["master", "dwindle", "scrolling", "monocle"],
+                    "key": "layout"
                 },
                 {
                     "icon": "monitor",
                     "name": "External Monitor Profile",
                     "type": "combobox",
-                    "comboBoxValues": Mem.options.desktop.hyprland.externalMonitorProfiles,
-                    "key": "desktop.hyprland.externalMonitorProfile"
-                }
+                    "store": "hypr",
+                    "key": "external_monitor_mode",
+                    "comboBoxValues": Mem.options.desktop.hyprland.externalMonitorProfiles
+                },
             ]
         },
         {
@@ -171,7 +220,7 @@ Singleton {
                 {
                     "icon": "timer",
                     "name": "Center Clock",
-                    "state": true,
+                    "store": "state",
                     "enableTooltip": false,
                     "key": "desktop.clock.center"
                 },
@@ -183,7 +232,7 @@ Singleton {
                     "comboBoxValues": ["Badeen Display", "Ndot 55", "Six Caps", "Alfa Slab One", "Notable", "Monoton", "Titan One", "Bebas Neue", "Rubik", "UnifrakturCook"]
                 },
                 {
-                    "state": true,
+                    "store": "state",
                     "icon": "font_download",
                     "name": "Clock Weight",
                     "key": "fonts.variableAxes.display.wght",
@@ -193,7 +242,7 @@ Singleton {
                     "sliderMaxValue": 1000
                 },
                 {
-                    "state": true,
+                    "store": "state",
                     "icon": "font_download",
                     "name": "Clock Width",
                     "key": "fonts.variableAxes.display.wdth",
@@ -208,7 +257,7 @@ Singleton {
                     "key": "desktop.clock.verticalMode"
                 },
                 {
-                    "state": true,
+                    "store": "state",
                     "icon": "timer",
                     "name": "Clock Size",
                     "key": "desktop.clock.scale",
@@ -368,11 +417,6 @@ Singleton {
             "shell": "Main",
             "items": [
                 {
-                    "icon": "apps",
-                    "name": "Apps",
-                    "key": "sidebar.content.apps"
-                },
-                {
                     "icon": "api",
                     "name": "APIs",
                     "key": "sidebar.content.apis"
@@ -391,11 +435,6 @@ Singleton {
                     "icon": "history",
                     "name": "History",
                     "key": "sidebar.content.history"
-                },
-                {
-                    "icon": "notifications",
-                    "name": "Notifications",
-                    "key": "sidebar.content.notifs"
                 },
                 {
                     "icon": "emoji_emotions",
@@ -423,11 +462,6 @@ Singleton {
                     "key": "sidebar.content.overview"
                 },
                 {
-                    "icon": "account_circle",
-                    "name": "Session",
-                    "key": "sidebar.content.session"
-                },
-                {
                     "icon": "stylus",
                     "name": "Notes",
                     "key": "sidebar.content.notes"
@@ -445,24 +479,17 @@ Singleton {
             "shell": "Main",
             "items": [
                 {
-                    "icon": "clear_all",
-                    "name": "Clear Chat on Search",
-                    "key": "beam.behavior.clearAiChatBeforeSearch"
+                    "icon": "animation",
+                    "name": "Animation Style",
+                    "type": "combobox",
+                    "comboBoxValues": BeamData.availableAnimationStyles,
+                    "key": "beam.appearance.animationStyle"
                 },
                 {
-                    "icon": "arrow_upward_alt",
-                    "name": "Scroll to Reveal",
-                    "key": "beam.behavior.scrollToReveal"
-                },
-                {
-                    "icon": "vertical_align_top",
-                    "name": "Top Mode",
-                    "key": "beam.behavior.topMode"
-                },
-                {
-                    "icon": "height",
-                    "name": "Reveal on Empty",
-                    "key": "beam.behavior.revealOnEmpty"
+                    "icon": "masked_transitions",
+                    "name": "Animation Scale",
+                    "type": "text",
+                    "key": "beam.appearance.animationScale"
                 }
             ]
         },
@@ -518,10 +545,22 @@ Singleton {
             "shell": "Global",
             "items": [
                 {
+                    "icon": "extension",
+                    "name": "Widgets",
+                    "key": "desktop.widgets.enabled"
+                },
+                {
+                    "icon": "palette",
+                    "name": "Widgets Bg Mode",
+                    "key": "desktop.widgets.mode",
+                    "type": "combobox",
+                    "comboBoxValues": ["col", "grad"]
+                },
+                {
                     "icon": "palette",
                     "name": "Shell Mode",
                     "type": "combobox",
-                    "comboBoxValues": ["main", "xp", "nobuntu"],
+                    "comboBoxValues": ["main", "zen", "xp", "nobuntu"],
                     "key": "desktop.shell.mode"
                 },
                 {

@@ -18,7 +18,15 @@ Singleton {
         userAgent: Mem.options.networking.userAgent
         onDownloadFinished: (index, success) => {
             const name = downloadModel.get(index).label;
-            success ? NoonUtils.toast(name + " Finished", "check") : NoonUtils.toast(name + " Failed", "close");
+            success ? NoonUtils.toast({
+                id: 4,
+                content: name + " Finished",
+                icon: "check"
+            }) : NoonUtils.toast({
+                id: 4,
+                content: name + " Failed",
+                icon: "close"
+            });
         }
         function clearAll() {
             for (let i = downloadModel.count - 1; i >= 0; i--) {

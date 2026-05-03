@@ -8,8 +8,8 @@ import qs.services
 
 ComboBox {
     id: root
-    Layout.preferredHeight: 45
-    Layout.preferredWidth: 210
+    implicitHeight: 45
+    implicitWidth: 110
     Material.theme: Material.System
 
     delegate: ItemDelegate {

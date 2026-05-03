@@ -22,7 +22,11 @@ StyledRect {
                 else if (text)
                     return (text).toLowerCase().includes(query);
             };
-            return BeatsService.tracksList.filter(entry => searchBy(entry.fileName) || searchBy(entry?.title) || searchBy(entry.artist));
+            const filtered = BeatsService.library.filter(entry => searchBy(entry.title) || searchBy(entry.artist));
+            if (Mem.states.services.beats.shuffleTracks)
+                return filtered.sort(() => Math.random() - 0.5);
+            else
+                return filtered;
         }
     }
 
@@ -32,6 +36,23 @@ StyledRect {
 
     LocalControls {
         id: controls
+    }
+    function createPlaylistFromModel() {
+        var playlist = [];
+        for (var i = 0; i < filteredModel.values.length; i++) {
+            var item = filteredModel.values[i];
+            if (item && item.title)
+                playlist.push(item.title);
+        }
+        return playlist.join(",");
+    }
+
+    function createPlaylist(fileName) {
+        if (controls.inputArea.text.length > 0) {
+            BeatsService.playCustomPlaylist(createPlaylistFromModel());
+        } else {
+            BeatsService.playTrackByFile(fileName);
+        }
     }
 
     radius: Rounding.verylarge
@@ -48,15 +69,15 @@ StyledRect {
         property int columns: root.expanded ? 4 : 2
         cellWidth: width / columns
         cellHeight: cellWidth
-
+        property string libPath: BeatsService.getCurrentLibraryPath() + "/"
         delegate: TrackItem {
             implicitSize: grid.cellWidth - Padding.large
             title: modelData?.title ?? ""
             artist: modelData?.artist ?? ""
-            coverArt: modelData?.cover_art ?? ""
+            coverArt: grid.libPath + modelData?.cover ?? ""
             eventArea.onClicked: event => {
                 if (event.button === Qt.LeftButton) {
-                    BeatsService.playTrack(modelData.playlist_index);
+                    root.createPlaylist(modelData?.file);
                 } else if (event.button === Qt.RightButton) {
                     menu.popup();
                 }
@@ -64,7 +85,7 @@ StyledRect {
             // REWORK
             TrackContextMenu {
                 id: menu
-                trackPath: modelData.filePath
+                trackPath: grid.libPath + modelData.file
                 trackName: modelData.title
             }
         }

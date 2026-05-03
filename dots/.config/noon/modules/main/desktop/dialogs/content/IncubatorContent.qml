@@ -20,7 +20,7 @@ Item {
     ContentChild {
         anchors.fill: parent
         category: root.category
-        anchors.margins: ["View", "Beats", "Notes"].includes(category) ? 0 : Padding.massive
+        anchors.margins: ["View", "Notes"].includes(category) ? 0 : Padding.massive
         _detached: true
         _expanded: true
         parentRoot: root

@@ -7,9 +7,8 @@ import qs.common.widgets
 import qs.services
 import qs.store
 
-StyledRect {
+LayerRect {
     id: root
-    color: "transparent"
     radius: Rounding.verylarge
 
     property string searchQuery: ""

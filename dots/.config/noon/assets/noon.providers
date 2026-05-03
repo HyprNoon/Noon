@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<providers>
+  <provider id="noon-exclusive">
+    <name>Noon Plugins Only</name>
+    <location>https://api.opendesktop.org/ocs/v1/</location>
+    <termsofuse>https://www.opendesktop.org/terms</termsofuse>
+    <register>https://www.opendesktop.org/register</register>
+    <services>
+      <content ocsid="Desktop Extensions" />
+    </services>
+    <!-- We append the user filter to the base query via the knsrc -->
+  </provider>
+</providers>

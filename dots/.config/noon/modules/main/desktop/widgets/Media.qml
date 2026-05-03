@@ -137,6 +137,7 @@ ListView {
 
             // Track Info
             ColumnLayout {
+                visible: root.expanded
                 Layout.fillWidth: true
                 Layout.rightMargin: Padding.massive
                 z: 2

@@ -3,12 +3,49 @@ import QtQuick.Layouts
 import qs.common
 import qs.store
 
-Rectangle {
-    color: Colors.colOutlineVariant
+ColumnLayout {
+    id: root
     visible: Mem.options.bar.appearance.enableSeparators
-    implicitWidth: 1
-    Layout.fillHeight: true
-    Layout.topMargin: Padding.large
-    Layout.bottomMargin: Padding.large
+    height: childrenRect.height
+    Layout.fillWidth: true
+    Layout.leftMargin: Padding.large
+    Layout.rightMargin: Padding.large
     Layout.margins: 4
+    spacing: 2
+    state: Mem.options.bar.appearance.separatorsMode
+    Rectangle {
+        id: bg
+        anchors.centerIn: parent
+        color: Colors.colOutlineVariant
+        state: root.state
+        states: [
+            State {
+                name: "dot"
+                PropertyChanges {
+                    target: bg
+                    implicitHeight: 4
+                    implicitWidth: 4
+                    radius: 999
+                }
+            },
+            State {
+                name: "thick"
+                PropertyChanges {
+                    target: bg
+                    implicitHeight: 20
+                    implicitWidth: 3
+                    radius: 999
+                }
+            },
+            State {
+                name: "thin"
+                PropertyChanges {
+                    target: bg
+                    implicitHeight: 20
+                    implicitWidth: 1
+                    radius: 4
+                }
+            }
+        ]
+    }
 }

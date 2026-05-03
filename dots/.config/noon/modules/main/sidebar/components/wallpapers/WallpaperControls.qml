@@ -93,10 +93,10 @@ BottomDialog {
             }
         }
         RowLayout {
-
             Layout.preferredHeight: 45
             Layout.fillWidth: true
             StyledTextField {
+                id: folderEntry
                 property string sanitizedAddress: "~" + FileUtils.trimFileProtocol(Mem.states.desktop.bg.currentFolder.slice(Directories.standard.home.length))
                 Layout.preferredHeight: 45
                 Layout.fillWidth: true
@@ -105,7 +105,7 @@ BottomDialog {
                 placeholderTextColor: Colors.colOnLayer1
                 color: Colors.colOnLayer1
                 Keys.onEscapePressed: focus = false
-                onAccepted: Mem.states.desktop.bg.currentFolder = Qt.resolvedUrl(text.replace("~", Directories.standard.home))
+                onAccepted: Mem.states.desktop.bg.currentFolder = Qt.resolvedUrl(folderEntry.text.replace("~", Directories.standard.home))
             }
             GroupButton {
                 clip: true

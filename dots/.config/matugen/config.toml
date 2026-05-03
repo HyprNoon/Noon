@@ -3,9 +3,11 @@
 [templates.btop]
 input_path = "~/.config/matugen/templates/applications/btop.theme"
 output_path = '~/.config/btop/themes/noon.theme'
-[templates.vitepress]
-input_path = "~/x.css"
-output_path = "~/xx.css"
+
+[templates.opencode]
+input_path = "~/.config/matugen/templates/applications/opencode.json"
+output_path = "~/.config/opencode/themes/noon.json"
+
 [templates.obsidian]
 input_path = "~/.config/matugen/templates/applications/obsidian.css"
 output_path = "~/Noon-docs/.obsidian/snippets/noon.css"
@@ -13,6 +15,15 @@ output_path = "~/Noon-docs/.obsidian/snippets/noon.css"
 [templates.sequences]
 input_path = "~/.config/matugen/templates/terminal/sequences.txt"
 output_path = '~/.local/state/noon/user/generated/terminal/sequences.txt'
+
+[templates.temp_qt]
+input_path = '~/.config/matugen/templates/qt/qt2.colors'
+output_path = '~/.local/share/color-schemes/Noon2.colors'
+
+[templates.qt]
+input_path = '~/.config/matugen/templates/qt/qt.colors'
+output_path = '~/.local/share/color-schemes/Noon.colors'
+post_hook = '~/.config/matugen/templates/qt/hot_reload.sh'
 
 [templates.noon]
 input_path = '~/.config/matugen/templates/colors.json'
@@ -22,9 +33,14 @@ output_path = '~/.local/state/noon/colors.json'
 input_path = '~/.config/matugen/templates/starship.toml'
 output_path = '~/.config/starship.toml'
 
+[templates.nvim]
+input_path = '~/.config/matugen/templates/applications/nvim.lua'
+output_path = '~/.config/nvim/lua/noon/colors.lua'
+post_hook = 'pkill -SIGUSR1 nvim'
+
 [templates.hyprland]
-input_path = '~/.config/matugen/templates/hyprland/colors.conf'
-output_path = '~/.cache/hyprland/colors.conf'
+input_path = '~/.config/matugen/templates/hyprland/colors.lua'
+output_path = '~/.config/hypr/colors.lua'
 
 [templates.gtk3]
 input_path = '~/.config/matugen/templates/gtk/colors.css'
@@ -38,10 +54,6 @@ output_path = '~/.config/gtk-4.0/gtk.css'
 input_path = '~/.config/matugen/templates/applications/firefox.json'
 output_path = '~/.cache/noon/user/generated/colors/firefox.json'
 post_hook = 'python /usr/lib/noon-mirsal/mirsald pull-palette'
-
-[templates.heroic]
-input_path = "~/.config/matugen/templates/applications/heroic.css"
-output_path = "~/.cache/noon/user/generated/heroic-colors.css"
 
 [templates.spicetify]
 input_path = "~/.config/matugen/templates/applications/spicetify.ini"
@@ -78,6 +90,10 @@ output_path = '~/.config/cava/themes/noon.ini'
 [templates.zathura]
 input_path = '~/.config/matugen/templates/applications/zathura'
 output_path = '~/.config/zathura/zathurarc'
+
+[templates.heroic]
+input_path = '~/.config/matugen/templates/applications/heroic.css'
+output_path = '~/.cache/noon/user/generated/heroic.css'
 
 [templates.sddm]
 input_path = '~/.config/matugen/templates/sddm.conf'

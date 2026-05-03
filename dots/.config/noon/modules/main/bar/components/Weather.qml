@@ -28,7 +28,7 @@ GridView {
             spacing: verticalMode ? 4 : 8
 
             Symbol {
-                text: weatherData.currentEmoji
+                icon: weatherData.currentEmoji
                 iconSize: verticalMode ? Fonts.sizes.large : Fonts.sizes.normal
                 color: Colors.colOnLayer1
                 fill: 1

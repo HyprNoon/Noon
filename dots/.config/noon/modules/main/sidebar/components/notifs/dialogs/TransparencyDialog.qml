@@ -41,8 +41,8 @@ BottomDialog {
             OptionsSection {
                 icon: "rocket_launch"
                 title: "Blur Applications"
-                checked: !Mem.options.desktop.hyprland.unBlurApps
-                action: Mem.options.desktop.hyprland.unBlurApps = !checked
+                checked: !Mem.hypr.unblur_apps
+                action: Mem.hypr.unblur_apps = !checked
             }
 
             ColumnLayout {
@@ -69,7 +69,7 @@ BottomDialog {
                         Layout.minimumWidth: 80
                         Layout.fillWidth: true
                         from: 0
-                        to: Mem.options.desktop.hyprland.layerAlpha - 0.01
+                        to: 0.9 - Mem.hypr.layers_alpha
                         value: Mem.options.appearance.transparency.scale
                         onMoved: Mem.options.appearance.transparency.scale = value
                     }
@@ -95,8 +95,8 @@ BottomDialog {
                         Layout.fillWidth: true
                         from: 0
                         to: 1
-                        value: Mem.options.desktop.hyprland.applicationsOpacity
-                        onMoved: Mem.options.desktop.hyprland.applicationsOpacity = value
+                        value: Mem.hypr.applications_opacity
+                        onMoved: Mem.hypr.applications_opacity = value
                     }
                 }
             }

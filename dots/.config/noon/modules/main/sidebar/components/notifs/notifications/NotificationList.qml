@@ -8,10 +8,9 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
 
-    color: Colors.colLayer1
     radius: Rounding.huge
     anchors.margins: Padding.small
     clip: false

@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -31,11 +30,6 @@ PopupWindow {
         }
     }
 
-    Connections {
-        target: ClipboardService
-        function onEntriesRefreshed() {
-        }
-    }
     Item {
         anchors.fill: parent
         StyledRect {
@@ -77,7 +71,7 @@ PopupWindow {
                     Layout.fillWidth: true
                     clip: true
                     radius: bg.radius - content.anchors.margins
-                    model: ClipboardService.entries
+                    model: ClipboardService.manager.entries
                     delegate: StyledRect {
                         required property var modelData
                         width: list.width
@@ -98,7 +92,7 @@ PopupWindow {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onPressed: {
-                                ClipboardService.copy(modelData);
+                                ClipboardService.manager.copy(modelData);
                                 Qt.callLater(() => root.visible = false);
                             }
                         }

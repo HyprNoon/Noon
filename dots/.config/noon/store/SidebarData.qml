@@ -31,8 +31,9 @@ Singleton {
         "API": {
             icon: "cognition",
             activeIcon: "cognition_2",
-            componentPath: "apis/Apis",
+            componentPath: "apis/AiChat",
             expandable: true,
+            async: true,
             incubatable: true,
             detachable: true,
             shape: "PixelCircle",

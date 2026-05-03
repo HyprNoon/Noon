@@ -16,7 +16,7 @@ Scope {
 
         StyledPanel {
             id: dockRoot
-            name: "slide_layer"
+            name: "blurred_layer"
             shell: "noon"
             screen: modelData
             _layer: "Top"
@@ -24,7 +24,7 @@ Scope {
             readonly property bool reveal: root.pinned || mouseArea.containsMouse || (!GlobalStates.topLevel?.activated && !GlobalStates.main.sidebar.expanded)
 
             implicitWidth: Screen.width
-            implicitHeight: bg?.height + Sizes.elevationMargin * 2
+            implicitHeight: bg?.height + Sizes.elevationMargin * 3
             exclusiveZone: root.pinned ? bg?.height + Sizes.elevationMargin : -1
             fill: true
             anchors.top: false
@@ -63,14 +63,13 @@ Scope {
                 StyledRectangularShadow {
                     target: bg
                 }
-                StyledRect {
+                ShaderRect {
                     id: bg
                     width: content.implicitWidth
                     height: content.implicitHeight
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottomMargin: Sizes.elevationMargin
                     anchors.bottom: parent.bottom
-                    color: Colors.colLayer0
                     radius: Rounding.verylarge
 
                     RowLayout {
@@ -81,7 +80,9 @@ Scope {
                         DockPluginsFactory {
                             leftMode: true
                         }
-                        DockApps {}
+                        DockApps {
+                            Layout.maximumWidth: dockRoot.implicitWidth * 0.75
+                        }
                         DockPluginsFactory {}
                     }
                 }

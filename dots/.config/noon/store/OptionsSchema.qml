@@ -20,6 +20,15 @@ JsonAdapter {
         property JO padding
         property JO icons
         property JO fonts
+        property JO effects
+
+        effects: JO {
+            property bool shaders: false
+            property string currentShader: "aero"
+            property var availableShaders: []
+            property bool showCirclesOnPanel: true
+            property int circleCount: 3
+        }
 
         animations: JO {
             property real scale: 1
@@ -37,6 +46,7 @@ JsonAdapter {
         }
 
         rounding: JO {
+            property bool syncCompositor: true
             property real scale: 1.5
             property real power: 2
         }
@@ -150,12 +160,12 @@ JsonAdapter {
     }
 
     property JO beam: JO {
+        property JO appearance: JO {
+            property real animationScale: 1.0
+            property string animationStyle: "expo"
+        }
         property JO behavior: JO {
             property bool scrollToReveal: true
-            property bool revealOnEmpty: false
-            property bool topMode: false
-            property bool clearAiChatBeforeSearch: false
-            property bool revealLauncherOnAction: true
         }
     }
 
@@ -245,7 +255,7 @@ JsonAdapter {
         property string visualizerMode: ""
         property bool showVisualizer: false
         property bool lyrics: false
-        property list<string> excludedPlayers: [".mpd", "playerctld", "mpv", "firefox", "chromium", "kdeconnect"]
+        property list<string> excludedPlayers: ["playerctld", "mpv", "firefox", "chromium", "kdeconnect"]
     }
     property JO desktop: JO {
         property JO shell
@@ -310,18 +320,6 @@ JsonAdapter {
         hyprland: JO {
             property list<string> externalMonitorProfiles: ["1680x1050@68", "1920x1080@60", "1920x1080@72"]
             property string externalMonitorProfile: "1680x1050@68"
-            property string tilingLayout: "dwindle"
-            property int blurPasses: 1
-            property bool unBlurApps: false
-            property bool shadows: true
-            property int shadowsRange: 1
-            property int shadowsPower: 1
-            property int gapsOut: 1
-            property int gapsIn: 1
-            property int borders: 1
-            property real applicationsOpacity: 0.6
-            property real layerAlpha: 0.6
-            property string cursorTheme: "Breeze"
         }
 
         behavior: JO {
@@ -364,6 +362,7 @@ JsonAdapter {
 
         appearance: JO {
             property int mode: 2
+            property string separatorsMode: "dot"
             property bool enableSeparators: true
             property bool useBg: true
             property bool barGroup: false

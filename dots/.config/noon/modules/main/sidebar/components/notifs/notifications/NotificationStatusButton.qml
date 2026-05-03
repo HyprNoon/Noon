@@ -33,7 +33,7 @@ GroupButton {
             spacing: 5
 
             Symbol {
-                text: buttonIcon
+                icon: buttonIcon
                 font.pixelSize: Fonts.sizes.large
                 color: button.colText
             }

@@ -16,6 +16,7 @@ StyledPanel {
     property bool pinned: false
     property bool expanded: false
     property bool reveal: revealCondition
+    property int selectedTabIndex: 0
     property bool rightMode: barPosition !== "right" // Default to right in horizontal Bars
     property alias selectedCategory: sidebarContent.selectedCategory
     readonly property bool show: !hoverMode
@@ -31,9 +32,9 @@ StyledPanel {
     function hide() {
         if (pinned)
             return;
-
         reveal = false;
         hoverMode = true;
+        selectedTabIndex = 0;
         sidebarContent.selectedCategory = "";
         if (!pinned)
             reset_reveal_conditions();
@@ -57,7 +58,11 @@ StyledPanel {
     function isDetached() {
         return SidebarData.detachedContent.includes(root.selectedCategory);
     }
-    function reveal_content() {
+    function setTab(tab) {
+        if (tab)
+            root.selectedTabIndex = tab;
+    }
+    function reveal_content(selectedTab = 0) {
         hoverMode = false;
         sidebarContent.forceActiveFocus();
     }
@@ -137,12 +142,10 @@ StyledPanel {
             target: visualContainer
         }
 
-        StyledRect {
+        ShaderRect {
             id: visualContainer
 
             width: root.sidebarWidth
-            color: sidebarContent.colors.colLayer0
-            clip: true
             readonly property int hideMargin: state === "float" ? Sizes.elevationMargin : 0
 
             anchors {
@@ -158,22 +161,23 @@ StyledPanel {
             Content {
                 id: sidebarContent
                 panelWindow: root
+                selectedTabIndex: root.selectedTabIndex
             }
 
             states: [
                 State {
-                    name: "sharp"
+                    name: "float"
                     when: root.appearanceMode === 0
-
                     PropertyChanges {
                         target: visualContainer
 
-                        topRightRadius: 0
-                        bottomRightRadius: 0
-                        topLeftRadius: 0
-                        bottomLeftRadius: 0
-                        anchors.topMargin: 0
-                        anchors.bottomMargin: 0
+                        topRightRadius: root.rounding
+                        bottomRightRadius: root.rounding
+                        topLeftRadius: root.rounding
+                        bottomLeftRadius: root.rounding
+
+                        anchors.topMargin: Sizes.elevationMargin
+                        anchors.bottomMargin: Sizes.elevationMargin
                     }
                 },
                 State {
@@ -193,8 +197,9 @@ StyledPanel {
                     }
                 },
                 State {
-                    name: "concave"
+                    name: "sharp"
                     when: root.appearanceMode === 2
+
                     PropertyChanges {
                         target: visualContainer
 
@@ -207,18 +212,17 @@ StyledPanel {
                     }
                 },
                 State {
-                    name: "float"
+                    name: "concave"
                     when: root.appearanceMode === 3
                     PropertyChanges {
                         target: visualContainer
 
-                        topRightRadius: root.rounding
-                        bottomRightRadius: root.rounding
-                        topLeftRadius: root.rounding
-                        bottomLeftRadius: root.rounding
-
-                        anchors.topMargin: Sizes.elevationMargin
-                        anchors.bottomMargin: Sizes.elevationMargin
+                        topRightRadius: 0
+                        bottomRightRadius: 0
+                        topLeftRadius: 0
+                        bottomLeftRadius: 0
+                        anchors.topMargin: 0
+                        anchors.bottomMargin: 0
                     }
                 }
             ]

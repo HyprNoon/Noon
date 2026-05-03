@@ -4,7 +4,7 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
 
     property string searchQuery: ""
@@ -14,7 +14,6 @@ StyledRect {
     signal dismiss
 
     clip: true
-    color: Colors.colLayer1
     radius: Rounding.verylarge
 
     onContentFocusRequested: {

@@ -15,11 +15,11 @@ Singleton {
     readonly property string store: FileUtils.trimFileProtocol(standard.config + "/noon/store")
     readonly property string assets: FileUtils.trimFileProtocol(standard.config + "/noon/assets")
     readonly property string gallery: FileUtils.trimFileProtocol(standard.pictures + "/Gallary/")
-    readonly property string shellConfigs: FileUtils.trimFileProtocol(standard.config + "/HyprNoon/")
+    readonly property string shellConfigs: FileUtils.trimFileProtocol(standard.config + "/HyprNoon")
     readonly property string shellDir: FileUtils.trimFileProtocol(standard.config + "/noon")
     readonly property string scriptsDir: shellDir + "/scripts"
     readonly property string favicons: FileUtils.trimFileProtocol(standard.cache + "/media/favicons")
-    readonly property string hyprConfigs: FileUtils.trimFileProtocol(shellDir + "/hypr")
+    readonly property string hyprConfigs: FileUtils.trimFileProtocol(standard.config + "/hypr")
     // standard directories
     readonly property QtObject standard: QtObject {
         readonly property string home: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
@@ -58,6 +58,7 @@ Singleton {
     // beats directories
     readonly property QtObject beats: QtObject {
         readonly property string main: FileUtils.trimFileProtocol(standard.cache + "/beats")
+        readonly property string mpd: FileUtils.trimFileProtocol(main + "/mpd")
         readonly property string downloads: FileUtils.trimFileProtocol(standard.home + "/Music")
         readonly property string coverArt: FileUtils.trimFileProtocol(main + "/coverart")
         readonly property string lyrics: FileUtils.trimFileProtocol(main + "/lyrics")
@@ -79,11 +80,11 @@ Singleton {
             // misc
             venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
-            services.notifications, services.latex, services.gamesCoverArts, services.screenshots,
+            services.latex, services.gamesCoverArts, services.screenshots,
             // wallpapers
             wallpapers.main, wallpapers.switchScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats
-            beats.main, beats.coverArt, beats.lyrics, beats.tracks,
+            beats.main, beats.mpd, beats.coverArt, beats.lyrics, beats.tracks,
             // plugins
             plugins.main, plugins.palettes, plugins.sidebar, plugins.dock]);
     }

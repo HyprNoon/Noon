@@ -19,5 +19,8 @@ Singleton {
     property int silly: 32 * scale
     property int full: 999 * scale
 
-    onScaleChanged: NoonUtils.setHyprKey("rounding", verylarge)
+    onScaleChanged: {
+        if (Mem.options.appearance.rounding.syncCompositor)
+            NoonUtils.setHyprKey("rounding", verylarge);
+    }
 }

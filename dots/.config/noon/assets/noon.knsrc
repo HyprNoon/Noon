@@ -1,0 +1,4 @@
+[KNewStuff3]
+# Change user= to personid=
+ProvidersUrl=https://api.opendesktop.org/ocs/v1/content/data?personid=pharmaracist
+Categories=Desktop Extensions

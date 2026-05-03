@@ -19,7 +19,11 @@ Singleton {
     }
 
     function handleFirstRun() {
-        NoonUtils.toast(`'${root.firstRunNotifSummary}' '${root.firstRunNotifBody}'`,"tune");
+        NoonUtils.toast({
+            id: 0,
+            content: `${root.firstRunNotifSummary} '${root.firstRunNotifBody}'`,
+            icon: "tune"
+        });
         Appearance.getCurrentIconTheme();
     }
 

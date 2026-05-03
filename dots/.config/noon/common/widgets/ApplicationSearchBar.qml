@@ -42,7 +42,7 @@ Item {
             }
             spacing: Padding.normal
             Symbol {
-                text: "search"
+                icon: "search"
                 font.pixelSize: 24
                 fill: 1
                 color: Colors.colSubtext

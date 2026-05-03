@@ -25,7 +25,7 @@ Switch {
     implicitWidth: 52 * root.scale
 
     PointingHandInteraction {}
-
+    text: ""
     // Custom track styling
     background: Rectangle {
         width: parent.width
@@ -45,7 +45,7 @@ Switch {
     }
 
     // Custom thumb styling
-    indicator: Rectangle {
+    indicator: StyledRect {
         width: (root.pressed || root.down) ? (28 * root.scale) : root.checked ? (24 * root.scale) : (16 * root.scale)
         height: (root.pressed || root.down) ? (28 * root.scale) : root.checked ? (24 * root.scale) : (16 * root.scale)
         radius: Rounding.full
@@ -63,27 +63,12 @@ Switch {
             color: root.checked ? root.iconActiveColor : root.iconColor
 
             Behavior on color {
-                ColorAnimation {
-                    duration: 750
-                    easing.type: Easing.OutQuad
-                }
+                CAnim {}
             }
         }
 
         Behavior on anchors.leftMargin {
             Anim {}
-        }
-
-        Behavior on width {
-            Anim {}
-        }
-
-        Behavior on height {
-            Anim {}
-        }
-
-        Behavior on color {
-            CAnim {}
         }
     }
 }

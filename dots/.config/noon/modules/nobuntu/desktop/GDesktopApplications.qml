@@ -23,6 +23,7 @@ Item {
 
     readonly property list<string> apps: Mem.states.favorites.desktopApps
     readonly property size appSize: Qt.size(100, 100)
+
     GridLayout {
         anchors {
             top: parent.top

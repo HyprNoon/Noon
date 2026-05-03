@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -13,69 +12,22 @@ import qs.store
 StyledPanel {
     id: root
     name: "blurred_layer"
-    readonly property int detectionArea: scrollReveal ? 20 : 4
-    readonly property bool scrollReveal: Mem.options.beam.behavior.scrollToReveal
-    readonly property bool reveal: GlobalStates.main.showBeam || (Mem.options.beam.behavior.revealOnEmpty && !MonitorsInfo.topLevel.activated)
-    readonly property int expandedThreshold: 25
+    property real scrollSum: 0
+    readonly property bool reveal: GlobalStates.main.showBeam
     readonly property int mainRounding: Rounding.full
-    readonly property bool topMode: Mem.options.beam.behavior.topMode ?? false
-    readonly property int elevationValue: {
-        const pos = Mem.options.bar.behavior.position;
-        const margin = Mem.options.bar.appearance.height;
-        const elevation = Sizes.elevationMargin;
-        if (topMode && pos === "top") {
-            return margin + elevation;
-        } else if (!topMode && pos === "bottom") {
-            return margin + elevation;
-        } else
-            return elevation;
-    }
-    visible: reveal || scrollReveal
+    readonly property int elevationValue: Sizes.elevationMargin + (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.height : 0)
+
+    readonly property int beamTargetWidth: (BeamData.getHint()?.length ?? 0) > 25 || BeamData.query.length > 25 ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width
+
+    visible: true
     kbFocus: true
     exclusiveZone: -1
-
     fill: true
 
     mask: Region {
-        item: bg
+        item: maskUnion
     }
 
-    // Screen Download Hint
-    ScreenActionHint {
-        target: dropArea
-    }
-
-    // Auto-hide timer
-    Timer {
-        id: idleTimer
-        repeat: true
-        running: root.reveal && BeamData.query.length === 0 && !beam_mouse_area.containsMouse
-        interval: 5000
-        onTriggered: root.hide()
-    }
-
-    // Focus handling
-    FocusHandler {
-        windows: [root]
-        active: root.reveal
-        onCleared: root.hide()
-    }
-
-    function takeScreenshot() {
-        ScreenShotService.request({
-            temp: true,
-            region: ScreenShotService.Regions.Window
-        });
-        attach.restart();
-        Qt.callLater(hide);
-    }
-    Timer {
-        id: attach
-        interval: Mem.options.hacks.arbitraryRaceConditionDelay
-        onTriggered: {
-            Ai.attachFile(Qt.resolvedUrl(ScreenShotService.tempPath));
-        }
-    }
     function hide() {
         GlobalStates.main.showBeam = false;
     }
@@ -83,49 +35,78 @@ StyledPanel {
     function sendMessage() {
         BeamData.executeCommand();
         BeamData.reset();
-        root.hide();
+        hide();
+    }
+
+    // function takeScreenshot() {
+    //     ScreenShotService.request({
+    //         temp: true,
+    //         region: ScreenShotService.Regions.Part
+    //     });
+    //     attachTimer.restart();
+    //     Qt.callLater(hide);
+    // }
+
+    // Timer {
+    //     id: attachTimer
+    //     interval: Mem.options.hacks.arbitraryRaceConditionDelay
+    //     onTriggered: Ai.attachFile(Qt.resolvedUrl(ScreenShotService.tempPath))
+    // }
+
+    FocusHandler {
+        windows: [root]
+        active: root.reveal
+        onCleared: root.hide()
+    }
+
+    ScreenActionHint {
+        target: dropArea
+    }
+
+    Item {
+        id: maskUnion
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: beamBg.width
+        height: root.reveal ? beamBg.height : 5
     }
 
     MouseArea {
-        id: beam_mouse_area
-        readonly property int _hidden_offset: -(Sizes.beamSize.height + elevationValue - 2)
-        z: 999
-        hoverEnabled: true
+        id: beamMouseArea
         anchors.fill: parent
+        hoverEnabled: true
         propagateComposedEvents: true
-        scrollGestureEnabled: true
         acceptedButtons: Qt.NoButton
+        scrollGestureEnabled: true
+
+        Timer {
+            id: idleTimer
+            repeat: true
+            interval: 5000
+            running: root.reveal && BeamData.query.length === 0 && !beamMouseArea.containsMouse
+            onTriggered: root.hide()
+        }
+
         onWheel: wheel => {
-            switch (wheel.modifiers) {
-            case Qt.ControlModifier:
-                if (wheel.angleDelta.y < 0)
-                    GlobalStates.main.sysDialogs.mode = "incubate";
-                else
-                    GlobalStates.main.sysDialogs.mode = "";
-                break;
-            case Qt.ShiftModifier:
-                if (wheel.angleDelta.y < 0)
-                    GlobalStates.main.sysDialogs.mode = "cheats";
-                else
-                    GlobalStates.main.sysDialogs.mode = "";
-                break;
+            if (wheel.modifiers === Qt.ControlModifier) {
+                GlobalStates.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "incubate" : "";
+                wheel.accepted = true;
+                return;
+            }
+            if (wheel.modifiers === Qt.ShiftModifier) {
+                GlobalStates.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "cheats" : "";
                 wheel.accepted = true;
                 return;
             }
 
-            if (!root.scrollReveal)
-                return;
+            root.scrollSum += wheel.angleDelta.y;
 
-            let scrollSum = 0;
-            let toggleThreshold = 20;
-            scrollSum += wheel.angleDelta.y;
-
-            if (!root.reveal && scrollSum <= -toggleThreshold) {
+            if (!root.reveal && root.scrollSum <= -20) {
                 GlobalStates.main.showBeam = true;
-                scrollSum = 0;
-            } else if (root.reveal && scrollSum >= toggleThreshold) {
+                root.scrollSum = 0;
+            } else if (root.reveal && root.scrollSum >= 20) {
                 GlobalStates.main.showBeam = false;
-                scrollSum = 0;
+                root.scrollSum = 0;
             }
 
             wheel.accepted = true;
@@ -135,213 +116,163 @@ StyledPanel {
             id: dropArea
             anchors.fill: parent
             keys: ["text/uri-list"]
-            onDropped: drop => {
-                let newPaths = drop.urls.map(url => url.toString());
-                const firstItem = newPaths[0];
-                NoonUtils.runDownloader(firstItem);
-            }
+            onDropped: drop => NoonUtils.runDownloader(drop.urls[0].toString())
         }
-        readonly property real marginOffset: root.reveal && !GlobalStates.main.showOsdValues ? 0 : _hidden_offset
-        anchors.bottomMargin: !root.topMode ? marginOffset : 0
-        anchors.topMargin: root.topMode ? marginOffset : 0
+    }
 
-        Behavior on anchors.bottomMargin {
-            Anim {}
-        }
+    BeamPopup {
+        id: popup
+        mainBg: beamBg
+        reveal: root.reveal
+    }
 
-        Behavior on anchors.topMargin {
-            Anim {}
-        }
+    StyledRectangularShadow {
+        target: popup
+    }
 
-        Item {
-            id: container
+    BeamBg {
+        id: beamBg
+        reveal: root.reveal && !GlobalStates.main.showOsdValues
+        rounding: root.mainRounding
+        elevationValue: root.elevationValue
+
+        implicitHeight: Sizes.beamSize.height
+        implicitWidth: root.beamTargetWidth
+
+        Symbol {
             z: 999
-            anchors.fill: parent
-            property alias input: inputField
-            property string hintText: BeamData.getHint() || ""
-            readonly property var appData: DesktopEntries.byId(container.hintText) || {}
+            font.pixelSize: 18
+            fill: 1
+            color: inputField.focus ? Colors.colOnPrimary : Colors.colOnLayer3
+            anchors.centerIn: icon
+            text: BeamData.getIcon()
+        }
 
-            BeamPopup {
-                id: popup
-                mainBg: bg
-                reveal: root.reveal
+        MaterialShape {
+            id: icon
+            anchors {
+                left: parent.left
+                verticalCenter: parent.verticalCenter
+                leftMargin: Padding.gigantic
             }
-            StyledRectangularShadow {
-                target: popup
+            implicitSize: 36
+            color: inputField.focus ? Colors.colPrimary : Colors.colLayer3
+            shape: BeamData.getShape()
+
+            property alias inputText: inputField.text
+            onInputTextChanged: if (inputField.text.length === 0)
+                rotation = 0
+
+            Behavior on color {
+                CAnim {}
             }
-            // StyledRectangularShadow {
-            //     target: bg
+
+            RotationAnimation on rotation {
+                running: inputField.text.length > 0
+                loops: Animation.Infinite
+                from: 0
+                to: 360
+                duration: 9000
+                easing.type: Easing.Linear
+            }
+        }
+
+        LayerRect {
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                left: icon.right
+                right: sendButton.left
+                leftMargin: Padding.huge
+                rightMargin: Padding.small
+                margins: Padding.normal
+            }
+            radius: Rounding.full
+
+            TextField {
+                id: inputField
+                anchors.fill: parent
+                z: 10
+                focus: root.reveal
+                objectName: "inputField"
+                placeholderText: BeamData.config?.placeholder ?? "Ask any thing ..."
+                text: BeamData.query
+                background: null
+                selectionColor: Colors.colPrimaryContainer
+                selectedTextColor: Colors.m3.m3onPrimaryContainer
+                color: Colors.colOnLayer0
+                placeholderTextColor: Colors.colSubtext
+                selectByMouse: true
+                leftPadding: Padding.huge
+                rightPadding: Padding.huge + osrButton.width
+                font.pixelSize: Fonts.sizes.normal
+                font.family: Fonts.family.main
+
+                onTextChanged: BeamData.updateStateFromQuery(text)
+
+                Keys.onPressed: event => {
+                    switch (event.key) {
+                    case Qt.Key_Escape:
+                        root.hide();
+                        event.accepted = true;
+                        break;
+                    case Qt.Key_Return:
+                        root.sendMessage();
+                        event.accepted = true;
+                        break;
+                    case Qt.Key_Tab:
+                        const hint = BeamData.getHint();
+                        if (hint) {
+                            BeamData.query = BeamData.autocomplete(hint);
+                            event.accepted = true;
+                        }
+                        break;
+                    default:
+                        if (event.modifiers === Qt.ControlModifier && event.key === Qt.Key_S) {
+                            root.takeScreenshot();
+                            event.accepted = true;
+                        }
+                    }
+                }
+            }
+
+            // GroupButtonWithIcon {
+            //     id: osrButton
+            //     z: 999
+            //     anchors {
+            //         top: parent.top
+            //         bottom: parent.bottom
+            //         right: parent.right
+            //         rightMargin: Padding.large
+            //     }
+            //     buttonRadius: root.mainRounding
+            //     releaseAction: () => root.takeScreenshot()
+            //     colBackground: "transparent"
+            //     materialIcon: "screenshot_region"
+            //     implicitSize: beamBg.implicitHeight * 0.75
+            //     enabled: !ScreenShotService.isBusy
+            //     visible: BeamData.config?.showOsrButton ?? false
+            //     Behavior on opacity {
+            //         Anim {}
+            //     }
             // }
-            StyledRect {
-                id: bg
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: root.topMode ? parent.top : undefined
-                    bottom: !root.topMode ? parent.bottom : undefined
-                    topMargin: elevationValue
-                    bottomMargin: elevationValue
-                }
+        }
 
-                radius: root.mainRounding
-                color: Colors.colLayer0
-
-                implicitHeight: Sizes.beamSize.height
-                implicitWidth: {
-                    const hintLength = BeamData.getHint()?.length ?? 0;
-                    const queryLength = BeamData.query.length;
-                    return (hintLength > root.expandedThreshold || queryLength > root.expandedThreshold) ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width;
-                }
-
-                Behavior on implicitWidth {
-                    Anim {}
-                }
-
-                Symbol {
-                    z: 999
-                    font.pixelSize: 18
-                    fill: 1
-                    color: inputField.focus ? Colors.colOnPrimary : Colors.colOnLayer3
-                    anchors.centerIn: icon
-                    text: BeamData.getIcon()
-                }
-
-                MaterialShape {
-                    id: icon
-                    anchors {
-                        left: parent.left
-                        verticalCenter: parent.verticalCenter
-                        leftMargin: Padding.gigantic
-                    }
-                    readonly property string inputText: inputField.text
-
-                    implicitSize: 36
-                    color: inputField.focus ? Colors.colPrimary : Colors.colLayer3
-                    shape: BeamData.getShape()
-                    onInputTextChanged: if (inputField.text.length === 0)
-                        rotation = 0
-
-                    RotationAnimation on rotation {
-                        running: icon.inputText.length > 0
-                        loops: Animation.Infinite
-                        from: 0
-                        to: 360
-                        duration: 9000
-                        easing.type: Easing.Linear
-                    }
-                    Behavior on color {
-                        CAnim {}
-                    }
-                    Behavior on rotation {
-                        Anim {}
-                    }
-                }
-                StyledRect {
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        right: sendButton.left
-                        left: icon.right
-                        margins: Padding.normal
-                        rightMargin: Padding.small
-                        leftMargin: Padding.huge
-                    }
-
-                    radius: Rounding.full
-                    color: Colors.colLayer2
-
-                    TextField {
-                        id: inputField
-                        z: 10
-                        anchors.fill: parent
-                        focus: root.reveal
-                        objectName: "inputField"
-                        placeholderText: BeamData.config?.placeholder || "Ask any thing ..."
-                        text: BeamData.query
-                        background: null
-                        selectionColor: Colors.colPrimaryContainer
-                        selectedTextColor: Colors.m3.m3onPrimaryContainer
-                        color: Colors.colOnLayer0
-                        placeholderTextColor: Colors.colSubtext
-                        selectByMouse: true
-                        leftPadding: Padding.huge
-                        rightPadding: Padding.huge + osrButton.width
-                        onTextChanged: {
-                            BeamData.updateStateFromQuery(text);
-                        }
-
-                        font {
-                            pixelSize: Fonts.sizes.normal
-                            family: Fonts.family.main
-                        }
-
-                        Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Escape) {
-                                root.hide();
-                                event.accepted = true;
-                            }
-
-                            if (event.key === Qt.Key_Return) {
-                                root.sendMessage();
-                                event.accepted = true;
-                            }
-
-                            if (event.key === Qt.Key_Tab) {
-                                const hint = BeamData.getHint();
-                                if (hint) {
-                                    BeamData.query = BeamData.autocomplete(hint);
-                                    event.accepted = true;
-                                }
-                            }
-
-                            if (event.modifiers === Qt.ControlModifier && event.key === Qt.Key_S) {
-                                root.takeScreenshot();
-                                event.accepted = true;
-                            }
-                        }
-                    }
-
-                    GroupButtonWithIcon {
-                        id: osrButton
-                        z: 999
-                        buttonRadius: root.mainRounding
-                        releaseAction: () => root.takeScreenshot()
-                        colBackground: "transparent"
-                        materialIcon: "screenshot_region"
-                        implicitSize: bg.height * 0.75
-                        enabled: !ScreenShotService.isBusy
-                        visible: BeamData.config?.showOsrButton || false
-                        Behavior on opacity {
-                            Anim {}
-                        }
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        anchors.rightMargin: Padding.large
-                    }
-                }
-
-                GroupButtonWithIcon {
-                    id: sendButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: Padding.large
-                    releaseAction: () => root.sendMessage()
-                    buttonRadius: root.mainRounding
-                    colBackground: "transparent"
-                    implicitSize: bg.height * 0.75
-                    animateIcon: true
-                    materialIcon: {
-                        if (BeamData.query.length === 0 && BeamData.activeState === "ai") {
-                            return "mic";
-                        } else if (root.isResponding) {
-                            return "stop";
-                        } else
-                            return "send";
-                    }
-                    Behavior on opacity {
-                        Anim {}
-                    }
-                }
+        GroupButtonWithIcon {
+            id: sendButton
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: Padding.large
+            }
+            releaseAction: () => root.sendMessage()
+            buttonRadius: root.mainRounding
+            colBackground: "transparent"
+            implicitSize: beamBg.implicitHeight * 0.75
+            animateIcon: true
+            materialIcon: BeamData.query.length === 0 && BeamData.activeState === "ai" ? "mic" : root.isResponding ? "stop" : "send"
+            Behavior on opacity {
+                Anim {}
             }
         }
     }

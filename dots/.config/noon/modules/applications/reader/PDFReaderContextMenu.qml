@@ -31,7 +31,7 @@ StyledMenu {
             "materialIcon": "delete",
             "action": () => {
                 if (fileData && fileData.filePath) {
-                    FileUtils.deleteItem(fileData.filePath);
+                    NoonUtils.deleteFile(fileData.filePath);
                 }
             }
         },

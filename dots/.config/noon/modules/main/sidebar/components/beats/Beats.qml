@@ -7,6 +7,7 @@ RedunduntMultiViewPanel {
     id: root
     property bool expanded
     path: Qt.resolvedUrl("./")
+
     tabButtonList: [
         {
             // Queue ?
@@ -29,13 +30,14 @@ RedunduntMultiViewPanel {
             "preload": "expanded",
             "preloadData": root.expanded,
             "component": "pages/HitsPage"
-        },
-        {
-            "icon": "tune",
-            "name": "EQ",
-            "preload": "expanded",
-            "preloadData": root.expanded,
-            "component": "pages/EQPage"
-        },
+        }
+        // {
+        //     "icon": "tune",
+        //     "name": "EQ",
+        //     "preload": "expanded",
+        //     "preloadData": root.expanded,
+        //     "component": "pages/EQPage"
+        // },
+        ,
     ]
 }

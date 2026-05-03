@@ -6,38 +6,24 @@ import qs.common.functions
 import qs.services
 import qs.store
 
-Item {
+Process {
     id: root
     property var plugins
     required property string group
-    property bool active: PluginsManager.enablePlugins
-    visible: false
+
     function refresh() {
-        getProc.running = true;
-    }
-    Loader {
-        visible: false
-        asynchronous: true
-        active: root.active
-        sourceComponent: FolderListModel {
-            id: folderModel
-            showDirs: true
-            folder: Qt.resolvedUrl(Directories.plugins.main + '/' + group)
-            onStatusChanged: getProc.running = true
-        }
+        running = false;
+        running = true;
     }
 
-    Process {
-        id: getProc
-        running: root.active
-        command: ["bash", Directories.scriptsDir + "/plugins_helper.sh", "list", group]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.plugins = JSON.parse(text.trim());
-                } catch (e) {
-                    console.warn("[Plugins] Failed to parse:", e, "\nRaw:", text);
-                }
+    running: PluginsManager?.enablePlugins
+    command: ["bash", Directories.scriptsDir + "/plugins_helper.sh", "list", group]
+    stdout: StdioCollector {
+        onStreamFinished: {
+            try {
+                root.plugins = JSON.parse(text.trim());
+            } catch (e) {
+                console.warn("[Plugins] Failed to parse:", e, "\nRaw:", text);
             }
         }
     }

@@ -8,9 +8,9 @@ RippleButtonWithIcon {
     id: root
 
     property var bar
-    readonly property string pos: Mem.options.bar.behavior.position
-    property bool verticalMode: pos === "left" || pos === "right"
+    property bool verticalMode
     property bool reveal: false
+    readonly property string pos: Mem.options.bar.behavior.position
     materialIcon: {
         let dic = {
             "top": "down",
@@ -20,7 +20,6 @@ RippleButtonWithIcon {
         };
         return `keyboard_arrow_${dic[pos]}`;
     }
-    visible: SystemTray.items.length > 1
     implicitSize: 28
     buttonRadius: Rounding.small
     releaseAction: () => reveal = !reveal

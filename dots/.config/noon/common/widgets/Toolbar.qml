@@ -24,11 +24,11 @@ Item {
     //     intensity: 0.25
     // }
 
-    Rectangle {
+    LayerRect {
         id: background
 
         anchors.fill: parent
-        color: Colors.m3.m3surfaceContainer // Needs to be opaque
+        colBackground: Colors.m3.m3surfaceContainer // Needs to be opaque
         implicitHeight: Math.max(toolbarLayout.implicitHeight + root.padding * 2, 56)
         implicitWidth: toolbarLayout.implicitWidth + root.padding * 2
         radius: height / 2

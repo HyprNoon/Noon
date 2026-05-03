@@ -30,6 +30,10 @@ JsonAdapter {
             property bool deload: false
         }
         icons: JO {
+            property int iconSize: 48
+            property int sortMode: 1
+            property bool snapToGrid: true
+            property var positions: []
             property string currentIconTheme: ""
         }
         bg: JO {
@@ -71,7 +75,6 @@ JsonAdapter {
         property JO record
         property JO emojis
         property JO nightLight
-        property JO mediaPlayer
         property JO power
         property JO games
         property JO todo
@@ -80,8 +83,10 @@ JsonAdapter {
         property JO calendar
 
         beats: JO {
+            property int pageIndex: 0
             property var previewData: ({})
             property bool discoverMode: false
+            property bool shuffleTracks: false
             property bool shuffleHits: false
             property int searchLimit: 128
             property list<var> hits: []
@@ -145,7 +150,6 @@ JsonAdapter {
         emojis: JO {
             property list<var> frequentEmojies: []
         }
-        mediaPlayer: JO {}
     }
 
     property JO fonts: JO {
@@ -192,13 +196,42 @@ JsonAdapter {
         }
     }
     property JO favorites: JO {
-        property list<string> apps: ["firefox", "dolphin"]
+        property var apps: [
+            {
+                "appId": "firefox",
+                "gid": null
+            },
+            {
+                "appId": "kitty",
+                "gid": null
+            },
+            {
+                "appId": "obsidian",
+                "gid": null
+            },
+            {
+                "appId": "zen",
+                "gid": null
+            },
+            {
+                "appId": "org.kde.dolphin",
+                "gid": "files"
+            },
+            {
+                "appId": "io.github.Qalculate.qalculate-qt",
+                "gid": "utilities"
+            },
+            {
+                "appId": "systemsettings",
+                "gid": "utilities"
+            },
+            {
+                "appId": "pavucontrol-qt",
+                "gid": "utilities"
+            },
+        ]
         property list<string> recentApps: ["vesktop", "kitty", "spotify", "heroic", "foot", "firefox"]
         property list<string> fastLaunchApps: ["heroic", "codium", "steam"]
         property list<string> desktopApps: ["org.kde.dolphin", "foot"]
-    }
-    property JO mediaPlayer: JO {
-        property string currentTrackPath: ""
-        property list<string> folders: []
     }
 }

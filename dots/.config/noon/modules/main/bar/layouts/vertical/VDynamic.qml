@@ -76,11 +76,11 @@ StyledPanel {
                 target: bg
             }
 
-            StyledRect {
+            ShaderRect {
                 id: bg
                 anchors.fill: parent
                 enableBorders: false
-                color: useBg ? Colors.colLayer0 : "transparent"
+                extraShaderCondition: useBg
 
                 states: [
                     State {

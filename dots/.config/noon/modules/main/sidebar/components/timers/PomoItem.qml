@@ -36,7 +36,7 @@ RippleButton {
             secondaryColor: Colors.m3.m3secondaryContainer
             primaryColor: timer?.color || Colors.m3.m3primary
             Symbol {
-                text: timer?.icon ?? "timer"
+                icon: timer?.icon ?? "timer"
                 anchors.centerIn: parent
                 font.pixelSize: Fonts.sizes.title
                 color: Colors.colOnLayer0

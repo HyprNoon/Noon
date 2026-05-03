@@ -87,6 +87,8 @@ Variants {
                         asynchronous: true
                         source: root.widgetsPath + modelData.component + ".qml"
                         onLoaded: {
+                            if ("window" in _item)
+                                _item.window = Qt.binding(() => root);
                             if ("expanded" in _item) {
                                 _item.expanded = Qt.binding(() => modelData?.expanded ?? false);
                             }

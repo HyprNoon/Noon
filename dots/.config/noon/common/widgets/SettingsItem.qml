@@ -12,11 +12,10 @@ StyledRect {
     property string icon: ""
     property string name: ""
     property string key: ""
-    property string hint: ""
     property string type: "switch"
     property string actionName: ""
     property bool reloadOnChange: false
-    property bool useStates: false
+    property string store: "options"
     property QtObject colors: Colors
     readonly property alias component: mainLoader._item
     property int minValue: 0
@@ -27,33 +26,60 @@ StyledRect {
     property bool fillHeight: false
     property string textPlaceholder: "text"
 
-    signal valueChanged(var newValue)
     signal clicked
+
+    readonly property var configValue: getConfigValue()
 
     readonly property var typeMap: ({
             "spin": {
                 source: "StyledSpinBox",
-                isActive: () => getConfigValue() > minValue
+                isActive: () => root.configValue > root.minValue,
+                props: {
+                    from: root.minValue,
+                    to: root.maxValue,
+                    value: root.configValue
+                }
             },
             "slider": {
                 source: "StyledSlider",
-                isActive: () => getConfigValue() > sliderMinValue,
-                width: 120
+                isActive: () => root.configValue > root.sliderMinValue,
+                width: 120,
+                props: {
+                    from: root.sliderMinValue,
+                    to: root.sliderMaxValue,
+                    value: root.configValue
+                }
             },
             "combobox": {
                 source: "StyledComboBox",
-                width: 165
+                width: 165,
+                props: {
+                    model: root.comboBoxValues,
+                    currentIndex: Math.max(0, root.comboBoxValues.findIndex(v => (v?.name ?? v) === root.configValue))
+                }
             },
             "text": {
                 source: "MaterialTextField",
-                width: 165
+                width: 165,
+                props: {
+                    implicitHeight: 47,
+                    placeholderText: root.textPlaceholder,
+                    text: String(root.configValue ?? "")
+                }
             },
             "field": {
                 source: "MaterialTextField",
-                fillWidth: true
+                fillWidth: true,
+                props: {
+                    placeholderText: root.textPlaceholder,
+                    text: String(root.configValue ?? "")
+                }
             },
             "switch": {
-                source: "StyledSwitch"
+                source: "StyledSwitch",
+                props: {
+                    checked: !!root.configValue
+                }
             },
             "font": {
                 source: "StyledFontSelector"
@@ -63,41 +89,30 @@ StyledRect {
             }
         })
 
-    readonly property var currentType: typeMap[type] ?? typeMap["switch"]
-    readonly property bool isActive: currentType.isActive ? currentType.isActive() : Boolean(getConfigValue())
+    readonly property var currentType: typeMap[type] || typeMap["switch"]
+    readonly property bool isActive: currentType.isActive ? currentType.isActive() : !!root.configValue
     readonly property bool hideTitle: type === "field"
 
     Layout.fillWidth: true
     Layout.fillHeight: fillHeight
     Layout.preferredHeight: (fillHeight && component) ? component.implicitHeight + 2 * Padding.normal : 65
 
-    color: {
-        if (!enabled)
-            return colors.colLayer2Disabled;
-        if (mouseArea.pressed)
-            return colors.colLayer2Active;
-        if (mouseArea.containsMouse)
-            return colors.colLayer2Hover;
-        return colors.colLayer2;
-    }
+    color: !enabled ? colors.colLayer2Disabled : mouseArea.pressed ? colors.colLayer2Active : mouseArea.containsMouse ? colors.colLayer2Hover : colors.colLayer2
 
     function getConfigValue() {
         if (key === "" || !Mem)
             return undefined;
-        return key.split('.').reduce((cur, k) => cur?.[k], useStates ? Mem.states : Mem.options);
+        const base = store === "hypr" ? Mem.hypr : (store === "state" ? Mem.states : Mem.options);
+        return key.split('.').reduce((cur, k) => cur?.[k], base);
     }
 
     function setConfigValue(value) {
         if (key === "" || !Mem)
             return;
         const parts = key.split('.');
-        const target = parts.slice(0, -1).reduce((cur, k) => {
-            if (!cur[k])
-                cur[k] = {};
-            return cur[k];
-        }, useStates ? Mem.states : Mem.options);
+        const base = store === "hypr" ? Mem.hypr : (store === "state" ? Mem.states : Mem.options);
+        const target = parts.slice(0, -1).reduce((cur, k) => cur[k] || (cur[k] = {}), base);
         target[parts[parts.length - 1]] = value;
-        valueChanged(value);
         if (reloadOnChange)
             NoonUtils.requestDialog("assure", {
                 title: "Restart",
@@ -107,36 +122,29 @@ StyledRect {
             });
     }
 
-    function applyToItem(val) {
-        if (!component)
-            return;
-        if ("checked" in component)
-            component.checked = Boolean(val);
-        if ("value" in component)
-            component.value = val;
-        if ("text" in component)
-            component.text = String(val ?? "");
-        if ("currentIndex" in component)
-            component.currentIndex = Math.max(0, comboBoxValues.findIndex(v => (v?.name ?? v) === val));
-    }
-
-    onValueChanged: val => applyToItem(val)
-
     Connections {
-        target: mainLoader._item
+        target: root.component
         ignoreUnknownSignals: true
+
+        function onClicked() {
+            root.setConfigValue(root.component.checked);
+        }
+
         function onMoved() {
-            root.setConfigValue(mainLoader._item.value);
+            root.setConfigValue(root.component.value);
         }
+
         function onValueChanged() {
-            root.setConfigValue(mainLoader._item.value);
+            root.setConfigValue(root.component.value);
         }
-        function onCurrentIndexChanged() {
-            const val = root.comboBoxValues[mainLoader._item.currentIndex];
-            root.setConfigValue(val?.name ?? val ?? "");
-        }
+
         function onEditingFinished() {
-            root.setConfigValue(mainLoader._item.text);
+            root.setConfigValue(root.component.text);
+        }
+
+        function onCurrentIndexChanged() {
+            const val = root.comboBoxValues[root.component.currentIndex];
+            root.setConfigValue(val?.name ?? val ?? "");
         }
     }
 
@@ -146,7 +154,7 @@ StyledRect {
         hoverEnabled: true
         enabled: root.enabled && type === "switch"
         onClicked: {
-            setConfigValue(!getConfigValue());
+            setConfigValue(!root.configValue);
             root.clicked();
             iconAnimation.start();
         }
@@ -180,7 +188,6 @@ StyledRect {
 
                 SequentialAnimation {
                     id: iconAnimation
-                    running: false
                     RotationAnimator {
                         target: iconSymbol
                         from: 0
@@ -206,19 +213,16 @@ StyledRect {
             source: sanitizeSource("", root.currentType.source)
             Layout.fillWidth: root.currentType.fillWidth ?? false
             Layout.minimumWidth: root.currentType.width ?? 0
+            Layout.alignment: Qt.AlignVCenter
             Layout.fillHeight: root.fillHeight
-            onLoaded: if (ready) {
+            onLoaded: {
                 if ("enabled" in item)
-                    item.enabled = root.enabled;
-                if ("from" in item)
-                    item.from = root.type === "spin" ? root.minValue : root.sliderMinValue;
-                if ("to" in item)
-                    item.to = root.type === "spin" ? root.maxValue : root.sliderMaxValue;
-                if ("model" in item)
-                    item.model = root.comboBoxValues;
-                if ("placeholderText" in item)
-                    item.placeholderText = root.textPlaceholder;
-                root.applyToItem(root.getConfigValue());
+                    item.enabled = Qt.binding(() => root.enabled);
+                const props = root.currentType.props || {};
+                Object.keys(props).forEach(prop => {
+                    if (prop in item)
+                        item[prop] = Qt.binding(() => props[prop]);
+                });
             }
         }
     }

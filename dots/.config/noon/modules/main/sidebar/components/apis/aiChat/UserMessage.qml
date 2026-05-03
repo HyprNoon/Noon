@@ -16,7 +16,7 @@ Item {
     property var messageInputField
     property bool enableMouseSelection: false
     property bool renderMarkdown: true
-    property bool editing: false
+    readonly property bool editing: actionBar.editing
 
     anchors.left: parent?.left
     anchors.right: parent?.right
@@ -53,13 +53,14 @@ Item {
         }
 
         WrapperRectangle {
-            Layout.maximumWidth: parent?.width - Padding.massive * 2
+            Layout.maximumWidth: root.width - Padding.huge
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: Padding.huge
             color: Colors.colLayer3
             radius: Rounding.large
             margin: Padding.small
             child: MessageTextBlock {
+                focus: root.editing
                 editing: root.editing
                 renderMarkdown: root.renderMarkdown
                 enableMouseSelection: root.enableMouseSelection
@@ -71,12 +72,11 @@ Item {
         }
 
         MessageActionBar {
+            id: actionBar
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: Padding.massive
             messageIndex: root.messageIndex
             messageData: root.messageData
-            editing: root.editing
-            onEditingChanged: root.editing = editing
         }
     }
 }

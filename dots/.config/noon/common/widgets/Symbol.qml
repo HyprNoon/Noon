@@ -3,6 +3,7 @@ import qs.common
 
 StyledText {
     id: root
+    property alias icon: root.text
     property bool nerd: false
     property real iconSize: Fonts.sizes.small ?? 16
     property real fill: 0

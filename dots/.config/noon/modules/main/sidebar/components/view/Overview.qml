@@ -10,6 +10,9 @@ import Quickshell.Widgets
 import Quickshell.Hyprland
 import Quickshell.Wayland
 
+/*
+    TODO: Migrate Dispachers
+*/
 Item {
     id: root
     property bool expanded: false

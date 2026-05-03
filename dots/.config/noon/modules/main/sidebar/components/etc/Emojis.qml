@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -6,11 +5,10 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
     visible: opacity > 0
     opacity: width > 320 ? 1 : 0
-    color: Colors.colLayer1
     radius: Rounding.verylarge
 
     readonly property int columns: 3
@@ -77,7 +75,7 @@ StyledRect {
                 anchors.fill: parent
                 onReleased: {
                     root.dismiss();
-                    ClipboardService.copy(modelData.emoji);
+                    ClipboardService.manager.copy(modelData.emoji);
                     EmojisService.recordEmojiUse(modelData.emoji);
                 }
             }
@@ -104,7 +102,7 @@ StyledRect {
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0) {
                     const e = model.values[currentIndex].emoji;
-                    ClipboardService.copy(e);
+                    ClipboardService.manager.copy(e);
                     EmojisService.recordEmojiUse(e);
                     root.dismiss();
                 }

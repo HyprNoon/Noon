@@ -27,7 +27,6 @@ Repeater {
             });
 
             loader.visible = Qt.binding(() => item.visible);
-
             if ("bar" in item)
                 item.bar = barRoot;
             if ("verticalMode" in item)

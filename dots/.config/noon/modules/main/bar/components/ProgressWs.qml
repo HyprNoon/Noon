@@ -21,9 +21,9 @@ BarGroup {
         acceptedButtons: Qt.BackButton
         onWheel: event => {
             if (event.angleDelta.y < 0)
-                Hyprland.dispatch(`workspace r+1`);
+                Hyprland.dispatch(`hl.dsp.focus({ workspace = "r+1" })`);
             else if (event.angleDelta.y > 0)
-                Hyprland.dispatch(`workspace r-1`);
+                Hyprland.dispatch(`hl.dsp.focus({ workspace = "r-1" })`);
         }
     }
 

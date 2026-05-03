@@ -1,5 +1,4 @@
 import QtQuick
-import Noon.Services
 import Quickshell
 import Quickshell.Services.Mpris
 import qs.common
@@ -13,7 +12,9 @@ import qs.store
 Scope {
     IpcHandler {
         target: "global"
-
+        function build_shaders(): void {
+            Shaders.rebuild();
+        }
         function open_note(fileName: string): void {
             NotesService.openNote(fileName);
         }
@@ -24,10 +25,10 @@ Scope {
             GlobalStates.main.showScreenshot = !GlobalStates.main.showScreenshot;
         }
 
-        function pronounce(text: string): void {
+        function say(text: string): void {
             if (!text)
                 return;
-            TtsService.pronounce(text);
+            SpeechService.say(text);
         }
 
         function thawb(link: string) {
@@ -46,8 +47,12 @@ Scope {
         function deload() {
             Mem.states.desktop.shell.deload = true;
         }
-        function toast(content: string, state: string) {
-            NoonUtils.toast(content, "check", state);
+        function toast(info: string, state: string) {
+            NoonUtils.toast({
+                id: 0,
+                content: info,
+                status: state ?? ""
+            });
         }
         function inc_brightness() {
             BrightnessService.increaseBrightness();
@@ -56,7 +61,7 @@ Scope {
             BrightnessService.decreaseBrightness();
         }
         function clear_clipboard() {
-            ClipboardService.wipe();
+            ClipboardService.manager.wipe();
         }
         function refresh_appearance() {
             WallpaperService.refreshTheme();
@@ -66,14 +71,22 @@ Scope {
         }
         function pick_accent() {
             WallpaperService.pickAccentColor();
-            NoonUtils.toast("Color Changed", "palette");
+            NoonUtils.toast({
+                id: 1,
+                content: "Color Changed",
+                icon: "palette"
+            });
         }
         function pick_random_wall() {
             WallpaperService.applyRandomWallpaper();
         }
         function set_wall(path: string) {
             WallpaperService.applyWallpaper(path);
-            NoonUtils.toast("Wallpaper Changed", "image");
+            NoonUtils.toast({
+                id: 2,
+                content: "Wallpaper Changed",
+                icon: "image"
+            });
         }
         function todoist_key(key: string) {
             const trimmed = key.trim();
@@ -86,7 +99,7 @@ Scope {
             AlarmService.addTimer(time, name);
         }
         function wake(message: string) {
-            NoonUtils.wake(message, "alarm");
+            NoonUtils.wake(message);
         }
 
         function edit_json() {
@@ -134,7 +147,13 @@ Scope {
     IpcHandler {
         target: "mirsal"
         function feedBookmarks(content: string) {
-            const data = JSON.parse(JSON.parse(content));
+            var data;
+            try {
+                data = JSON.parse(JSON.parse(content));
+            } catch (e) {
+                console.error("Failed to parse bookmarks: ", e);
+                return;
+            }
             Mem.states.services.bookmarks.firefoxBookmarks = data;
         }
 
@@ -146,7 +165,14 @@ Scope {
         // }
 
         function feedDownloadInfo(text: string): void {
-            const parsed = JSON.parse(text);
+            let parsed;
+            try {
+                parsed = JSON.parse(text);
+            } catch (e) {
+                console.error("Failed to parse download info: ", e);
+                return;
+            }
+
             const data = parsed.data;
             const headers = JSON.stringify(data.headers);
             console.log("[Mirsal] Download Requested: ", headers);

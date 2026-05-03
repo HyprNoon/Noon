@@ -4,6 +4,7 @@ import Noon.Utils
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.store
 import qs.common
 import qs.common.utils
 import qs.common.functions
@@ -23,11 +24,12 @@ Singleton {
     readonly property var modelList: states.models ?? []
     readonly property string currentModelId: states.model
     readonly property var skills: states.skills
+    readonly property var modelPoses: posesView.data
 
     property var sessions: []
     property var messageIDs: []
-    property var messageByID: ({})
     property var messageQueue: []
+    property var messageByID: ({})
     property string pendingSkillName: ""
     property string pendingFilePath: ""
     property var postResponseHook
@@ -35,7 +37,9 @@ Singleton {
     function idForMessage(message) {
         return Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
     }
-
+    function openInTerm(sessionId = root.states.currentSessionId) {
+        NoonUtils.runInTerminal(`opencode -s '${sessionId}'`);
+    }
     function addMessage(message, role) {
         if (message.length === 0)
             return;
@@ -220,6 +224,12 @@ Singleton {
     }
 
     Process {
+        id: openCodeServer
+        running: true
+        command: ["opencode", "serve", "--port", "4096", "--hostname", "127.0.0.1"]
+    }
+
+    Process {
         id: skillsDiscovery
         running: true
         command: ["sh", "-c", "grep -rPl '^name:\\s*\\S+' " + Directories.services.skills + " --include='SKILL.md' | xargs -n1 dirname | xargs -n1 basename"]
@@ -306,26 +316,18 @@ Singleton {
         }
     }
 
-    Process {
+    Item {
         id: requester
         property AiMessageData message
-
-        function buildCommand(userMessage) {
-            let flags = "--format json";
-            if (root.pendingSkillName.length > 0) {
-                userMessage += " , using skill " + root.pendingSkillName;
-                root.pendingSkillName = "";
-            }
-            if (root.pendingFilePath.length > 0)
-                flags += ` -f ${root.pendingFilePath}`;
-            if (root.currentModelId.length > 0)
-                flags += ` -m ${root.currentModelId}`;
-            if (root.currentSessionId.length > 0)
-                flags += ` -s ${root.currentSessionId}`;
-            return ["sh", "-c", `opencode run '${userMessage}' ${flags} < /dev/null`];
-        }
+        property bool startedReasoning: false
+        property bool running: false
+        property int lastProcessedIndex: 0
 
         function makeRequest(userMessage) {
+            requester.running = true;
+            requester.startedReasoning = false;
+            requester.lastProcessedIndex = 0;
+
             requester.message = root.aiMessageComponent.createObject(root, {
                 "role": "assistant",
                 "content": "",
@@ -333,57 +335,106 @@ Singleton {
                 "thinking": true,
                 "done": false
             });
+
             const id = root.idForMessage(requester.message);
-            root.pendingFilePath = "";
             root.messageIDs = [...root.messageIDs, id];
             root.messageByID[id] = requester.message;
-            requester.command = buildCommand(userMessage);
-            requester.running = true;
+
+            const sessionId = root.currentSessionId || "default";
+            const xhr = new XMLHttpRequest();
+
+            let body = {
+                "parts": [
+                    {
+                        "type": "text",
+                        "text": userMessage
+                    }
+                ]
+            };
+
+            if (root.currentModelId.length > 0) {
+                const modelParts = root.currentModelId.split("/");
+                body["model"] = {
+                    "providerID": modelParts.length > 1 ? modelParts[0] : "opencode",
+                    "modelID": modelParts.length > 1 ? modelParts.slice(1).join("/") : modelParts[0]
+                };
+            }
+
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+                    const responseText = xhr.responseText;
+                    const newContent = responseText.substring(requester.lastProcessedIndex);
+                    requester.lastProcessedIndex = responseText.length;
+                    processChunks(newContent);
+                }
+
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    requester.running = false;
+                    markDone();
+                }
+            };
+
+            xhr.open("POST", `http://127.0.0.1:4096/session/${sessionId}/message`);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(body));
+        }
+
+        function processChunks(chunkData) {
+            const lines = chunkData.split(/\r?\n/);
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith("<"))
+                    return;
+
+                try {
+                    const event = JSON.parse(trimmed);
+                    if (event.parts) {
+                        event.parts.forEach(p => {
+                            if (p.type === "reasoning" && p.text) {
+                                requester.message.thinking = false;
+                                if (!requester.startedReasoning) {
+                                    requester.message.content += "<think>";
+                                    requester.startedReasoning = true;
+                                }
+                                requester.message.content += p.text;
+                            } else if (p.type === "text" && p.text) {
+                                requester.message.thinking = false;
+                                if (requester.startedReasoning) {
+                                    requester.message.content += "</think>";
+                                    requester.startedReasoning = false;
+                                }
+                                requester.message.content += p.text;
+                                requester.message.rawContent += p.text;
+                            }
+                        });
+                    }
+                    if (event.info && event.info.done)
+                        markDone();
+                } catch (e) {}
+            });
         }
 
         function markDone() {
+            if (!requester.message || requester.message.done)
+                return;
+
+            if (requester.startedReasoning) {
+                requester.message.content += "</think>";
+                requester.startedReasoning = false;
+            }
+
             requester.message.done = true;
             requester.message.thinking = false;
-            if (root.postResponseHook) {
-                root.postResponseHook();
-                root.postResponseHook = null;
-            }
+
             refreshSessions();
             root.responseFinished();
             root.processQueue();
         }
+    }
 
-        stdout: SplitParser {
-            onRead: data => {
-                const event = JSON.parse(data);
-                if (event.sessionID && root.currentSessionId.length === 0)
-                    root.states.currentSessionId = event.sessionID;
-                if (requester.message.thinking)
-                    requester.message.thinking = false;
-                switch (event.type) {
-                case "text":
-                    requester.message.rawContent += event.part.text;
-                    requester.message.content += event.part.text;
-                    break;
-                case "step_finish":
-                    const tokens = event.part.tokens;
-                    if (tokens) {
-                        root.tokenCount.input = tokens.input;
-                        root.tokenCount.output = tokens.output;
-                        root.tokenCount.total = tokens.total;
-                    }
-                    if (event.part.reason === "stop")
-                        requester.markDone();
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-
-        onExited: exitCode => {
-            if (!requester.message.done && exitCode === 0)
-                requester.markDone();
-        }
+    ConfigFileView {
+        id: posesView
+        fileName: "poses"
+        adapter: PosesSchema {}
     }
 }

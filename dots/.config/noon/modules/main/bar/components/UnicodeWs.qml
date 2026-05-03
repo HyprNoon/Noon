@@ -22,7 +22,7 @@ BarGroup {
         anchors.fill: parent
         onWheel: event => {
             const dir = event.angleDelta.y < 0 ? "+1" : "-1";
-            Hyprland.dispatch(`workspace r${dir}`);
+            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r${dir}" })`);
         }
     }
 

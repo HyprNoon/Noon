@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import Noon.Utils
 import Quickshell
 import Quickshell.Io
 import Qt.labs.platform
@@ -12,6 +13,7 @@ Singleton {
     id: root
 
     property string selectedLocation: ""
+    readonly property bool developmentMode: true
     readonly property bool enablePlugins: true
     readonly property alias sidebarPlugins: sidebar?.plugins
     readonly property alias dockPlugins: dock?.plugins
@@ -82,6 +84,12 @@ Singleton {
         actionProc.running = true;
     }
 
+    QmlCrawler {
+        enabled: root.developmentMode
+        folder: Qt.resolvedUrl(Directories.plugins.main)
+        onContentsChanged: Quickshell.reload(true)
+    }
+
     FileDialog {
         id: selectionDialog
         title: "Select Plugin Dir"
@@ -91,19 +99,21 @@ Singleton {
             NoonUtils.callIpc("sidebar reveal Plugins");
         }
     }
-
+    function refreshAll() {
+        dock.refresh();
+        sidebar.refresh();
+        beam.refresh();
+    }
     Process {
         id: actionProc
         onStarted: console.log(command.join())
-        onExited: NoonUtils.callIpc("plugins reload")
+        onExited: refreshAll()
     }
 
     IpcHandler {
         target: "plugins"
         function reload(): void {
-            dock.refresh();
-            sidebar.refresh();
-            beam.refresh();
+            root.refreshAll();
         }
     }
 }

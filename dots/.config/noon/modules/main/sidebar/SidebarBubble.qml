@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -93,7 +92,7 @@ Item {
                     {
                         "icon": "globe",
                         "action": () => {
-                            Ai.resumeInWeb(Ai.currentSessionId);
+                            Ai.openInTerm();
                         }
                     }
                 ]
@@ -137,7 +136,7 @@ Item {
                     {
                         "icon": "clear_all",
                         "action": () => {
-                            ClipboardService.wipe();
+                            ClipboardService.manager.wipe();
                         }
                     }
                 ]
@@ -193,14 +192,12 @@ Item {
             action: () => sidebar.pinned = !sidebar.pinned
         },
         {
-            icon: getExpandIcon(),
+            icon: "expand_content",
+            toggled: sidebar.expanded,
             action: () => sidebar.expanded = !sidebar.expanded
         }
     ]
-    function getExpandIcon() {
-        const direction = (root.sidebar.rightMode && !root.sidebar.expanded) || (!root.sidebar.rightMode && root.sidebar.expanded) ? "left" : "right";
-        return `keyboard_double_arrow_${direction}`;
-    }
+
     visible: bg.width > 0
     width: show ? 55 : 0
     clip: true
@@ -246,6 +243,7 @@ Item {
                         }
 
                         RippleButtonWithIcon {
+                            toggled: modelData.toggled ?? false
                             colors: root.colors
                             visible: modelData?.extraVisibleCondition ?? true
                             Layout.fillWidth: true
@@ -267,6 +265,7 @@ Item {
                     colors: root.colors
                     Layout.fillWidth: true
                     visible: modelData?.visible ?? true
+                    toggled: modelData.toggled ?? false
                     enabled: modelData?.enabled ?? true
                     materialIcon: modelData?.icon
                     releaseAction: modelData?.action

@@ -213,8 +213,4 @@ Singleton {
         const fileName = getEscapedFileName(item);
         NoonUtils.execDetached(`mv ${trimFileProtocol(item)} ${trimFileProtocol(target)}/${fileName}`);
     }
-    function deleteItem(path: string) {
-        if (path)
-            NoonUtils.execDetached(`rm -rf "${trimFileProtocol(path)}"`);
-    }
 }

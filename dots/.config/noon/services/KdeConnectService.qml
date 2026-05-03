@@ -167,7 +167,11 @@ Singleton {
             filePicker.open();
         } else {
             _run(["--device", id, "--share", path]);
-            NoonUtils.toast("Sharing..", "share");
+            NoonUtils.toast({
+                id: 8,
+                content: "Sharing..",
+                icon: "share"
+            });
         }
     }
 

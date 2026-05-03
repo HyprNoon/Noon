@@ -156,9 +156,8 @@ Item {
             Layout.leftMargin: Padding.large
         }
     }
-    component Group: StyledRect {
+    component Group: LayerRect {
         Layout.fillWidth: true
         radius: Rounding.verylarge
-        color: Colors.colLayer1
     }
 }

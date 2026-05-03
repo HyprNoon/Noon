@@ -17,8 +17,7 @@ Button {
     implicitWidth: columnLayout.implicitWidth
     background: null
 
-    PointingHandInteraction {
-    }
+    PointingHandInteraction {}
 
     // Real stuff
     ColumnLayout {
@@ -43,19 +42,13 @@ Button {
                 color: toggled ? Colors.m3.m3onSecondaryContainer : Colors.colOnLayer1
 
                 Behavior on color {
-                    CAnim {
-                    }
-
+                    CAnim {}
                 }
-
             }
 
             Behavior on color {
-                CAnim {
-                }
-
+                CAnim {}
             }
-
         }
 
         StyledText {
@@ -63,7 +56,5 @@ Button {
             text: buttonText
             color: Colors.colOnLayer1
         }
-
     }
-
 }

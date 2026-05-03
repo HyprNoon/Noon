@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.common
 import qs.common.widgets
+import qs.common.functions
 import qs.services
 
 StyledRect {
@@ -77,7 +78,7 @@ StyledRect {
                     if (isAdd) {
                         BeatsService.addNewFolder();
                     } else {
-                        Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
+                        // Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
                     }
                 }
                 altAction: () => {
@@ -126,6 +127,13 @@ StyledRect {
                             icon: "search",
                             action: () => {
                                 isSearching = !isSearching;
+                            }
+                        },
+                        {
+                            icon: "shuffle",
+                            toggled: Mem.states.services.beats.shuffleTracks,
+                            action: () => {
+                                Mem.states.services.beats.shuffleTracks = !Mem.states.services.beats.shuffleTracks;
                             }
                         },
                         {

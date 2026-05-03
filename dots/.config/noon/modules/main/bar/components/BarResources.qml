@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -35,7 +34,7 @@ ColumnLayout {
             Layout.fillWidth: true
             visible: modelData.percentage > 0.01
             Symbol {
-                text: modelData.iconName
+                icon: modelData.iconName
                 color: Colors.colOnLayer0
                 fill: 1
                 font.pixelSize: 12

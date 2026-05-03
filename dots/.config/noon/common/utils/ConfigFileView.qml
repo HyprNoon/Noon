@@ -1,35 +1,44 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import qs.common
 
 FileView {
     id: root
 
-    required property string filePath
-    property bool autoCreateOnError: true
     property string fileName
-    property alias data: root.adapter
-    property Timer reloadTimer: timer.createObject(root)
     property bool state: true
-    property Component timer
 
-    filePath: (state ? Directories.standard.state + "/" : Directories.shellConfigs) + fileName + ".json"
+    readonly property alias data: root.adapter
+    readonly property Timer reloadTimer: Timer {
+        interval: 20
+        onTriggered: root.reload()
+    }
+
+    signal contentChanged
+
     preload: true
     printErrors: true
     watchChanges: true
-    path: filePath
-    onFileChanged: reloadTimer.restart()
-    onAdapterUpdated: root.writeAdapter()
+
+    path: {
+        const parent = state ? Directories.standard.state : Directories.shellConfigs;
+        return parent + "/" + fileName + ".json";
+    }
+
+    onFileChanged: {
+        contentChanged();
+        reloadTimer.restart();
+    }
+
+    onAdapterUpdated: {
+        root.writeAdapter();
+        contentChanged();
+    }
+
     onLoadFailed: error => {
-        if (autoCreateOnError && error === FileViewError.FileNotFound)
+        if (error === FileViewError.FileNotFound)
             root.writeAdapter();
     }
     adapter: children[0] ?? null
-
-    timer: Timer {
-        id: reloadTimer
-
-        interval: 100
-        onTriggered: root.reload()
-    }
 }

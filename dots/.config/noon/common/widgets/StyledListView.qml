@@ -25,6 +25,7 @@ ListView {
     property bool fasterInteractions: Mem.options.interactions.scrolling.fasterTouchpadScroll
     property var _model
     // Accumulated scroll destination so wheel deltas stack while animating
+    property alias hinter: hinter
     property real scrollTargetY: 0
     property real touchpadScrollFactor: Mem.options.interactions.scrolling.touchpadScrollFactor ?? 100
     property real mouseScrollFactor: Mem.options.interactions.scrolling.mouseScrollFactor ?? 50
@@ -51,6 +52,7 @@ ListView {
     layer.enabled: root.clip
 
     ScrollEdgeFade {
+        id: hinter
         anchors.margins: -parent?.anchors.margins
         visible: root.hint
         target: root

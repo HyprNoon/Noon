@@ -1,4 +1,8 @@
 import QtQuick
+import QtQuick.Effects
+import Qt5Compat.GraphicalEffects
+import QtQuick.Controls
+import QtQuick.Controls.Material
 import QtQuick.Layouts
 import qs.services
 import qs.common
@@ -13,11 +17,11 @@ SquareComponent {
     readonly property string today: DateTimeService.request("D/M/yyyy")
     Component.onCompleted: CalendarService.pull()
     function formatTasks() {
-        const data = TodoService.list;
+        const data = TodoService?.list;
         return data.map(item => {
             return {
-                content: item.content,
-                start: item.due + '/' + DateTimeService.year,
+                content: item?.content ?? "",
+                start: item?.due + '/' + DateTimeService.year ?? "",
                 isTask: true
             };
         });
@@ -158,33 +162,25 @@ SquareComponent {
                         id: dayButton
                         readonly property int row: Math.floor(index / 7)
                         readonly property int col: index % 7
+                        window: root.window
                         day: calendarLayout[row][col].day
                         isToday: calendarLayout[row][col].today
-                        releaseAction: () => {
-                            CalendarService.pull();
-                        }
-                        StyledToolTip {
-                            color: Colors.colLayer1
-                            textArea.font.pixelSize: Fonts.sizes.small
-                            content: {
-                                if (dayButton.hovered) {
-                                    const day = dayButton.day;
-                                    if (!day)
-                                        return "";
-                                    const date = DateTimeService.request(`${day}/M/yyyy`);
-                                    const events = root.getTasksOfDate(date);
-                                    const text = events.map(event => event.content).join('\n');
-                                    if (text.length > 0)
-                                        return text;
-                                    else
-                                        return "No Events in day " + day;
-                                } else
-                                    return "";
-                            }
-                        }
+                        getTasksOfDate: root.getTasksOfDate
+                        releaseAction: () => CalendarService.pull()
                     }
                 }
             }
         }
+    }
+    component ItemSeparator: Rectangle {
+        Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
+        Layout.leftMargin: Padding.massive
+        Layout.rightMargin: Padding.massive
+
+        visible: index !== tasksRepeater.count - 1
+        color: Colors.colLayer3
+        radius: 6
+        height: 1
     }
 }

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "defs": {
+    "md_bg": "{{colors.surface.default.hex}}",
+    "md_surface_dim": "{{colors.surface_dim.default.hex}}",
+    "md_surface_bright": "{{colors.surface_bright.default.hex}}",
+    "md_panel": "{{colors.surface_container.default.hex}}",
+    "md_panel_high": "{{colors.surface_container_high.default.hex}}",
+    "md_panel_highest": "{{colors.surface_container_highest.default.hex}}",
+    "md_primary": "{{colors.primary.default.hex}}",
+    "md_on_primary": "{{colors.on_primary.default.hex}}",
+    "md_primary_container": "{{colors.primary_container.default.hex}}",
+    "md_secondary": "{{colors.secondary.default.hex}}",
+    "md_tertiary": "{{colors.tertiary.default.hex}}",
+    "md_outline": "{{colors.outline.default.hex}}",
+    "md_outline_variant": "{{colors.outline_variant.default.hex}}",
+    "md_text": "{{colors.on_surface.default.hex}}",
+    "md_text_variant": "{{colors.on_surface_variant.default.hex}}"
+  },
+  "theme": {
+    "primary": {
+      "dark": "md_primary",
+      "light": "md_primary"
+    },
+    "secondary": {
+      "dark": "md_secondary",
+      "light": "md_secondary"
+    },
+    "accent": {
+      "dark": "md_tertiary",
+      "light": "md_tertiary"
+    },
+    "text": {
+      "dark": "md_text",
+      "light": "md_text"
+    },
+    "textMuted": {
+      "dark": "md_text_variant",
+      "light": "md_text_variant"
+    },
+    "background": {
+      "dark": "md_bg",
+      "light": "md_surface_bright"
+    },
+    "backgroundPanel": {
+      "dark": "md_panel",
+      "light": "md_panel"
+    },
+    "backgroundElement": {
+      "dark": "md_panel_high",
+      "light": "md_panel_highest"
+    },
+    "border": {
+      "dark": "md_outline",
+      "light": "md_outline"
+    },
+    "borderSubtle": {
+      "dark": "md_outline_variant",
+      "light": "md_outline_variant"
+    },
+    "markdownHeading": {
+      "dark": "md_primary",
+      "light": "md_primary"
+    },
+    "markdownCodeBlock": {
+      "dark": "md_surface_dim",
+      "light": "md_panel"
+    },
+    "syntaxKeyword": {
+      "dark": "md_primary",
+      "light": "md_primary"
+    },
+    "syntaxString": {
+      "dark": "md_tertiary",
+      "light": "md_tertiary"
+    },
+    "syntaxComment": {
+      "dark": "md_text_variant",
+      "light": "md_text_variant"
+    }
+  }
+}

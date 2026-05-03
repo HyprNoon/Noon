@@ -227,7 +227,7 @@ def list_bookmarks():
 def open_url(url):
     """Open URL in existing Firefox instance or new tab."""
     try:
-        subprocess.run(["xdg-open", url], check=True, capture_output=True, timeout=5)
+        subprocess.run(["gio", "open", url], check=True, capture_output=True, timeout=5)
         print(json.dumps({"success": True, "url": url}, indent=2))
     except subprocess.TimeoutExpired:
         print(json.dumps({"success": True, "url": url}, indent=2))

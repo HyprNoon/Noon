@@ -10,25 +10,17 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 
-GroupButton {
+DockButton {
     id: root
 
-    property var appToplevel
-    property var appListRoot
     property int lastFocused: -1
-    property real iconSize: Mem.options.dock.appearance.iconSize
     property real countDotWidth: 10
-    property real countDotHeight: 3
-    property bool appIsActive: appToplevel.toplevels.find(t => (t.activated == true)) !== undefined
 
-    property bool isSeparator: appToplevel.appId === "SEPARATOR"
     property var desktopEntry: DesktopEntries.byId(appToplevel.appId)
     enabled: !isSeparator
-    baseSize: iconSize
     width: isSeparator ? 1 : implicitWidth
-    Layout.fillHeight: true
-    buttonRadius: Rounding.normal
     colBackground: "transparent"
+
     Loader {
         active: isSeparator
         anchors {
@@ -39,11 +31,18 @@ GroupButton {
         sourceComponent: DockSeparator {}
     }
 
+    StyledToolTip {
+        bg.enableBorders: true
+        bg.color: Colors.colLayer1
+        bg.anchors.bottomMargin: root.iconSize / 10
+        extraVisibleCondition: !root.isSeparator
+        content: appToplevel.appId
+    }
+
     Loader {
         anchors.fill: parent
         active: appToplevel.toplevels.length > 0
         sourceComponent: MouseArea {
-            id: mouseArea
             anchors.fill: parent
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
@@ -53,13 +52,15 @@ GroupButton {
                 lastFocused = appToplevel.toplevels.length - 1;
             }
             onExited: {
-                if (appListRoot.lastHoveredButton === root) {
+                if (appListRoot.lastHoveredButton === root)
                     appListRoot.buttonHovered = false;
-                }
             }
         }
     }
+
     releaseAction: () => {
+        if (dragHandlerActive)
+            return;
         if (appToplevel.toplevels.find(item => item.id === appToplevel.toplevels[lastFocused].id)) {
             appToplevel.toplevels[lastFocused].activate();
             return;
@@ -72,17 +73,25 @@ GroupButton {
     middleClickAction: () => {
         root.desktopEntry?.execute();
     }
+
     altAction: () => {
-        if (Mem.states.favorites.apps.indexOf(appToplevel.appId) !== -1) {
-            Mem.states.favorites.apps = Mem.states.favorites.apps.filter(id => id !== appToplevel.appId);
+        if (Mem.states.favorites.apps.find(a => a.appId === appToplevel.appId)) {
+            Mem.states.favorites.apps = Mem.states.favorites.apps.filter(a => a.appId !== appToplevel.appId);
         } else {
-            Mem.states.favorites.apps = Mem.states.favorites.apps.concat([appToplevel.appId]);
+            Mem.states.favorites.apps = Mem.states.favorites.apps.concat([
+                {
+                    appId: appToplevel.appId,
+                    gid: null
+                }
+            ]);
         }
     }
+
     contentItem: Loader {
         active: !isSeparator
         sourceComponent: Item {
             anchors.fill: parent
+
             Loader {
                 id: iconImageLoader
                 anchors.centerIn: parent
@@ -90,7 +99,6 @@ GroupButton {
                 width: root.iconSize - Padding.large
                 height: root.iconSize - Padding.large
                 sourceComponent: StyledIconImage {
-                    id: iconImage
                     cache: false
                     source: NoonUtils.iconPath(root.desktopEntry ? (root.desktopEntry.icon || root.desktopEntry.genericIcon || "applications-system") : appToplevel.appId)
                 }
@@ -100,7 +108,6 @@ GroupButton {
                 spacing: 2
                 height: countDotHeight
                 width: countDotWidth * Math.min(appToplevel.toplevels.length, 2)
-
                 anchors {
                     top: iconImageLoader.bottom
                     topMargin: countDotHeight

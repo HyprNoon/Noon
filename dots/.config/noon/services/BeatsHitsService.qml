@@ -13,8 +13,9 @@ Singleton {
     readonly property int searchLimit: Mem.options.mediaPlayer.fetchLimit ?? 18
     property int _limit: searchLimit
     property var searchResults
-
+    property string lastQuery: ""
     function search(query, limit = _limit) {
+        lastQuery = query;
         _limit = limit;
         var cmd = ["uv", "--directory", Directories.venv, "run", Directories.scriptsDir + "/hits_service.py", "search", "--query", query, "--limit", limit];
         root.searchResults = null;

@@ -8,6 +8,7 @@ import QtQuick.Effects
 
 Rectangle {
     id: root
+    readonly property int diaglonal: Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
     property bool enableShadows: false
     property bool enableBorders: false
     property int rightRadius
@@ -57,6 +58,16 @@ Rectangle {
         }
     }
     Behavior on height {
+        Anim {
+            duration: animationDuration
+        }
+    }
+    Behavior on scale {
+        Anim {
+            duration: animationDuration
+        }
+    }
+    Behavior on y {
         Anim {
             duration: animationDuration
         }

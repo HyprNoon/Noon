@@ -1,4 +1,3 @@
-import Noon.Services
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -7,11 +6,10 @@ import qs.common.functions
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
     visible: opacity > 0
     opacity: width > 320 ? 1 : 0
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
     property string searchQuery: ""
@@ -19,12 +17,6 @@ StyledRect {
     signal searchFocusRequested
     signal contentFocusRequested
     signal dismiss
-
-    Connections {
-        target: ClipboardService
-        function onEntriesRefreshed() {
-        }
-    }
 
     onContentFocusRequested: {
         if (listView.count > 0) {
@@ -37,26 +29,15 @@ StyledRect {
     ScriptModel {
         id: filteredModel
         values: {
-            const entries = ClipboardService.entries;
+            const entries = ClipboardService.manager.entries;
             if (!entries.length)
                 return [];
 
-            // Create simple data objects
-            let items = [];
-            for (let i = 0; i < entries.length; i++) {
-                items.push({
-                    index: i,
-                    text: entries[i],
-                    isImage: ClipboardService.isImage(i)
-                });
-            }
-
-            // Filter by search query
             const query = root.searchQuery.trim().toLowerCase();
             if (!query)
-                return items;
+                return entries;
 
-            return items.filter(item => item.text.toLowerCase().includes(query));
+            return entries.filter(item => item.text.toLowerCase().includes(query));
         }
     }
 
@@ -112,7 +93,7 @@ StyledRect {
                 StyledImage {
                     anchors.fill: parent
                     anchors.margins: 4
-                    source: "file://" + ClipboardService.getImagePath(itemData.index)
+                    source: "file://" + itemData.imagePath
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     cache: false
@@ -147,7 +128,7 @@ StyledRect {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        ClipboardService.copyByIndex(itemData.index);
+                        ClipboardService.manager.copyByIndex(itemData.index);
                         NoonUtils.playSound("event_accepted");
                         root.dismiss();
                     }
@@ -174,7 +155,7 @@ StyledRect {
                 colTitle: !hovered && isColor ? ColorUtils.getReadableColOn(colBackground) : colors.colOnLayer2
                 colSubtext: !hovered && isColor ? ColorUtils.colorWithLightness(colTitle, 0.2) : colors.colSubtext
                 releaseAction: () => {
-                    ClipboardService.copyByIndex(itemData.index);
+                    ClipboardService.manager.copyByIndex(itemData.index);
                     NoonUtils.playSound("event_accepted");
                     root.dismiss();
                 }
@@ -198,14 +179,14 @@ StyledRect {
                 event.accepted = true;
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0 && currentIndex < model.values.length) {
-                    ClipboardService.copyByIndex(model.values[currentIndex].index);
+                    ClipboardService.manager.copyByIndex(model.values[currentIndex].index);
                     NoonUtils.playSound("event_accepted");
                     root.dismiss();
                 }
                 event.accepted = true;
             } else if (event.key === Qt.Key_Delete) {
                 if (currentIndex >= 0 && currentIndex < model.values.length) {
-                    ClipboardService.deleteEntry(model.values[currentIndex].index);
+                    ClipboardService.manager.deleteEntry(model.values[currentIndex].index);
                     if (currentIndex >= count) {
                         currentIndex = count - 1;
                     }

@@ -102,7 +102,7 @@ StyledRect {
             id: content
             Layout.fillWidth: true
             Layout.fillHeight: true
-            SpotifyLyrics {
+            LiveLyrics {
                 id: activeLyrics
             }
 
@@ -161,9 +161,8 @@ StyledRect {
             }
 
             StyledRectangularShadow {
-                visible: root.expanded
                 target: queue
-                intensity: 0.4
+                intensity: 0.45
             }
         }
     }

@@ -7,8 +7,8 @@ import qs.services
 BarGroup {
     id: root
 
-    implicitHeight: 80
-    implicitWidth: 80
+    implicitHeight: 70
+    implicitWidth: 70
 
     // visible: BatteryService.available
 
@@ -25,10 +25,9 @@ BarGroup {
 
     ClippedProgressBar {
         id: batteryProgress
-        anchors.margins: Padding.verysmall
+        anchors.margins: Padding.small
         anchors.fill: parent
         vertical: root.verticalMode
-
         value: BatteryService.percentage
         trackColor: Colors.colLayer3
         highlightColor: (BatteryService.percentage <= Mem.options.battery.low / 100 && !BatteryService.isCharging) ? Colors.m3.m3error : Colors.colPrimary

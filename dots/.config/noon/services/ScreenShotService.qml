@@ -27,7 +27,12 @@ Singleton {
     signal screenshotCompleted(string path)
 
     onScreenshotCompleted: {
-        NoonUtils.toast("Screen Shot Saved", "camera", "success");
+        NoonUtils.toast({
+            id: 10,
+            content: "Screen Shot Saved",
+            icon: "camera",
+            status: "success"
+        });
     }
     function delete_temp(): void {
         NoonUtils.execDetached("rm -rf " + tempPath);

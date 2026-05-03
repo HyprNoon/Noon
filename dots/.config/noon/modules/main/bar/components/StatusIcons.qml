@@ -1,4 +1,3 @@
-import Noon.Services
 import Qt5Compat.GraphicalEffects
 import QtNetwork
 import QtQuick
@@ -73,7 +72,7 @@ BarGroup {
             model: root.content.filter(item => item.visible ?? true)
 
             delegate: Symbol {
-                text: modelData.icon || ""
+                icon: modelData.icon || ""
                 color: Colors.colSecondary
                 font.pixelSize: Fonts.sizes.verylarge
                 fill: 1

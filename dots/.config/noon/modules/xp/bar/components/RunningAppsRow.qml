@@ -25,7 +25,7 @@ Item {
         contentHeight: childrenRect.height
         ScrollBar.vertical.policy: ScrollBar.AlwaysOff
         RowLayout {
-            spacing: - XPadding.tiny
+            spacing: -XPadding.tiny
             anchors.fill: parent
             Repeater {
                 model: appData
@@ -47,17 +47,17 @@ Item {
                         hoverEnabled: true
                         onPressed: event => {
                             switch (event.button) {
-                                case Qt.LeftButton:
-                                    modelData.activate();
-                                    break;
-                                case Qt.RightButton:
-                                    appMenu.popup();
-                                    break;
-                                case Qt.MiddleButton:
-                                    modelData.close();
-                                    break;
-                                default:
-                                    modelData.activate();
+                            case Qt.LeftButton:
+                                modelData.activate();
+                                break;
+                            case Qt.RightButton:
+                                appMenu.popup();
+                                break;
+                            case Qt.MiddleButton:
+                                modelData.close();
+                                break;
+                            default:
+                                modelData.activate();
                             }
                         }
                     }
@@ -66,18 +66,18 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: XPadding.large
                         anchors.rightMargin: XPadding.large
-                        spacing: XPadding.normal
+
                         StyledIconImage {
                             implicitSize: 24
                             source: NoonUtils.iconPath(modelData.appId)
                         }
                         StyledText {
-                            Layout.maximumWidth: rect.width * 0.6
+                            truncate: true
+                            horizontalAlignment: Text.AlignLeft
+                            Layout.fillWidth: true
+                            Layout.rightMargin: XPadding.large
                             text: modelData.title
                             color: XColors.colors.colOnSecondary
-                            elide: Text.ElideRight
-                            wrapMode: Text.Wrap
-                            maximumLineCount: 1
                         }
                     }
                 }

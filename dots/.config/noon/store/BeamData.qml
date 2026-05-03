@@ -1,5 +1,4 @@
 pragma Singleton
-import Noon.Services
 import QtQuick
 import Quickshell
 
@@ -34,6 +33,7 @@ Singleton {
     property var registry: rebuildRegistry()
     readonly property var pluginsContent: PluginsManager?.beamPlugins
     readonly property var rawBeamPlugins: PluginsManager?.beamPlugins
+    readonly property list<string> availableAnimationStyles: ["slidebottom", "overshoot", "morphIn", "expo", "springPop"]
     onRawBeamPluginsChanged: rebuildRegistry()
 
     readonly property var mainContent: {
@@ -46,8 +46,6 @@ Singleton {
             showOsrButton: true,
             hinter: () => "",
             executor: () => {
-                if (Mem.options.beam.behavior.clearAiChatBeforeSearch)
-                    Ai.clearMessages();
                 Ai.sendUserMessage(query);
                 NoonUtils.callIpc("sidebar reveal API");
             }
@@ -89,7 +87,7 @@ Singleton {
             },
             executor: () => {
                 if (QalcService.result)
-                    ClipboardService.copy(QalcService.result);
+                    ClipboardService.manager.copy(QalcService.result);
             }
         },
         "install": {
@@ -125,10 +123,8 @@ Singleton {
             hinter: () => "",
             executor: () => {
                 AlarmService.addTimer(cleanQuery, "Beam Timer");
-                if (Mem.options.beam.behavior.revealLauncherOnAction) {
-                    Mem.states.sidebar.misc.selectedTabIndex = 3;
-                    NoonUtils.callIpc("sidebar reveal Alarms");
-                }
+                Mem.states.sidebar.misc.selectedTabIndex = 3;
+                NoonUtils.callIpc("sidebar reveal Alarms");
             }
         },
         "find": {
@@ -199,10 +195,10 @@ Singleton {
             hinter: () => "",
             executor: () => {
                 const duration = TimerService.parseTimeString(cleanQuery);
-                if (duration > 0)
+                if (duration > 0) {
                     TimerService.addTimer("Focus Time", duration, true, true);
-                if (Mem.options.beam.behavior.revealLauncherOnAction)
                     NoonUtils.callIpc("sidebar reveal Timers");
+                }
             }
         },
         "todo": {
@@ -242,7 +238,7 @@ Singleton {
             showHint: true,
             showOsrButton: false,
             hinter: () => {
-                if (BookmarksService.bookmarkTitles.length > 0) {
+                if (!subConfig && BookmarksService.bookmarkTitles.length > 0) {
                     const q = cleanQuery.toLowerCase();
                     for (let bookmark of BookmarksService.bookmarkTitles) {
                         if (bookmark.toLowerCase().startsWith(q))
@@ -254,7 +250,10 @@ Singleton {
             executor: () => {
                 const searchUrl = subConfig?.searchQuery || Mem.options.networking.searchPrefix;
                 const searchText = subConfig ? cleanQuery.substring(subConfig.prefix.length) : cleanQuery;
-                Quickshell.execDetached(["xdg-open", searchUrl + encodeURIComponent(searchText)]);
+                if (!subConfig.exec)
+                    Quickshell.execDetached(["gio", "open", searchUrl + encodeURIComponent(searchText)]);
+                else
+                    subConfig.exec(searchText);
             },
             subStates: {
                 "search": {
@@ -266,8 +265,12 @@ Singleton {
                 "yt_music": {
                     prefix: "m",
                     icon: "music_note",
-                    searchQuery: "https://music.youtube.com/search?q=",
-                    shape: "Bun"
+                    shape: "Bun",
+                    exec: query => {
+                        BeatsHitsService.search(query);
+                        GlobalStates.main.sidebar.setTab(2);
+                        NoonUtils.callIpc("sidebar reveal Beats");
+                    }
                 },
                 "spotify": {
                     prefix: "s",
@@ -307,7 +310,7 @@ Singleton {
             },
             executor: () => {
                 if (TranslatorService.translatedText)
-                    ClipboardService.copy(TranslatorService.translatedText);
+                    ClipboardService.manager.copy(TranslatorService.translatedText);
             }
         },
         "download": {

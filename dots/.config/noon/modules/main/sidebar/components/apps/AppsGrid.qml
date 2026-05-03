@@ -5,9 +5,8 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-StyledRect {
+LayerRect {
     id: root
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
     readonly property alias gridView: contentView
@@ -89,12 +88,12 @@ StyledRect {
             width: contentView.cellWidth
             height: contentView.cellHeight
 
-            StyledRect {
+            LayerRect {
                 id: groupTile
                 anchors.fill: parent
                 anchors.margins: Padding.normal
                 anchors.bottomMargin: 40
-                color: isSelected ? Colors.colSecondaryContainer : Colors.colLayer2
+                toggled: isSelected
                 radius: Rounding.large
 
                 MouseArea {
@@ -127,7 +126,7 @@ StyledRect {
             }
 
             StyledText {
-                text: modelData.category
+                text: modelData.category.replace(/([a-z])([A-Z])/g, '$1 $2')
                 anchors.top: groupTile.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: Padding.small

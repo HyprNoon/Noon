@@ -1,13 +1,12 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Quickshell
 import qs.services
 import qs.common
 import qs.common.widgets
 import qs.common.functions
 import "aiChat"
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
-import Quickshell
-import Noon.Services
 
 Item {
     id: root
@@ -60,21 +59,17 @@ Item {
         }
     ]
 
-    function handleInput(inputText) {
-        if (inputText.startsWith(root.commandPrefix)) {
-            const parts = inputText.split(" ");
-            const command = parts[0].substring(1);
-            const args = parts.slice(1);
-            const cmd = root.allCommands.find(c => c.name === command);
-            cmd ? cmd.execute(args) : Ai.addMessage(qsTr("Unknown command: ") + command, Ai.interfaceRole);
-        } else {
-            Ai.sendUserMessage(inputText);
-        }
-        messageListView.positionViewAtEnd();
+    function sendText(text) {
+        if (text.trim().length === 0)
+            return;
+        const parts = text.trim().split(" ");
+        const cmd = root.allCommands.find(c => c.name === parts[0].substring(1));
+        text.startsWith(root.commandPrefix) && cmd ? cmd.execute(parts.slice(1)) : Ai.sendUserMessage(text);
+        // chatView.listView.positionViewAtEnd();
     }
 
     function decodeImageAndAttach(entry) {
-        Ai.attachFile(ClipboardService.getImagePath(entry));
+        Ai.attachFile(ClipboardService.manager.getImagePath(entry));
     }
 
     function handleCommandSuggestions(query) {
@@ -88,7 +83,6 @@ Item {
             all: true,
             key: "name"
         });
-
         root.suggestionList = results.map(r => ({
                     name: root.commandPrefix + r.target,
                     displayName: root.commandPrefix + r.target,
@@ -109,7 +103,6 @@ Item {
             key: "name"
         });
         const isFirst = messageInputField.text.trim().split(" ").length === 1;
-
         root.suggestionQuery = query;
         root.suggestionList = results.map(r => ({
                     name: (isFirst ? root.commandPrefix + "model " : "") + r.target,
@@ -120,21 +113,17 @@ Item {
 
     function handleSkillsSuggestions() {
         const query = messageInputField.text.split(" ")[1] ?? "";
-
         const source = Ai.skills.map(f => ({
                     name: f,
                     prepared: Fuzzy.prepare(f)
                 }));
-
         const results = query.length === 0 ? Ai.skills.map(f => ({
                     target: f
                 })) : Fuzzy.go(query, source, {
             all: true,
             key: "name"
         });
-
         const isFirst = messageInputField.text.trim().split(" ").length === 1;
-
         root.suggestionQuery = query;
         root.suggestionList = results.map(r => ({
                     name: (isFirst ? root.commandPrefix + "skill " : "") + r.target,
@@ -159,7 +148,6 @@ Item {
                     target: r.obj
                 }));
         const isFirst = messageInputField.text.trim().split(" ").length === 1;
-
         root.suggestionQuery = query;
         root.suggestionList = results.map(r => ({
                     name: (isFirst ? root.commandPrefix + "load " : "") + r.target.id,
@@ -168,7 +156,6 @@ Item {
                 }));
     }
 
-    // suggestion dispatch table — keyed by command name
     readonly property var argHandlers: ({
             "model": handleModelSuggestions,
             "skill": handleSkillsSuggestions,
@@ -197,22 +184,18 @@ Item {
 
     Keys.onPressed: event => {
         messageInputField.forceActiveFocus();
-        if (event.modifiers === Qt.NoModifier) {
-            if (event.key === Qt.Key_PageUp) {
-                messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
-                event.accepted = true;
-            } else if (event.key === Qt.Key_PageDown) {
-                messageListView.contentY = Math.min(messageListView.contentHeight - messageListView.height / 2, messageListView.contentY + messageListView.height / 2);
-                event.accepted = true;
-            }
-        }
         if (event.modifiers & Qt.ControlModifier) {
-            if (event.key === Qt.Key_L)
+            switch (event.key) {
+            case Qt.Key_L:
                 Ai.clearMessages();
-            if (event.key === Qt.Key_R)
+                break;
+            case Qt.Key_R:
                 Ai.regenerate(Ai.messageIDs.length - 1);
-            if (event.key === Qt.Key_O)
+                break;
+            case Qt.Key_O:
                 root.expandRequested();
+                break;
+            }
             event.accepted = true;
         }
     }
@@ -242,7 +225,7 @@ Item {
             } else {
                 const text = messageInputField.text;
                 messageInputField.clear();
-                root.handleInput(text);
+                root.sendText(text);
             }
             event.accepted = true;
             break;
@@ -259,8 +242,8 @@ Item {
                     event.accepted = true;
                     return;
                 }
-                const entry = ClipboardService.entries[0];
-                if (ClipboardService.isImage(0)) {
+                const entry = ClipboardService.manager.entries[0];
+                if (ClipboardService.manager.isImage(0)) {
                     decodeImageAndAttach(entry);
                     event.accepted = true;
                 } else if (StringUtils.cleanCliphistEntry(entry).startsWith("file://")) {
@@ -271,72 +254,24 @@ Item {
         }
     }
 
+    Connections {
+        target: SpeechService
+        enabled: SpeechService.isListening
+        function onSpeechChanged() {
+            if (SpeechService.speech.length > 0) {
+                messageInputField.text = SpeechService.speech;
+            }
+        }
+    }
+
     ColumnLayout {
         id: columnLayout
         anchors.fill: parent
         spacing: root.padding
 
-        StyledRect {
-            clip: true
-            color: "transparent"
-            radius: Rounding.small
+        InteractionArea {
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            StyledListView {
-                id: messageListView
-                z: 0
-                clip: true
-                radius: Rounding.verylarge
-                fasterInteractions: false
-                anchors.fill: parent
-                spacing: Padding.veryhuge
-                reuseItems: false
-                popin: false
-                animateAppearance: false
-                onCountChanged: if (messageListView.atYEnd)
-                    Qt.callLater(messageListView.positionViewAtEnd)
-
-                _model: Ai.messageIDs.filter(id => Ai.messageByID[id]?.visibleToUser ?? true)
-
-                delegate: Item {
-                    required property var modelData
-                    required property int index
-
-                    readonly property var msg: Ai.messageByID[modelData]
-                    readonly property Component userComp: UserMessage {
-                        messageIndex: index
-                        messageData: msg
-                        messageInputField: root.inputField
-                    }
-                    readonly property Component aiComp: AiMessage {
-                        messageIndex: index
-                        messageData: msg
-                        messageInputField: root.inputField
-                    }
-
-                    anchors.left: parent?.left
-                    anchors.right: parent?.right
-                    implicitHeight: loader?.implicitHeight
-
-                    Loader {
-                        id: loader
-                        asynchronous: true
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        sourceComponent: parent.msg?.role === "user" ? userComp : aiComp
-                    }
-                }
-            }
-
-            PagePlaceholder {
-                z: 2
-                shown: Ai.messageIDs.length === 0
-                icon: "neurology"
-                title: "AI"
-                description: "access various AI models\n press '/' for more options "
-                shape: MaterialShape.Shape.PixelCircle
-            }
         }
 
         DescriptionBox {
@@ -387,17 +322,13 @@ Item {
             }
         }
 
-        Rectangle {
+        LayerRect {
             id: inputWrapper
             property real spacing: 5
             Layout.fillWidth: true
             radius: Rounding.verylarge
-            color: Colors.colLayer1
             implicitHeight: Math.max(inputFieldRowLayout.implicitHeight + inputFieldRowLayout.anchors.topMargin + commandButtonsRow.implicitHeight + commandButtonsRow.anchors.bottomMargin + spacing, 45) + (attachedFileIndicator.implicitHeight + spacing + attachedFileIndicator.anchors.topMargin)
             clip: true
-            Behavior on implicitHeight {
-                Anim {}
-            }
 
             AttachedFileIndicator {
                 id: attachedFileIndicator
@@ -441,7 +372,6 @@ Item {
                         }
                         root.updateSuggestions();
                     }
-
                     Keys.onPressed: event => root.handleInputKeyPress(event)
                 }
 
@@ -454,7 +384,7 @@ Item {
                     SequentialAnimation {
                         id: loadingAnimation
                         loops: Animation.Infinite
-                        running: Ai.isResponding || root.isRecording
+                        running: SpeechService.isListening || Ai.isResponding || root.isRecording
                         PropertyAction {
                             target: shape
                             property: "rotation"
@@ -507,12 +437,17 @@ Item {
                         enabled: sendButton.toggled
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+
                         onClicked: {
-                            if (Ai.isResponding)
+                            if (Ai.isResponding) {
                                 Ai.stop();
-                            else if (messageInputField.text.length > 0) {
-                                root.handleInput(messageInputField.text);
+                            } else if (messageInputField.text.length > 0) {
+                                const text = messageInputField.text;
                                 messageInputField.clear();
+                                root.sendText(text);
+                            } else {
+                                console.log("Listening...");
+                                SpeechService.listen();
                             }
                         }
                     }
@@ -566,7 +501,7 @@ Item {
                             buttonText: cmd
                             downAction: () => {
                                 if (modelData.sendDirectly) {
-                                    root.handleInput(cmd);
+                                    root.sendText(cmd);
                                     messageInputField.text = "";
                                 } else {
                                     messageInputField.text = cmd + (modelData.dontAddSpace ? "" : " ");

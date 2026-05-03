@@ -10,7 +10,7 @@ import qs.common.widgets
 import qs.services
 import "popups"
 
-StyledRect {
+ShaderRect {
     id: root
     required property var mainBg
     property bool reveal
@@ -49,8 +49,7 @@ StyledRect {
     opacity: root.reveal && (root.hintText.length > 0) ? 1 : 0
 
     anchors {
-        top: topMode ? mainBg.bottom : undefined
-        bottom: !topMode ? mainBg.top : undefined
+        bottom: mainBg.top
         margins: Padding.normal
         horizontalCenter: parent.horizontalCenter
     }
@@ -68,7 +67,6 @@ StyledRect {
     }
     width: Math.min(Sizes.beamPopupExpanded.width - 200, Math.max(popupText?.contentWidth + Padding.massive, mainBg.implicitWidth + Padding.massive))
     height: Math.max(136, Math.min(Sizes.beamPopupExpanded.height, popupText?.contentHeight + Padding.massive))
-    color: Colors.colLayer0
     enableBorders: true
     radius: Rounding.massive
 

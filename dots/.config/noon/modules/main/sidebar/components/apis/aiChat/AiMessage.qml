@@ -16,7 +16,6 @@ Item {
     property var messageInputField
     property bool enableMouseSelection: false
     property bool renderMarkdown: true
-    property bool editing: false
 
     readonly property list<var> messageBlocks: StringUtils.splitMarkdownBlocks(root.messageData?.content)
 
@@ -89,7 +88,7 @@ Item {
                     DelegateChoice {
                         roleValue: "think"
                         MessageThinkBlock {
-                            editing: root.editing
+                            editing: actionBar.editing
                             renderMarkdown: root.renderMarkdown
                             enableMouseSelection: root.enableMouseSelection
                             segmentContent: modelData.content
@@ -107,9 +106,9 @@ Item {
             delegate: ToolCallBlock {
                 required property var modelData
                 Layout.fillWidth: true
-                tool: modelData.tool
-                input: modelData.input
-                output: modelData.output
+                tool: modelData?.tool ?? ""
+                input: modelData?.input ?? ""
+                output: modelData?.output ?? ""
                 status: modelData.status
             }
         }
@@ -132,13 +131,12 @@ Item {
         }
 
         MessageActionBar {
-            visible: !loading.visible
+            id: actionBar
+            visible: messageData?.done
             Layout.leftMargin: Padding.large
             Layout.alignment: Qt.AlignLeft
             messageIndex: root.messageIndex
             messageData: root.messageData
-            editing: root.editing
-            onEditingChanged: root.editing = editing
         }
     }
 }

@@ -9,11 +9,10 @@ import qs.services
 import Noon.Utils.Download
 import "./"
 
-StyledRect {
+LayerRect {
     id: root
     visible: opacity > 0
     opacity: width > 320 ? 1 : 0
-    color: Colors.colLayer1
     radius: Rounding.verylarge
     clip: true
 

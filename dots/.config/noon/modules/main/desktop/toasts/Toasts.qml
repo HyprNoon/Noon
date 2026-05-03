@@ -52,7 +52,7 @@ StyledPanel {
         reverseRemoveDirection: root.anchors.left
         animateAppearance: true
         verticalLayoutDirection: ListView.BottomToTop
-        model: GlobalStates.toasts.data
+        _model: GlobalStates.toasts.data
         spacing: Padding.normal
         reuseItems: false
         delegate: Toast {
