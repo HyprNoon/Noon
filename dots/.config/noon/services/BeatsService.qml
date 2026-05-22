@@ -162,7 +162,7 @@ Singleton {
     }
 
     function isCurrentPlayer() {
-        return player?.desktopEntry?.toLowerCase() === "mpv";
+        return player?.desktopEntry?.toLowerCase() === "mpd";
     }
 
     function downloadCurrentSong() {
@@ -181,6 +181,16 @@ Singleton {
     function downloadWithDLP(info) {
         dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}'`];
         dlpHelperProc.running = true;
+    }
+    function openUrl() {
+        Qt.openUrlExternally("http://localhost:" + daemonOptions.players.webClient.port);
+    }
+    function openWebClient() {
+        if (!webClientProc.running) {
+            webClientProc.running = true;
+        } else {
+            openUrl();
+        }
     }
 
     Connections {
@@ -201,7 +211,11 @@ Singleton {
         running: root.player && root._playing
         onTriggered: root.player.positionChanged()
     }
-
+    Process {
+        id: webClientProc
+        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "serve", "--port", daemonOptions.players.webClient.port]
+        onStarted: openUrl()
+    }
     Process {
         id: mainProc
         command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "--player", "main", ""]

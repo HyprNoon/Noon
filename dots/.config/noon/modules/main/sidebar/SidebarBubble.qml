@@ -165,6 +165,11 @@ Item {
                         "action": () => BeatsService.downloadCurrentSong()
                     },
                     {
+                        "icon": "globe",
+                        // "extraVisibleCondition": BeatsService.isCurrentPlayer(),
+                        "action": () => BeatsService.openWebClient()
+                    },
+                    {
                         "icon": "close",
                         "action": () => BeatsService.stopPlayer()
                     }
