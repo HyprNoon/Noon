@@ -105,8 +105,14 @@ StyledRect {
             LiveLyrics {
                 id: activeLyrics
             }
-
+            StyledRectangularShadow {
+                target: bigCover
+                radius: 50
+                intensity: 0.6
+                show: true
+            }
             StyledLoader {
+                id: bigCover
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: -35
                 width: root.playing ? 320 : 285

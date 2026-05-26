@@ -1,0 +1,3 @@
+import Quickshell.Widgets
+
+WrapperRectangle {}

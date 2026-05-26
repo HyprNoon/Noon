@@ -8,12 +8,17 @@ import qs.common.widgets
 import "components"
 
 Repeater {
+    id: factory
     Layout.fillHeight: true
     Layout.fillWidth: true
     property bool leftMode: false
     visible: model.length > 0
     model: ScriptModel {
-        values: Object.values(PluginsManager?.dockPlugins).filter(i => i?.direction === (leftMode ? "left" : "right"))
+        values: {
+            const plugins = Object.values(PluginsManager?.dockPlugins ?? {});
+            const filteredPlugins = plugins.filter(i => i?.direction === (factory.leftMode ? "left" : "right"));
+            return filteredPlugins;
+        }
     }
     delegate: StyledLoader {
         required property var modelData

@@ -124,7 +124,7 @@ Scope {
                     left: bg.right
                 }
                 color: bg.color
-                corner: cornerEnum.topLeft
+                corner: RoundCorner.TopLeft
                 size: bg.bottomRadius
                 opacity: bg.opacity
             }
@@ -134,7 +134,7 @@ Scope {
                     right: bg.left
                 }
                 color: bg.color
-                corner: cornerEnum.topRight
+                corner: RoundCorner.TopRight
                 size: bg.bottomRadius
                 opacity: bg.opacity
             }

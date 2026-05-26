@@ -1,12 +1,10 @@
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
 import qs.common
+import qs.common.widgets
 
-Rectangle {
-    Layout.topMargin: Sizes.elevationMargin + Rounding.normal
-    Layout.bottomMargin: Sizes.hyprland.gapsOut + Rounding.normal
-    Layout.fillHeight: true
-    implicitWidth: 1
-    color: Colors.colOutlineVariant
+StyledRect {
+    width: 2
+    radius: 1
+    color: Colors.m3.m3outline
+    anchors.centerIn: parent
+    height: parent.height * 0.6
 }

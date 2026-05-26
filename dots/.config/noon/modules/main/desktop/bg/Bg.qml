@@ -41,6 +41,18 @@ Scope {
 
             Item {
                 anchors.fill: parent
+                DropArea {
+                    id: dropArea
+                    anchors.fill: parent
+
+                    keys: ["text/uri-list"]
+
+                    onDropped: drop => {
+                        const urls = drop.urls.map(url => url.toString());
+                        WallpaperService.applyWallpaper(urls[0]);
+                        NoonUtils.playSound("event_accepted");
+                    }
+                }
                 Item {
                     id: bgLayerWrapper
                     anchors.fill: parent

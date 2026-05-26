@@ -279,7 +279,7 @@ StyledPanel {
             id: c1
 
             visible: root.appearanceMode === 2
-            corner: root.rightMode ? cornerEnum.bottomRight : cornerEnum.bottomLeft
+            corner: root.rightMode ? RoundCorner.BottomRight : RoundCorner.BottomLeft
             color: visualContainer.color
             size: root.rounding
 
@@ -293,7 +293,7 @@ StyledPanel {
 
         RoundCorner {
             visible: c1.visible
-            corner: root.rightMode ? cornerEnum.topRight : cornerEnum.topLeft
+            corner: root.rightMode ? RoundCorner.TopRight : RoundCorner.TopLeft
             color: visualContainer.color
             size: c1.size
 

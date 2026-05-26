@@ -10,8 +10,14 @@ import qs.services
 import Noon.Utils.Download
 
 Singleton {
-    readonly property var model: downloadModel
-
+    readonly property var manager: downloadModel
+    readonly property var model: {
+        let model = [];
+        for (let i = 0; i < downloadModel.count; i++) {
+            model.push(downloadModel.get(i));
+        }
+        return model;
+    }
     DownloadModel {
         id: downloadModel
         jsonPath: Directories.standard.state + "/downloads.json"
@@ -27,11 +33,6 @@ Singleton {
                 content: name + " Failed",
                 icon: "close"
             });
-        }
-        function clearAll() {
-            for (let i = downloadModel.count - 1; i >= 0; i--) {
-                downloadModel.remove(i);
-            }
         }
     }
 }

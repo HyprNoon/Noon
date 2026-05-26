@@ -24,7 +24,7 @@ Item {
                         "icon": "clear_all",
                         "enabled": true,
                         "action": () => {
-                            DownloadService.model.clearAll();
+                            DownloadService.manager.clearAll();
                         }
                     },
                 ]

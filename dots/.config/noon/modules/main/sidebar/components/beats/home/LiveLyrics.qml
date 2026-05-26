@@ -1,13 +1,9 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
-import Quickshell
-import QtQuick.Effects
 import Qt5Compat.GraphicalEffects
-import qs.common.widgets
 import qs.services
 import qs.common
-import qs.common.functions
+import qs.common.widgets
 
 Item {
     id: root
@@ -17,11 +13,11 @@ Item {
     anchors.fill: parent
     opacity: showContent ? 1 : 0
 
-    readonly property real scale: (parent.height + parent.width) / 1000
-    readonly property var displayLines: syncedLines.length > 0 ? syncedLines : plainLines
-    readonly property bool loading: LyricsService.state === LyricsService.Loading
-    readonly property bool showContent: !loading && displayLines.length > 2
-    readonly property int currentLineIndex: getCurrentIndex()
+    readonly property bool isSynced: syncedLines.length > 0
+    readonly property var displayLines: isSynced ? syncedLines : plainLines
+    readonly property bool loading: LyricsService.state === "loading"
+    readonly property bool showContent: !loading && displayLines.length > 0
+    property int currentLine: -1
 
     property var syncedLines: []
     property var plainLines: []
@@ -30,46 +26,61 @@ Item {
         Anim {}
     }
 
-    function getCurrentIndex() {
-        if (!displayLines?.length || !syncedLines.length)
-            return -1;
-        for (let i = displayLines.length - 1; i >= 0; i--) {
-            if (BeatsService.player.position >= displayLines[i].lineTime)
-                return i;
-        }
-        return 0;
-    }
-
     function parseLyrics(text, synced) {
         if (!text)
             return [];
-        return text.split("\n").map(line => {
+
+        const lines = text.split("\n");
+        const result = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const l = lines[i];
+            if (!l)
+                continue;
+
             if (synced) {
-                const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
-                return m ? {
-                    lineTime: parseInt(m[1]) * 60 + parseFloat(m[2]),
-                    lineText: m[3].trim()
-                } : null;
+                if (l[0] === "[" && l.indexOf("]") > 0) {
+                    const closeIdx = l.indexOf("]");
+                    const timeStr = l.substring(1, closeIdx);
+                    const lyricsStr = l.substring(closeIdx + 1).trim();
+
+                    if (!lyricsStr)
+                        continue;
+
+                    const splitTime = timeStr.split(":");
+                    if (splitTime.length === 2) {
+                        result.push({
+                            t: parseInt(splitTime[0]) * 60 + parseFloat(splitTime[1]),
+                            s: lyricsStr
+                        });
+                    }
+                }
+            } else {
+                const plainStr = l.trim();
+                if (plainStr) {
+                    result.push({
+                        t: 0,
+                        s: plainStr
+                    });
+                }
             }
-            return {
-                lineTime: 0,
-                lineText: line.trim()
-            };
-        }).filter(l => l && (!synced || l.lineText));
+        }
+        return result;
     }
 
     function updateLyrics() {
-        const data = LyricsService.onlineLyricsData;
-        syncedLines = data?.syncedLyrics ? parseLyrics(data.syncedLyrics, true) : [];
-        plainLines = !syncedLines.length && data?.plainLyrics ? parseLyrics(data.plainLyrics, false) : [];
+        syncedLines = LyricsService.syncedLyrics ? parseLyrics(LyricsService.syncedLyrics, true) : [];
+        if (!isSynced)
+            plainLines = LyricsService.plainLyrics ? parseLyrics(LyricsService.plainLyrics, false) : [];
     }
 
     Component.onCompleted: updateLyrics()
 
     Connections {
         target: LyricsService
-        function onOnlineLyricsDataChanged() {
-            updateLyrics();
+        function onStateChanged() {
+            if (LyricsService.state === "loaded")
+                updateLyrics();
         }
     }
 
@@ -78,6 +89,27 @@ Item {
         function onTitleChanged() {
             syncedLines = [];
             plainLines = [];
+            currentLine = -1;
+        }
+    }
+
+    Timer {
+        running: isSynced
+        interval: 100
+        repeat: true
+        onTriggered: {
+            let idx = 0;
+            const currentPos = BeatsService.player.position;
+            for (let i = syncedLines.length - 1; i >= 0; i--) {
+                if (currentPos >= syncedLines[i].t) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx !== currentLine) {
+                currentLine = idx;
+                list.currentIndex = idx;
+            }
         }
     }
 
@@ -119,78 +151,52 @@ Item {
             }
         }
 
-        StyledFlickable {
-            id: flick
+        ListView {
+            id: list
+            interactive: !isSynced
+            spacing: isSynced ? 30 : 16
+            model: displayLines
+            highlightMoveDuration: 300
+            highlightMoveVelocity: -1
             anchors.fill: parent
-            anchors.leftMargin: Padding.massive
-            contentHeight: column.height
-            interactive: false
-            boundsBehavior: Flickable.StopAtBounds
-            Component.onCompleted: syncCurrentLine()
 
-            Column {
-                id: column
-                width: parent.width - Padding.huge
-                spacing: 30
+            preferredHighlightBegin: height / 2 - (currentItem ? currentItem.height / 2 : 0)
+            preferredHighlightEnd: height / 2 + (currentItem ? currentItem.height / 2 : 0)
+            highlightRangeMode: isSynced ? ListView.StrictlyEnforceRange : ListView.ApplyRange
 
-                topPadding: flick.height / 2
-                bottomPadding: flick.height / 2
+            delegate: StyledText {
+                id: textItem
+                required property int index
+                required property var modelData
+                readonly property bool active: root.isSynced && index === currentLine
+                readonly property int dist: Math.abs(index - currentLine)
 
-                Repeater {
-                    model: displayLines
-                    delegate: Item {
-                        id: lineWrapper
-                        width: column.width
-                        height: lineTextItem.height
+                anchors.left: parent?.left
+                anchors.right: parent?.right
 
-                        required property int index
-                        required property var modelData
-                        readonly property bool isCurrent: index === currentLineIndex
+                text: modelData.s
+                font.family: "Rubik"
+                font.pixelSize: Fonts.sizes.title
+                font.weight: active ? 800 : 600
+                color: BeatsService.colors.colOnLayer2
+                wrapMode: Text.Wrap
+                horizontalAlignment: isSynced ? Text.AlignLeft : Text.AlignCenter
 
-                        readonly property int distance: Math.abs(index - currentLineIndex)
+                Behavior on opacity {
+                    Anim {}
+                }
+                Behavior on font.weight {
+                    Anim {}
+                }
 
-                        StyledText {
-                            id: lineTextItem
-                            width: parent.width
-                            text: modelData.lineText
-                            font.family: "SF Arabic Rounded"
-                            font.weight: isCurrent ? 700 : 600
-                            font.pixelSize: Math.max(Fonts.sizes.huge, (isCurrent ? 1.1 : 1.0) * Fonts.sizes.title * scale)
-                            font.letterSpacing: -0.5
-                            color: BeatsService.colors.colOnLayer2
-                            wrapMode: Text.Wrap
+                opacity: active || !isSynced ? 1 : Math.max(0.1, 0.5 - dist * 0.1)
 
-                            Behavior on opacity {
-                                Anim {}
-                            }
-
-                            Behavior on font.pixelSize {
-                                Anim {}
-                            }
-
-                            opacity: {
-                                if (isCurrent)
-                                    return 1.0;
-                                return Math.max(0.1, 0.5 - (distance * 0.1));
-                            }
-
-                            layer.enabled: distance > 0
-                            layer.effect: FastBlur {
-                                anchors.fill: parent
-                                radius: Math.max(15, distance * 4)
-                                transparentBorder: true
-                            }
-                        }
-                    }
+                layer.enabled: isSynced && dist > 0
+                layer.effect: FastBlur {
+                    radius: Math.max(20, dist * 5)
+                    transparentBorder: true
                 }
             }
         }
     }
-    function syncCurrentLine() {
-        if (currentLineIndex >= 0 && column.children[currentLineIndex]) {
-            const lineItem = column.children[currentLineIndex];
-            flick.contentY = lineItem.y - (flick.height / 2) + (lineItem.height / 2);
-        }
-    }
-    onCurrentLineIndexChanged: syncCurrentLine()
 }

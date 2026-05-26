@@ -39,7 +39,7 @@ Scope {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 size: Rounding.verylarge
-                corner: cornerEnum.topLeft
+                corner: RoundCorner.TopLeft
                 color: "black"
             }
 
@@ -49,7 +49,7 @@ Scope {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 size: Rounding.verylarge
-                corner: cornerEnum.topRight
+                corner: RoundCorner.TopRight
                 color: "black"
             }
 
@@ -59,7 +59,7 @@ Scope {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 size: Rounding.verylarge
-                corner: cornerEnum.bottomLeft
+                corner: RoundCorner.BottomLeft
                 color: "black"
             }
 
@@ -69,15 +69,11 @@ Scope {
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 size: Rounding.verylarge
-                corner: cornerEnum.bottomRight
+                corner: RoundCorner.BottomRight
                 color: "black"
             }
 
-            mask: Region {
-            }
-
+            mask: Region {}
         }
-
     }
-
 }

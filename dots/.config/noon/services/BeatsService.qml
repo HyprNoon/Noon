@@ -26,7 +26,7 @@ Singleton {
     readonly property int defaultPlayerIndex: getCurrentPlayerIndex()
     property int selectedPlayerIndex: defaultPlayerIndex
 
-    readonly property bool filterPlayersEnabled: true
+    readonly property bool filterPlayersEnabled: false
     readonly property list<string> excludedPlayers: Mem.options.mediaPlayer?.excludedPlayers ?? []
 
     readonly property string artUrl: player ? StringUtils.cleanMusicTitle(player.trackArtUrl) : ""
@@ -38,7 +38,7 @@ Singleton {
 
     readonly property bool _downloading: dlpHelperProc.running
     readonly property bool _playing: player && player.playbackState === MprisPlaybackState.Playing
-
+    readonly property var baseCmd: ["python3", Directories.scriptsDir + "/beats_daemon.py"]
     readonly property var meaningfulPlayers: {
         const source = root.players;
         if (!source)
@@ -63,18 +63,25 @@ Singleton {
     }
 
     onPlayersChanged: handleOverlappingPlayers()
-
+    Component.onCompleted: NoonUtils.execDetached([...baseCmd, "init"])
     function getCurrentPlayerIndex() {
         const players = meaningfulPlayers;
         const currentlyActivePlayer = players.find(player => player.playbackState === MprisPlaybackState.Playing);
         return Math.max(0, players?.indexOf(currentlyActivePlayer)) ?? 0;
     }
+    function refreshTracks() {
+        NoonUtils.execDetached([...baseCmd, "update-db"]);
+        Qt.callLater(() => NoonUtils.execDetached([...baseCmd, "rebuild-covers"]));
+    }
 
     function fetchLibrary() {
+        refreshTracks();
         libraryFetcher.running = true;
     }
 
     function handleOverlappingPlayers() {
+        if (!meaningfulPlayers)
+            return;
         const players = meaningfulPlayers;
         const currentlyActivePlayers = players.filter(p => p.playbackState === MprisPlaybackState.Playing);
 
@@ -133,6 +140,22 @@ Singleton {
             getQueue();
         }
         return ratio;
+    }
+
+    function moveQueueItemByMpdIdx(fromMpdIdx, toMpdIdx) {
+        _daemonCmd(["--player", "main", "queue-move", "--index", `${fromMpdIdx}`, "--new-index", `${toMpdIdx}`]);
+        moveQueueTimer.restart();
+    }
+
+    function moveQueueItem(fromUiIndex, toUiIndex) {
+        const q = queue;
+        if (!q || fromUiIndex < 0 || fromUiIndex >= q.length || toUiIndex < 0 || toUiIndex >= q.length)
+            return;
+        const fromMpdIdx = q[fromUiIndex]?.index;
+        const toMpdIdx = q[toUiIndex]?.index;
+        if (fromMpdIdx == null || toMpdIdx == null)
+            return;
+        moveQueueItemByMpdIdx(fromMpdIdx, toMpdIdx);
     }
 
     function getQueue() {
@@ -213,22 +236,28 @@ Singleton {
     }
     Process {
         id: webClientProc
-        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "serve", "--port", daemonOptions.players.webClient.port]
+        command: [...baseCmd, "serve", "--port", daemonOptions.players.webClient.port]
         onStarted: openUrl()
     }
     Process {
         id: mainProc
-        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "--player", "main", ""]
+        command: [...baseCmd, "--player", "main", ""]
     }
 
     Fetcher {
         id: libraryFetcher
-        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "--player", "main", "library"]
+        command: [...baseCmd, "--player", "main", "library"]
     }
 
     Fetcher {
         id: queueFetcher
-        command: ["python3", Directories.scriptsDir + "/beats_daemon.py", "queue", "--player", "main"]
+        command: [...baseCmd, "queue", "--player", "main"]
+    }
+
+    Timer {
+        id: moveQueueTimer
+        interval: 350
+        onTriggered: getQueue()
     }
 
     Process {
@@ -245,8 +274,9 @@ Singleton {
 
     FileSystemWatcher {
         folder: root.tracksDir
-        onContentsChanged: if (!libraryFetcher.running)
-            libraryFetcher.running = true
+        onContentsChanged: {
+            refreshTracks();
+        }
     }
 
     SourceDownloader {

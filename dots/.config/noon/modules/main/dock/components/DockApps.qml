@@ -25,10 +25,26 @@ Item {
     property string draggingAppId: ""
     property string dropTargetAppId: ""
     property string draggingFromGroup: ""
+    property bool draggingIsGroup: false
 
     Layout.preferredWidth: listView.implicitWidth
     Layout.preferredHeight: listView.implicitHeight
     Layout.margins: Padding.normal
+
+    function insertSeparator(nearAppId) {
+        var apps = pinnedApps.slice();
+        const idx = apps.findIndex(a => a.appId === nearAppId || a.gid === nearAppId);
+        apps.splice(idx !== -1 ? idx + 1 : apps.length, 0, {
+            appId: "SEPARATOR"
+        });
+        Mem.states.favorites.apps = apps;
+    }
+
+    function removeSeparatorAt(idx) {
+        var apps = pinnedApps.slice();
+        apps.splice(idx, 1);
+        Mem.states.favorites.apps = apps;
+    }
 
     ListView {
         id: listView
@@ -45,7 +61,8 @@ Item {
                 var runningAppIds = new Set();
 
                 for (const entry of root.pinnedApps) {
-                    pinnedAppIds.add(entry.appId.toLowerCase());
+                    if (entry.appId !== "SEPARATOR")
+                        pinnedAppIds.add(entry.appId.toLowerCase());
                 }
 
                 for (const toplevel of ToplevelManager.toplevels.values) {
@@ -57,74 +74,66 @@ Item {
                 }
 
                 var groupMap = new Map();
-                var order = [];
+                var seenGroups = new Set();
+                var values = [];
+                var sepIndex = 0;
 
                 for (const entry of root.pinnedApps) {
-                    const key = entry.appId.toLowerCase();
-                    const gid = entry.gid;
-
-                    if (gid) {
+                    if (entry.appId === "SEPARATOR") {
+                        values.push({
+                            appId: "SEPARATOR_" + sepIndex++,
+                            isSeparator: true,
+                            isGroup: false
+                        });
+                    } else if (entry.gid) {
+                        const gid = entry.gid;
                         if (!groupMap.has(gid)) {
                             groupMap.set(gid, {
                                 appId: gid,
                                 gid: gid,
                                 isGroup: true,
+                                isSeparator: false,
                                 pinned: true,
                                 entries: [],
                                 toplevels: []
                             });
-                            order.push({
-                                type: "group",
-                                gid: gid
-                            });
                         }
                         const grp = groupMap.get(gid);
                         grp.entries.push(entry);
-                        if (toplevelMap.has(key))
-                            grp.toplevels.push(...toplevelMap.get(key));
-                    } else {
-                        order.push({
-                            type: "app",
-                            appId: entry.appId,
-                            pinned: true,
-                            toplevels: toplevelMap.get(key) ?? []
-                        });
-                    }
-                }
-
-                var values = [];
-                var seen = new Set();
-
-                for (const item of order) {
-                    if (item.type === "group") {
-                        if (!seen.has(item.gid)) {
-                            seen.add(item.gid);
-                            values.push(groupMap.get(item.gid));
+                        if (toplevelMap.has(entry.appId.toLowerCase()))
+                            grp.toplevels.push(...toplevelMap.get(entry.appId.toLowerCase()));
+                        if (!seenGroups.has(gid)) {
+                            seenGroups.add(gid);
+                            values.push(grp);
                         }
                     } else {
-                        values.push(item);
+                        values.push({
+                            appId: entry.appId,
+                            isGroup: false,
+                            isSeparator: false,
+                            pinned: true,
+                            toplevels: toplevelMap.get(entry.appId.toLowerCase()) ?? []
+                        });
                     }
                 }
 
                 const hasUnpinnedRunning = Array.from(runningAppIds).some(id => !pinnedAppIds.has(id));
-                if (root.pinnedApps.length > 0 && hasUnpinnedRunning) {
+                if (hasUnpinnedRunning) {
                     values.push({
-                        appId: "SEPARATOR",
-                        isGroup: false,
-                        pinned: false,
-                        toplevels: []
+                        appId: "RUNNING_SEPARATOR",
+                        isSeparator: true,
+                        isGroup: false
                     });
-                }
-
-                for (const [key, toplevels] of toplevelMap) {
-                    if (!pinnedAppIds.has(key)) {
-                        values.push({
-                            appId: toplevels[0].appId,
-                            gid: null,
-                            isGroup: false,
-                            pinned: false,
-                            toplevels: toplevels
-                        });
+                    for (const [key, toplevels] of toplevelMap) {
+                        if (!pinnedAppIds.has(key))
+                            values.push({
+                                appId: toplevels[0].appId,
+                                gid: null,
+                                isGroup: false,
+                                isSeparator: false,
+                                pinned: false,
+                                toplevels: toplevels
+                            });
                     }
                 }
 
@@ -133,20 +142,31 @@ Item {
         }
 
         delegate: DelegateChooser {
-            role: "isGroup"
+            role: "isSeparator"
             DelegateChoice {
                 roleValue: true
-                DockGroupButton {
-                    required property var modelData
-                    appToplevel: modelData
-                    appListRoot: root
-                }
+                DockSeparator {}
             }
             DelegateChoice {
-                DockAppButton {
-                    required property var modelData
-                    appToplevel: modelData
-                    appListRoot: root
+                roleValue: false
+                DelegateChooser {
+                    role: "isGroup"
+                    DelegateChoice {
+                        roleValue: true
+                        DockGroupButton {
+                            required property var modelData
+                            appToplevel: modelData
+                            appListRoot: root
+                        }
+                    }
+                    DelegateChoice {
+                        roleValue: false
+                        DockAppButton {
+                            required property var modelData
+                            appToplevel: modelData
+                            appListRoot: root
+                        }
+                    }
                 }
             }
         }

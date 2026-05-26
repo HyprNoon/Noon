@@ -70,7 +70,7 @@ StyledPanel {
             id: corner1
             visible: mode === 2 && bg.height > 0
             size: Rounding.verylarge
-            corner: pos === "bottom" ? cornerEnum.bottomLeft : cornerEnum.topLeft
+            corner: pos === "bottom" ? RoundCorner.BottomLeft : RoundCorner.TopLeft
             color: bg.color
 
             anchors {
@@ -85,7 +85,7 @@ StyledPanel {
             id: corner2
             visible: mode === 2 && bg.height > 0
             size: Rounding.verylarge
-            corner: pos === "bottom" ? cornerEnum.bottomRight : cornerEnum.topRight
+            corner: pos === "bottom" ? RoundCorner.BottomRight : RoundCorner.TopRight
             color: bg.color
 
             anchors {

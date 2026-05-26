@@ -23,7 +23,7 @@ DockButton {
     releaseAction: () => {
         if (dragHandlerActive)
             return;
-        groupPopup.shown = !groupPopup.shown;
+        groupPopup.visible = !groupPopup.visible;
     }
 
     contentItem: Item {

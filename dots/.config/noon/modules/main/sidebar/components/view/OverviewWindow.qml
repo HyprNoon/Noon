@@ -21,8 +21,8 @@ StyledRect {
     property bool restrictToWorkspace: true
     property bool hovered: false
     property bool pressed: false
-    property real initX: ((windowData?.at[0] - (monitorData?.x ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * viewScale) + xOffset
-    property real initY: ((windowData?.at[1] - (monitorData?.y ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * viewScale) + yOffset
+    readonly property real initX: ((windowData?.at[0] - (monitorData?.x ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * viewScale) + xOffset
+    readonly property real initY: ((windowData?.at[1] - (monitorData?.y ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * viewScale) + yOffset
     readonly property real targetWindowWidth: (windowData?.size[0] ?? 0) * viewScale
     readonly property real targetWindowHeight: (windowData?.size[1] ?? 0) * viewScale
 

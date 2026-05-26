@@ -8,7 +8,7 @@ import qs.services
 StyledMenu {
     id: contextMenu
     required property var modelData
-    property bool isPinned: Mem.states.favorites.apps.some(id => id.toLowerCase() === modelData.id.toLowerCase())
+    property bool isPinned: Mem.states.favorites.apps.some(obj => obj.appId.toLowerCase() === modelData.id.toLowerCase())
     signal dismiss
     content: [
         {
@@ -24,7 +24,12 @@ StyledMenu {
             "materialIcon": "push_pin",
             "action": () => {
                 const id = modelData.id;
-                Mem.states.favorites.apps = isPinned ? Mem.states.favorites.apps.filter(x => x !== id) : [...Mem.states.favorites.apps, id];
+                Mem.states.favorites.apps = isPinned ? Mem.states.favorites.apps.filter(x => x.appId !== id) : [...Mem.states.favorites.apps,
+                    {
+                        appId: id,
+                        gid: null
+                    }
+                ];
             }
         }
     ]

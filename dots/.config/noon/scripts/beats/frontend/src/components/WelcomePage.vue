@@ -1,8 +1,8 @@
 <template>
   <div id="welcome-box">
     <div class="welcome-brand">
-      <span class="welcome-dot" :class="{ connected: mpd.connected.value }" />
       <span>beats</span>
+      <span class="welcome-dot" :class="{ connected: mpd.connected.value }" />
     </div>
     <p class="welcome-sub">Select a player</p>
 
@@ -147,6 +147,7 @@ onMounted(fetchPlayers)
   border-radius: 50%;
   background: var(--text3);
   flex-shrink: 0;
+  margin-left: auto;
   transition: background var(--transition), box-shadow var(--transition);
 }
 

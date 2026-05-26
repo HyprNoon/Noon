@@ -1,8 +1,9 @@
 <template>
   <aside id="sidebar" :class="{ collapsed }">
     <div class="brand">
-      <span class="icon brand-dot" :class="{ connected: mpd.connected.value }">link</span>
+      <img src="/assets/icon.svg" class="brand-icon" alt="" />
       <span class="brand-text">beats</span>
+      <span class="icon brand-dot" :class="{ connected: mpd.connected.value }">link</span>
     </div>
     <nav>
       <button
@@ -135,13 +136,20 @@ onMounted(() => {
   white-space: nowrap;
   line-height: 1;
 }
+.brand-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
 .brand-dot {
   font-size: 18px;
   color: var(--text3);
   flex-shrink: 0;
+  margin-left: auto;
 }
 .brand-dot.connected { color: var(--accent); }
 .collapsed .brand-text { display: none; }
+.collapsed .brand-dot { display: none; }
 .collapsed .brand { justify-content: center; padding: 0; gap: 0; }
 
 nav { display: flex; flex-direction: column; gap: 2px; }

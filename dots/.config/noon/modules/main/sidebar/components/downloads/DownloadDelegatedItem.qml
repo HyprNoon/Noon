@@ -11,13 +11,16 @@ import Noon.Utils.Download
 StyledRect {
     id: root
 
-    height: expanded ? 280 : 72
+    height: expanded ? 320 : 72
     radius: Rounding.large
     color: Colors.colLayer2
     clip: true
+    anchors.left: parent?.left
+    anchors.right: parent?.right
 
     required property var modelData
     required property int index
+    property int cppIndex: index
 
     property bool expanded: false
     property bool canceled: modelData.state === DownloadItem.State.Canceled
@@ -97,7 +100,7 @@ StyledRect {
                 anchors.fill: parent
                 anchors.margins: Padding.large
                 itemData: root.modelData
-                itemIndex: root.index
+                itemIndex: root.cppIndex
             }
         }
     }
@@ -233,6 +236,43 @@ StyledRect {
 
         RLayout {
             Layout.fillWidth: true
+            visible: !root.canceled && !root.finished
+            spacing: 2 * Padding.massive
+
+            ColumnLayout {
+                spacing: 0
+                StyledText {
+                    text: "Speed Limit"
+                    color: Colors.colOnLayer2
+                    font.weight: 600
+                    font.pixelSize: Fonts.sizes.small - 1
+                    Layout.alignment: Qt.AlignVCenter
+                }
+                StyledText {
+                    text: {
+                        const mb = itemData.itemMaxSpeed / (1024 * 1024);
+                        return mb > 0 ? mb.toFixed(1) + " MB/s" : "Unlimited";
+                    }
+                    color: Colors.colSubtext
+                    font.pixelSize: Fonts.sizes.verysmall
+                    Layout.alignment: Qt.AlignVCenter
+                }
+            }
+
+            StyledSlider {
+                Layout.minimumWidth: 80
+                Layout.fillWidth: true
+                from: 0
+                to: 100
+                stepSize: 0.5
+                enableTooltip: false
+                value: itemData.itemMaxSpeed / (1024 * 1024)
+                onMoved: itemData.itemMaxSpeed = value * 1024 * 1024
+            }
+        }
+
+        RLayout {
+            Layout.fillWidth: true
             Layout.topMargin: Padding.small
 
             Item {
@@ -243,43 +283,42 @@ StyledRect {
                     {
                         icon: "open_in_new",
                         visible: root.finished,
-                        releaseAction: () => DownloadService.model.open(itemIndex)
+                        releaseAction: () => DownloadService.manager.open(itemIndex)
                     },
                     {
                         icon: "folder",
                         visible: root.finished,
-                        releaseAction: () => DownloadService.model.reveal(itemIndex)
+                        releaseAction: () => DownloadService.manager.reveal(itemIndex)
                     },
                     {
                         icon: itemData.state === DownloadItem.State.Paused ? "play_arrow" : "pause",
                         visible: !root.canceled && !root.finished,
                         releaseAction: () => {
                             if (itemData.state === DownloadItem.State.Running)
-                                DownloadService.model.pause(itemIndex);
+                                DownloadService.manager.pause(itemIndex);
                             else if (itemData.state === DownloadItem.State.Paused)
-                                DownloadService.model.resume(itemIndex);
+                                DownloadService.manager.resume(itemIndex);
                         }
                     },
                     {
                         visible: !root.canceled && !root.finished,
                         icon: "close",
-                        releaseAction: () => DownloadService.model.cancel(itemIndex)
+                        releaseAction: () => DownloadService.manager.cancel(itemIndex)
                     },
                     {
                         visible: root.canceled,
                         icon: "restart_alt",
-                        releaseAction: () => {
-                            const url = itemData.url;
-                            const destination = itemData.destination;
-                            const lbl = itemData.label;
-                            DownloadService.model.dismiss(itemIndex);
-                            DownloadService.model.add(url, destination, lbl);
-                        }
+                        releaseAction: () => DownloadService.manager.retry(itemIndex)
+                    },
+                    {
+                        visible: root.finished || root.canceled,
+                        icon: "link",
+                        releaseAction: () => ClipboardService.manager.copy(itemData.url)
                     },
                     {
                         visible: root.finished || root.canceled,
                         icon: "close",
-                        releaseAction: () => DownloadService.model.dismiss(itemIndex)
+                        releaseAction: () => DownloadService.manager.dismiss(itemIndex)
                     }
                 ]
                 delegate: RippleButtonWithIcon {

@@ -10,7 +10,7 @@ output_path = "~/.config/opencode/themes/noon.json"
 
 [templates.obsidian]
 input_path = "~/.config/matugen/templates/applications/obsidian.css"
-output_path = "~/Noon-docs/.obsidian/snippets/noon.css"
+output_path = "~/Documents/.obsidian/snippets/noon.css"
 
 [templates.sequences]
 input_path = "~/.config/matugen/templates/terminal/sequences.txt"

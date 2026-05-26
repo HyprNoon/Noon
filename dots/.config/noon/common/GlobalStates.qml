@@ -4,6 +4,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+
+import qs.common.utils
 import qs.common.widgets
 import qs.services
 
@@ -12,6 +14,7 @@ Singleton {
 
     property QtObject main
     property QtObject xp
+    property QtObject common
     property QtObject nobuntu
     property QtObject applications
     property QtObject toasts
@@ -25,10 +28,7 @@ Singleton {
         id: superHeldShortcut
         name: "superHeld"
     }
-    Component.onCompleted: {
-        ClipboardService.manager.init();
-        ClipboardService.manager.parent = root;
-    }
+
     function handle_init(mode) {
         KeyringStorage.reload();
         NightLightService.reload();
@@ -49,6 +49,14 @@ Singleton {
             break;
         }
         console.log("Initialized " + mode);
+    }
+    common: QtObject {
+        readonly property GamePadLongPress _longPress: GamePadLongPress {
+            gamepad: GamePadService.main
+            _watchButton: "MenuStart"
+            onTriggered: GlobalStates.common.openGameUI = true
+        }
+        property bool openGameUI: false
     }
     applications: QtObject {
         property QtObject mediaplayer: QtObject {
@@ -74,6 +82,8 @@ Singleton {
         id: main
         property var sidebar
         property var lock
+        property var dock
+
         property bool locked: false
         property bool exposeView: false
         property bool showOsdValues: false

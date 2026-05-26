@@ -47,12 +47,13 @@ StyledRect {
         return playlist.join(",");
     }
 
-    function createPlaylist(fileName) {
+    function playResults() {
         if (controls.inputArea.text.length > 0) {
             BeatsService.playCustomPlaylist(createPlaylistFromModel());
-        } else {
-            BeatsService.playTrackByFile(fileName);
         }
+    }
+    function createPlaylist(fileName) {
+        BeatsService.playTrackByFile(fileName);
     }
 
     radius: Rounding.verylarge
@@ -78,6 +79,8 @@ StyledRect {
             eventArea.onClicked: event => {
                 if (event.button === Qt.LeftButton) {
                     root.createPlaylist(modelData?.file);
+                } else if (event.button === Qt.MiddleButton) {
+                    root.playResults();
                 } else if (event.button === Qt.RightButton) {
                     menu.popup();
                 }

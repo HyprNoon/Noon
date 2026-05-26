@@ -10,11 +10,17 @@ import Quickshell.Widgets
 
 PopupWindow {
     id: root
-
     property var groupData
     property var parentButton
-    property bool shown: false
-    property bool extraVisibleCondition: !GlobalStates.topLevel?.activated
+
+    // Connections {
+    //     target: GlobalStates.main.dock
+    //     enabled: GlobalStates.main.dock
+    //     function onRevealChanged() {
+    //         if (!GlobalStates.main.dock.reveal)
+    //             root.visible = false;
+    //     }
+    // }
 
     anchor.window: parentButton?.QsWindow.window
     anchor.rect.x: parentButton ? parentButton.mapToItem(null, parentButton?.width / 2, 0).x : 0
@@ -23,7 +29,6 @@ PopupWindow {
     anchor.gravity: Edges.Top
 
     grabFocus: true
-    visible: shown && extraVisibleCondition
     color: "transparent"
 
     implicitWidth: container.implicitWidth

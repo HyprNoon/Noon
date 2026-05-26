@@ -6,7 +6,13 @@ import qs.common.utils
 
 Singleton {
     id: root
-    readonly property var connections: JSON.parse(oauthView.text())
+    readonly property var connections: {
+        try {
+            return JSON.parse(oauthView.text());
+        } catch (e) {
+            return console.log("Failed to parse OAuth : " + e);
+        }
+    }
     readonly property var integrations: {
         "tasks": {
             id: "tasks",

@@ -8,8 +8,8 @@ QuickToggleButton {
     buttonName: "GameMode"
     dialogName: "GameMode"
     buttonIcon: "stadia_controller"
-    onClicked: {
-        GameLauncherService.setGameMode(!toggled);
-        toggled = !toggled;
+    releaseAction: () => {
+        GlobalStates.common.openGameUI = true;
+    // GameLauncherService.setGameMode(!toggled);
     }
 }

@@ -204,7 +204,7 @@ StyledPanel {
                 placeholderTextColor: Colors.colSubtext
                 selectByMouse: true
                 leftPadding: Padding.huge
-                rightPadding: Padding.huge + osrButton.width
+                rightPadding: Padding.huge  // + osrButton.width
                 font.pixelSize: Fonts.sizes.normal
                 font.family: Fonts.family.main
 

@@ -22,7 +22,7 @@ StyledRect {
     MouseArea {
         id: eventArea
         z: 99999
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         propagateComposedEvents: true
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor

@@ -6,6 +6,12 @@ Process {
     id: root
     property var data: null
     running: true
+    signal streamFinished
+    function refresh() {
+        root.running = false;
+        root.running = true;
+    }
+
     stdout: StdioCollector {
         onStreamFinished: {
             const out = text.trim();
@@ -14,6 +20,7 @@ Process {
             } catch (e) {
                 console.error(e);
             }
+            root.streamFinished();
         }
     }
 }

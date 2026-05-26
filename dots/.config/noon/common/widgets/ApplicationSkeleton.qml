@@ -275,7 +275,7 @@ AppWindow {
     RoundCorner {
         id: top_corner
         visible: root.appearance_mode === 2
-        corner: cornerEnum.topLeft
+        corner: RoundCorner.TopLeft
         size: Rounding.massive
         color: sidebar.color
         anchors {
@@ -286,7 +286,7 @@ AppWindow {
     RoundCorner {
         id: bottom_corner
         visible: root.appearance_mode === 2
-        corner: cornerEnum.bottomLeft
+        corner: RoundCorner.BottomLeft
         size: Rounding.massive
         color: sidebar.color
         anchors {

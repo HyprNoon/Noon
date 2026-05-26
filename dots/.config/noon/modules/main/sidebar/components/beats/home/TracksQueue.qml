@@ -15,6 +15,8 @@ StyledRect {
     clip: true
 
     readonly property string searchQuery: searchInput.text.trim().toLowerCase()
+    property int moveSrc: -1
+    property var moveSrcItem: null
 
     ColumnLayout {
         anchors.fill: parent
@@ -27,7 +29,6 @@ StyledRect {
             color: "transparent"
 
             RowLayout {
-                id: searchRow
                 height: 36
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -64,6 +65,28 @@ StyledRect {
                             }
                             event.accepted = true;
                         }
+                    }
+                }
+
+                StyledRect {
+                    visible: root.moveSrc >= 0
+                    radius: Rounding.full
+                    color: colors.colLayer2
+                    height: 28
+                    Layout.preferredWidth: cancelRow.width + Padding.normal * 2
+
+                    RowLayout {
+                        id: cancelRow
+                        anchors.centerIn: parent
+                        spacing: Padding.small
+
+                        Symbol { font.pixelSize: 14; text: "close"; color: Colors.colOnLayer2 }
+                        StyledText { text: "Cancel"; color: Colors.colOnLayer2; font.pixelSize: Fonts.sizes.small }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: { root.moveSrc = -1; root.moveSrcItem = null; }
                     }
                 }
             }
@@ -113,14 +136,11 @@ StyledRect {
                 z: 2
                 width: list.width
                 height: 60
-
                 StyledRect {
                     anchors.left: parent.left
                     anchors.leftMargin: Padding.huge
                     anchors.verticalCenter: parent.verticalCenter
-                    height: 24
-                    radius: 6
-                    width: 6
+                    height: 24; radius: 6; width: 6
                     color: Colors.colPrimary
                 }
             }
@@ -132,9 +152,8 @@ StyledRect {
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                     if (list.currentItem) {
                         let currentTrack = list.model[list.currentIndex];
-                        if (currentTrack) {
+                        if (currentTrack)
                             BeatsService.playTrackByFile(currentTrack.file);
-                        }
                     }
                     event.accepted = true;
                 }
@@ -147,39 +166,26 @@ StyledRect {
                 anchors.right: parent?.right
                 anchors.left: parent?.left
                 height: 60
-                color: "transparent"
+                color: root.moveSrc === index ? colors.colSecondaryContainer : "transparent"
 
                 Rectangle {
                     visible: index !== list.count - 1
                     anchors.bottom: parent?.bottom
-                    anchors.left: contentRow?.left
-                    anchors.right: contentRow?.right
-                    anchors.rightMargin: Padding.massive
+                    anchors.left: parent?.left
+                    anchors.right: parent?.right
                     anchors.leftMargin: Padding.massive
-
+                    anchors.rightMargin: Padding.massive
                     height: 1
                     color: colors.colOutline
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        list.currentIndex = index;
-                        BeatsService.playTrackByFile(modelData?.file);
-                    }
-                }
-
                 RLayout {
-                    id: contentRow
                     anchors.fill: parent
                     anchors.rightMargin: Padding.normal
                     anchors.leftMargin: Padding.normal
                     spacing: Padding.massive
 
-                    Item {
-                        height: 24
-                        width: 6
-                    }
+                    Item { height: 24; width: 6 }
 
                     ColumnLayout {
                         Layout.fillWidth: true
@@ -199,6 +205,25 @@ StyledRect {
                             Layout.fillWidth: true
                             color: Colors.colSubtext
                             font.pixelSize: Fonts.sizes.small
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton) {
+                            root.moveSrc = index;
+                            root.moveSrcItem = modelData;
+                        } else if (root.moveSrc >= 0) {
+                            if (root.moveSrc !== index && root.moveSrcItem)
+                                BeatsService.moveQueueItemByMpdIdx(root.moveSrcItem.index, modelData.index);
+                            root.moveSrc = -1;
+                            root.moveSrcItem = null;
+                        } else {
+                            list.currentIndex = index;
+                            BeatsService.playTrackByFile(modelData?.file);
                         }
                     }
                 }

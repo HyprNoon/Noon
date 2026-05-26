@@ -344,8 +344,7 @@ JsonAdapter {
         property string horizontalLayout: "Dynamic"
         property string verticalLayout: "VDynamic"
         property string currentLayout: "Dynamic"
-        property list<var> hMapPresets: []
-        property list<var> vMapPresets: []
+
         property JO vMap: JO {
             property int spacing: 6
             property list<string> topArea: ["materialStatusIcons", "battery", "weather", "tray"]

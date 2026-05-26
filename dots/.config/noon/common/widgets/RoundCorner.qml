@@ -4,50 +4,44 @@ import qs.common
 
 Item {
     id: root
+
+    enum Corner {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+
     property int size: Rounding.verylarge
     property color color: parent?.color ?? Colors.colLayer0
-
-    property QtObject cornerEnum: QtObject {
-        property int topLeft: 0
-        property int topRight: 1
-        property int bottomLeft: 2
-        property int bottomRight: 3
-    }
-    property int corner: cornerEnum.topLeft // Default to TopLeft
-
-    // Add a revision property that changes when corner changes
-    property int shapeRevision: 0
-
-    onCornerChanged: {
-        shapeRevision++;  // Force shape to update
-    }
+    property int corner: RoundCorner.TopLeft
 
     width: size
     height: size
 
     Shape {
+        id: shapeItem
         anchors.fill: parent
         antialiasing: true
         preferredRendererType: Shape.CurveRenderer
 
-        // Force the shape to depend on shapeRevision to trigger redraws
-        property int revision: root.shapeRevision
+        property int triggerUpdate: root.corner
 
         ShapePath {
             strokeWidth: 0
+            strokeColor: "transparent"
             fillColor: root.color
 
             startX: {
-                // Reference shapeRevision to ensure binding updates
-                root.shapeRevision;
+                var update = shapeItem.triggerUpdate;
                 switch (root.corner) {
-                case root.cornerEnum.topLeft:
+                case RoundCorner.TopLeft:
                     return 0;
-                case root.cornerEnum.topRight:
+                case RoundCorner.TopRight:
                     return root.size;
-                case root.cornerEnum.bottomLeft:
+                case RoundCorner.BottomLeft:
                     return 0;
-                case root.cornerEnum.bottomRight:
+                case RoundCorner.BottomRight:
                     return root.size;
                 default:
                     return 0;
@@ -55,16 +49,15 @@ Item {
             }
 
             startY: {
-                // Reference shapeRevision to ensure binding updates
-                root.shapeRevision;
+                var update = shapeItem.triggerUpdate;
                 switch (root.corner) {
-                case root.cornerEnum.topLeft:
+                case RoundCorner.TopLeft:
                     return 0;
-                case root.cornerEnum.topRight:
+                case RoundCorner.TopRight:
                     return 0;
-                case root.cornerEnum.bottomLeft:
+                case RoundCorner.BottomLeft:
                     return root.size;
-                case root.cornerEnum.bottomRight:
+                case RoundCorner.BottomRight:
                     return root.size;
                 default:
                     return 0;
@@ -73,81 +66,83 @@ Item {
 
             PathAngleArc {
                 moveToStart: false
+                radiusX: root.size
+                radiusY: root.size
+                sweepAngle: 90
+
                 centerX: {
-                    // Reference shapeRevision to ensure binding updates
-                    root.shapeRevision;
+                    var update = shapeItem.triggerUpdate;
                     switch (root.corner) {
-                    case root.cornerEnum.topLeft:
+                    case RoundCorner.TopLeft:
                         return root.size;
-                    case root.cornerEnum.topRight:
+                    case RoundCorner.TopRight:
                         return 0;
-                    case root.cornerEnum.bottomLeft:
+                    case RoundCorner.BottomLeft:
                         return root.size;
-                    case root.cornerEnum.bottomRight:
+                    case RoundCorner.BottomRight:
+                        return 0;
+                    default:
                         return 0;
                     }
                 }
                 centerY: {
-                    // Reference shapeRevision to ensure binding updates
-                    root.shapeRevision;
+                    var update = shapeItem.triggerUpdate;
                     switch (root.corner) {
-                    case root.cornerEnum.topLeft:
+                    case RoundCorner.TopLeft:
                         return root.size;
-                    case root.cornerEnum.topRight:
+                    case RoundCorner.TopRight:
                         return root.size;
-                    case root.cornerEnum.bottomLeft:
+                    case RoundCorner.BottomLeft:
                         return 0;
-                    case root.cornerEnum.bottomRight:
+                    case RoundCorner.BottomRight:
+                        return 0;
+                    default:
                         return 0;
                     }
                 }
-                radiusX: root.size
-                radiusY: root.size
                 startAngle: {
-                    // Reference shapeRevision to ensure binding updates
-                    root.shapeRevision;
+                    var update = shapeItem.triggerUpdate;
                     switch (root.corner) {
-                    case root.cornerEnum.topLeft:
+                    case RoundCorner.TopLeft:
                         return 180;
-                    case root.cornerEnum.topRight:
+                    case RoundCorner.TopRight:
                         return 270;
-                    case root.cornerEnum.bottomLeft:
+                    case RoundCorner.BottomLeft:
                         return 90;
-                    case root.cornerEnum.bottomRight:
+                    case RoundCorner.BottomRight:
+                        return 0;
+                    default:
                         return 0;
                     }
                 }
-                sweepAngle: 90
             }
 
             PathLine {
                 x: {
-                    // Reference shapeRevision to ensure binding updates
-                    root.shapeRevision;
+                    var update = shapeItem.triggerUpdate;
                     switch (root.corner) {
-                    case root.cornerEnum.topLeft:
+                    case RoundCorner.TopLeft:
                         return 0;
-                    case root.cornerEnum.topRight:
+                    case RoundCorner.TopRight:
                         return root.size;
-                    case root.cornerEnum.bottomLeft:
+                    case RoundCorner.BottomLeft:
                         return 0;
-                    case root.cornerEnum.bottomRight:
+                    case RoundCorner.BottomRight:
                         return root.size;
                     default:
                         return 0;
                     }
                 }
                 y: {
-                    // Reference shapeRevision to ensure binding updates
-                    root.shapeRevision;
+                    var update = shapeItem.triggerUpdate;
                     switch (root.corner) {
-                    case root.cornerEnum.topLeft:
+                    case RoundCorner.TopLeft:
                         return 0;
-                    case root.cornerEnum.topRight:
+                    case RoundCorner.TopRight:
                         return 0;
-                    case root.cornerEnum.bottomLeft:
+                    case RoundCorner.BottomLeft:
                         return root.size;
-                    case root.cornerEnum.bottomRight:
+                    case RoundCorner.BottomRight:
                         return root.size;
                     default:
                         return 0;

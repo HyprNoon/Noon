@@ -89,7 +89,7 @@ StyledRect {
     RoundCorner {
         id: checkmark
 
-        corner: cornerEnum.bottomRight
+        corner: RoundCorner.BottomRight
         size: 70
         color: Colors.m3.m3primary
         visible: isCurrentWallpaper

@@ -134,7 +134,7 @@ StyledPanel {
                         PropertyChanges {
                             target: c1
                             visible: true
-                            corner: pos === "right" ? cornerEnum.topRight : cornerEnum.topLeft
+                            corner: pos === "right" ? RoundCorner.TopRight : RoundCorner.TopLeft
                         }
                         AnchorChanges {
                             target: c1
@@ -149,7 +149,7 @@ StyledPanel {
                         PropertyChanges {
                             target: c2
                             visible: true
-                            corner: pos === "right" ? cornerEnum.bottomRight : cornerEnum.bottomLeft
+                            corner: pos === "right" ? RoundCorner.BottomRight : RoundCorner.BottomLeft
                         }
                         AnchorChanges {
                             target: c2

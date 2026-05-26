@@ -1,6 +1,7 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
-import Noon.Utils
+import QtQuick
+import Noon.Utils.Hypr
 import qs.common.utils
 import qs.store
 

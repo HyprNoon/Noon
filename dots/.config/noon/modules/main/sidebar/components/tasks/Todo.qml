@@ -72,12 +72,12 @@ LayerRect {
                     break;
                 case Qt.Key_Right:
                     if (selectedItem.status < 3)
-                        TodoService.setStatus(selectedItemIndex, (selectedItem.status + 5) % 4);
+                        TodoService.nextStatus(selectedItemIndex);
                     event.accepted = true;
                     break;
                 case Qt.Key_Left:
                     if (selectedItem.status > 0 && selectedItem.status <= 3)
-                        TodoService.setStatus(selectedItemIndex, (selectedItem.status + 3) % 4);
+                        TodoService.previousStatus(selectedItemIndex);
                     event.accepted = true;
                     break;
                 case Qt.Key_Delete:

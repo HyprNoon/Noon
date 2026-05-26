@@ -179,6 +179,14 @@ Singleton {
                     "key": "layout"
                 },
                 {
+                    "icon": "blur_on",
+                    "name": "Animation Style",
+                    "type": "combobox",
+                    "store": "hypr",
+                    "key": "animation_style",
+                    "comboBoxValues": ["standard", "snappy", "cinematic"]
+                },
+                {
                     "icon": "monitor",
                     "name": "External Monitor Profile",
                     "type": "combobox",

@@ -18,6 +18,7 @@ import qs.modules.zen
 import qs.modules.main
 import qs.modules.nobuntu
 import qs.modules.applications
+import qs.modules.common
 
 ShellRoot {
     id: root
@@ -42,4 +43,5 @@ ShellRoot {
     AiIPC {}
     GlobalIPC {}
     AppsIPC {}
+    CommonModules {}
 }

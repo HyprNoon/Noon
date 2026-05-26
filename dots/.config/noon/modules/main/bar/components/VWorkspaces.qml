@@ -182,7 +182,7 @@ BarGroup {
 
                 Layout.fillWidth: true
                 height: workspaceButtonHeight
-                onPressed: Hyprland.dispatch(`workspace ${workspaceValue}`)
+                onPressed: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${workspaceValue} })`)
 
                 background: Item {
                     implicitHeight: workspaceButtonHeight

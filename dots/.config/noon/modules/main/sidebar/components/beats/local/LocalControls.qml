@@ -138,10 +138,7 @@ StyledRect {
                         },
                         {
                             icon: "refresh",
-                            action: () => {
-                                isSearching = false;
-                                BeatsService.rebuildMetadata();
-                            }
+                            action: () => BeatsService.fetchLibrary()
                         },
                         {
                             icon: "folder",

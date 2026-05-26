@@ -80,7 +80,7 @@ BarGroup {
         acceptedButtons: Qt.BackButton
         onPressed: event => {
             if (event.button === Qt.BackButton) {
-                Hyprland.dispatch(`togglespecialworkspace`);
+                Hyprland.dispatch(`hl.dsp.focus({ workspace = special })`);
             }
         }
     }
@@ -179,7 +179,7 @@ BarGroup {
 
                 Layout.fillHeight: true
                 width: workspaceButtonWidth
-                onPressed: Hyprland.dispatch(`workspace ${workspaceValue}`)
+                onPressed: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${workspaceValue} })`)
 
                 background: Item {
                     implicitWidth: workspaceButtonWidth

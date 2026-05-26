@@ -17,25 +17,12 @@ DockButton {
     property real countDotWidth: 10
 
     property var desktopEntry: DesktopEntries.byId(appToplevel.appId)
-    enabled: !isSeparator
-    width: isSeparator ? 1 : implicitWidth
     colBackground: "transparent"
-
-    Loader {
-        active: isSeparator
-        anchors {
-            fill: parent
-            topMargin: 6
-            bottomMargin: 6
-        }
-        sourceComponent: DockSeparator {}
-    }
 
     StyledToolTip {
         bg.enableBorders: true
         bg.color: Colors.colLayer1
         bg.anchors.bottomMargin: root.iconSize / 10
-        extraVisibleCondition: !root.isSeparator
         content: appToplevel.appId
     }
 
@@ -70,10 +57,6 @@ DockButton {
         }
     }
 
-    middleClickAction: () => {
-        root.desktopEntry?.execute();
-    }
-
     altAction: () => {
         if (Mem.states.favorites.apps.find(a => a.appId === appToplevel.appId)) {
             Mem.states.favorites.apps = Mem.states.favorites.apps.filter(a => a.appId !== appToplevel.appId);
@@ -87,43 +70,39 @@ DockButton {
         }
     }
 
-    contentItem: Loader {
-        active: !isSeparator
-        sourceComponent: Item {
-            anchors.fill: parent
+    contentItem: Item {
+        anchors.fill: parent
 
-            Loader {
-                id: iconImageLoader
-                anchors.centerIn: parent
-                active: !root.isSeparator
-                width: root.iconSize - Padding.large
-                height: root.iconSize - Padding.large
-                sourceComponent: StyledIconImage {
-                    cache: false
-                    source: NoonUtils.iconPath(root.desktopEntry ? (root.desktopEntry.icon || root.desktopEntry.genericIcon || "applications-system") : appToplevel.appId)
-                }
+        Loader {
+            id: iconImageLoader
+            anchors.centerIn: parent
+            width: root.iconSize - Padding.large
+            height: root.iconSize - Padding.large
+            sourceComponent: StyledIconImage {
+                cache: false
+                source: NoonUtils.iconPath(root.desktopEntry ? (root.desktopEntry.icon || root.desktopEntry.genericIcon || "applications-system") : appToplevel.appId)
             }
+        }
 
-            RowLayout {
-                spacing: 2
-                height: countDotHeight
-                width: countDotWidth * Math.min(appToplevel.toplevels.length, 2)
-                anchors {
-                    top: iconImageLoader.bottom
-                    topMargin: countDotHeight
-                    horizontalCenter: parent.horizontalCenter
-                }
-                Repeater {
-                    model: Math.min(appToplevel.toplevels.length, 3)
-                    delegate: StyledRect {
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.fillWidth: true
-                        required property int index
-                        radius: Rounding.full
-                        Layout.maximumWidth: (appToplevel.toplevels.length <= 3) ? Sizes.infinity : root.countDotHeight
-                        implicitHeight: root.countDotHeight
-                        color: appIsActive ? Colors.colPrimary : ColorUtils.transparentize(Colors.colOnLayer0, 0.4)
-                    }
+        RowLayout {
+            spacing: 2
+            height: countDotHeight
+            width: countDotWidth * Math.min(appToplevel.toplevels.length, 2)
+            anchors {
+                top: iconImageLoader.bottom
+                topMargin: countDotHeight
+                horizontalCenter: parent.horizontalCenter
+            }
+            Repeater {
+                model: Math.min(appToplevel.toplevels.length, 3)
+                delegate: StyledRect {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    required property int index
+                    radius: Rounding.full
+                    Layout.maximumWidth: (appToplevel.toplevels.length <= 3) ? Sizes.infinity : root.countDotHeight
+                    implicitHeight: root.countDotHeight
+                    color: appIsActive ? Colors.colPrimary : ColorUtils.transparentize(Colors.colOnLayer0, 0.4)
                 }
             }
         }

@@ -3,6 +3,7 @@ import json
 import mimetypes
 import os
 import urllib.parse
+import urllib.request
 
 from websockets import Request, Response
 from websockets.datastructures import Headers
@@ -100,6 +101,32 @@ class BeatsWebServer:
             from .player import Player
             Player(self.player).play_by_name(name)
             return _resp(200, "OK", "application/json")
+
+        if path == "/api/lyrics" or path.startswith("/api/lyrics?"):
+            parsed = urllib.parse.urlparse(path)
+            qs = urllib.parse.parse_qs(parsed.query)
+            title = qs.get("title", [""])[0]
+            artist = qs.get("artist", [""])[0]
+            if not title:
+                return _resp(400, '{"error": "missing title"}', "application/json")
+
+            async def fetch_lyrics():
+                script = os.path.join(HERE, "..", "lyrics_service.py")
+                loop = asyncio.get_event_loop()
+                try:
+                    proc = await asyncio.create_subprocess_exec(
+                        "python3", script, "--title", title, "--artist", artist,
+                        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+                    )
+                    out, _ = await asyncio.wait_for(proc.communicate(), timeout=15)
+                    data = json.loads(out.decode())
+                    if "error" in data:
+                        return _resp(404, json.dumps(data), "application/json")
+                    return _resp(200, json.dumps(data), "application/json")
+                except Exception as e:
+                    return _resp(500, json.dumps({"error": str(e)}), "application/json")
+
+            return fetch_lyrics()
 
         if path.startswith("/api/covers/"):
             rel = urllib.parse.unquote(path.removeprefix("/api/covers/"))

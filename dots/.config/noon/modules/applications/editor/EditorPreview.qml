@@ -5,6 +5,7 @@ import qs.common
 import qs.common.widgets
 import qs.common.functions
 import Noon.Utils
+import org.kde.syntaxhighlighting
 
 Item {
     id: root
@@ -141,18 +142,16 @@ Item {
                         selectByKeyboard: true
                         selectionColor: Colors.colPrimaryContainer
                         selectedTextColor: Colors.colOnPrimaryContainer
-
                         cursorVisible: true
                         persistentSelection: true
-                        JsonHighlighter {
-                            id: jsonHighlighter
-                            textDocument: textEdit.textDocument
 
-                            keyColor: Colors.colPrimary
-                            stringColor: Colors.colTertiary
-                            numberColor: Colors.colSecondary
-                            boolColor: Colors.colError
+                        SyntaxHighlighter {
+                            textEdit: textEdit
+                            repository: Repository
+                            definition: Repository.definitionForFileName(FileUtils.trimFileProtocol(root.currentFile))
+                            theme: Colors.m3.darkmode ? "Monokai" : "ayu Light"
                         }
+
                         Rectangle {
                             id: lineIndicator
                             y: Math.floor(textEdit.cursorRectangle.y)
@@ -279,17 +278,20 @@ Item {
             }
         }
     }
+
     Timer {
         running: root.currentFile.length > 0 && root.modified
         interval: 200
         onTriggered: root.window.expandSidebar = false
     }
+
     Connections {
         target: GlobalStates.applications.editor
         function onCurrentFileChanged() {
             edit(currentFile);
         }
     }
+
     PagePlaceholder {
         anchors.centerIn: parent
         icon: "code"

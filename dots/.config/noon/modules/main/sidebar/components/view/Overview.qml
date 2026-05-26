@@ -10,29 +10,18 @@ import Quickshell.Widgets
 import Quickshell.Hyprland
 import Quickshell.Wayland
 
-/*
-    TODO: Migrate Dispachers
-*/
 Item {
     id: root
+
     property bool expanded: false
+
     readonly property var monitor: MonitorsInfo.focused
     readonly property var monitorData: HyprlandService.monitors.find(m => m.name === monitor?.name) ?? null
-    readonly property var windowByAddress: HyprlandService?.windowByAddress
+    readonly property var windowByAddress: HyprlandService.windowByAddress
+    readonly property int activeWorkspaceId: HyprlandService.activeWorkspace?.id ?? 1
 
-    readonly property real windowOffset: 0.10
     readonly property real viewScale: 0.185
     readonly property real workspaceSpacing: Padding.small
-    readonly property real wsWidthMultiplier: 1
-    readonly property bool monitorIsFocused: Hyprland.focusedMonitor?.id === monitor?.id
-    readonly property color activeBorderColor: Colors.colSecondary
-
-    property int draggingFromWorkspace: -1
-    property int draggingTargetWorkspace: -1
-
-    property int workspaceZ: 0
-    property int windowZ: 1
-    property int windowDraggingZ: 99999
 
     readonly property real workspaceImplicitWidth: {
         if (!monitorData || !monitor)
@@ -45,24 +34,32 @@ Item {
     readonly property int rowsNumber: Math.max(Math.floor(height / workspaceImplicitHeight), 1)
     readonly property int columnsNumber: Math.max(Math.floor(width / workspaceImplicitWidth), 1)
     readonly property int workspacesShown: rowsNumber * columnsNumber
-    readonly property int workspaceGroup: Math.floor(((activeWorkspaceId) - 1) / workspacesShown)
+    readonly property int workspaceGroup: Math.floor((activeWorkspaceId - 1) / workspacesShown)
 
-    // Use monitorData for active workspace since it's the reliable Hyprland IPC source
-    readonly property int activeWorkspaceId: monitorData?.activeWorkspace?.id ?? 1
+    property int draggingFromWorkspace: -1
+    property int draggingTargetWorkspace: -1
 
-    function getWorkspaceNumber(row, col) {
+    property int workspaceZ: 0
+    property int windowZ: 1
+    property int windowDraggingZ: 99999
+
+    function workspaceNumber(row, col) {
         const base = workspaceGroup * workspacesShown;
         return expanded ? base + row * columnsNumber + col + 1 : base + col * rowsNumber + row + 1;
     }
 
-    function getRowIndex(wsId) {
+    function rowIndex(wsId) {
         const local = (wsId - 1) % workspacesShown;
         return expanded ? Math.floor(local / columnsNumber) : local % rowsNumber;
     }
 
-    function getColIndex(wsId) {
+    function colIndex(wsId) {
         const local = (wsId - 1) % workspacesShown;
         return expanded ? local % columnsNumber : Math.floor(local / rowsNumber);
+    }
+
+    function dispatch(lua) {
+        Hyprland.dispatch(lua);
     }
 
     GridLayout {
@@ -76,22 +73,27 @@ Item {
 
         Repeater {
             model: root.workspacesShown
+
             delegate: Rectangle {
-                property int rowIndex: Math.floor(index / root.columnsNumber)
-                property int colIndex: index % root.columnsNumber
-                property int workspaceValue: root.getWorkspaceNumber(rowIndex, colIndex)
+                required property int index
+
+                readonly property int rowIdx: Math.floor(index / root.columnsNumber)
+                readonly property int colIdx: index % root.columnsNumber
+                readonly property int wsValue: root.workspaceNumber(rowIdx, colIdx)
                 property bool hoveredWhileDragging: false
 
                 width: root.workspaceImplicitWidth
                 height: root.workspaceImplicitHeight
                 radius: Rounding.verylarge
+
+                color: hoveredWhileDragging ? ColorUtils.mix(ColorUtils.transparentize(Colors.m3.m3secondaryContainer, 0.86), Colors.colLayer1Hover, 0.1) : ColorUtils.transparentize(Colors.m3.m3secondaryContainer, 0.86)
+
                 border.width: 2
                 border.color: hoveredWhileDragging ? Colors.colLayer2Hover : "transparent"
-                color: hoveredWhileDragging ? ColorUtils.mix(ColorUtils.transparentize(Colors.m3.m3secondaryContainer, 0.86), Colors.colLayer1Hover, 0.1) : ColorUtils.transparentize(Colors.m3.m3secondaryContainer, 0.86)
 
                 StyledText {
                     anchors.centerIn: parent
-                    text: WorkspaceLabelManager.getDisplayText(workspaceValue)
+                    text: WorkspaceLabelManager.getDisplayText(parent.wsValue)
                     font.family: WorkspaceLabelManager.useJapanese ? "Noto Sans CJK JP" : "Rubik"
                     font.weight: WorkspaceLabelManager.useJapanese ? Font.Light : Font.DemiBold
                     font.pixelSize: 40
@@ -105,20 +107,20 @@ Item {
                     acceptedButtons: Qt.LeftButton
                     onClicked: {
                         if (root.draggingTargetWorkspace === -1)
-                            Hyprland.dispatch(`workspace ${workspaceValue}`);
+                            root.dispatch(`hl.dsp.focus({ workspace = ${parent.wsValue} })`);
                     }
                 }
 
                 DropArea {
                     anchors.fill: parent
                     onEntered: {
-                        root.draggingTargetWorkspace = workspaceValue;
-                        if (root.draggingFromWorkspace !== workspaceValue)
-                            hoveredWhileDragging = true;
+                        root.draggingTargetWorkspace = parent.wsValue;
+                        if (root.draggingFromWorkspace !== parent.wsValue)
+                            parent.hoveredWhileDragging = true;
                     }
                     onExited: {
-                        hoveredWhileDragging = false;
-                        if (root.draggingTargetWorkspace === workspaceValue)
+                        parent.hoveredWhileDragging = false;
+                        if (root.draggingTargetWorkspace === parent.wsValue)
                             root.draggingTargetWorkspace = -1;
                     }
                 }
@@ -140,29 +142,29 @@ Item {
                 }).sort((a, b) => {
                     const wa = root.windowByAddress[`0x${a.HyprlandToplevel.address}`];
                     const wb = root.windowByAddress[`0x${b.HyprlandToplevel.address}`];
-                    const areaA = (wa?.size[0] ?? 0) * (wa?.size[1] ?? 0);
-                    const areaB = (wb?.size[0] ?? 0) * (wb?.size[1] ?? 0);
-                    return areaB - areaA;
+                    return ((wb?.size[0] ?? 0) * (wb?.size[1] ?? 0)) - ((wa?.size[0] ?? 0) * (wa?.size[1] ?? 0));
                 })
             }
 
             delegate: OverviewWindow {
                 id: window
                 required property var modelData
-                property string address: `0x${modelData.HyprlandToplevel.address}`
-                property int wsCol: windowData?.workspace?.id !== undefined ? root.getColIndex(windowData.workspace.id) : 0
-                property int wsRow: windowData?.workspace?.id !== undefined ? root.getRowIndex(windowData.workspace.id) : 0
-                property bool atInitPosition: initX === x && initY === y
-                windowData: root.windowByAddress[address]
+
+                readonly property string address: `0x${modelData.HyprlandToplevel.address}`
+                readonly property var winData: root.windowByAddress[address]
+                readonly property int wsId: winData?.workspace?.id ?? -1
+                readonly property bool atInitPos: initX === x && initY === y
+
+                windowData: winData
                 toplevel: modelData
                 monitorData: root.monitorData
                 viewScale: root.viewScale
                 availableWorkspaceWidth: root.workspaceImplicitWidth
                 availableWorkspaceHeight: root.workspaceImplicitHeight
-                restrictToWorkspace: Drag.active || atInitPosition
-                xOffset: (root.workspaceImplicitWidth + root.workspaceSpacing) * wsCol
-                yOffset: (root.workspaceImplicitHeight + root.workspaceSpacing) * wsRow
-                z: atInitPosition ? root.windowZ : root.windowDraggingZ
+                restrictToWorkspace: Drag.active || atInitPos
+                xOffset: (root.workspaceImplicitWidth + root.workspaceSpacing) * root.colIndex(wsId)
+                yOffset: (root.workspaceImplicitHeight + root.workspaceSpacing) * root.rowIndex(wsId)
+                z: atInitPos ? root.windowZ : root.windowDraggingZ
 
                 Drag.hotSpot.x: targetWindowWidth / 2
                 Drag.hotSpot.y: targetWindowHeight / 2
@@ -171,7 +173,7 @@ Item {
                     id: updatePos
                     interval: 50
                     onTriggered: {
-                        const wd = window.windowData;
+                        const wd = window.winData;
                         const md = window.monitorData;
                         if (wd?.at?.length >= 2 && md?.reserved?.length >= 4) {
                             window.x = Math.round(Math.max((wd.at[0] - (md.x ?? 0) - md.reserved[3]) * root.viewScale, 0) + window.xOffset);
@@ -187,11 +189,11 @@ Item {
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                     drag.target: parent
 
-                    onEntered: hovered = true
-                    onExited: hovered = false
+                    onEntered: window.hovered = true
+                    onExited: window.hovered = false
 
                     onPressed: mouse => {
-                        root.draggingFromWorkspace = window.windowData?.workspace.id;
+                        root.draggingFromWorkspace = window.wsId;
                         window.pressed = true;
                         window.Drag.active = true;
                         window.Drag.source = window;
@@ -204,8 +206,9 @@ Item {
                         window.pressed = false;
                         window.Drag.active = false;
                         root.draggingFromWorkspace = -1;
-                        if (target !== -1 && window.windowData?.workspace?.id !== undefined && target !== window.windowData.workspace.id) {
-                            Hyprland.dispatch(`movetoworkspacesilent ${target}, address:${window.windowData.address}`);
+
+                        if (target !== -1 && window.wsId !== -1 && target !== window.wsId) {
+                            root.dispatch(`hl.dsp.window.move({ workspace = ${target}, window = "address:${window.address}", silent = true })`);
                             updatePos.restart();
                         } else {
                             window.x = window.initX;
@@ -214,19 +217,19 @@ Item {
                     }
 
                     onClicked: event => {
-                        if (!window.windowData)
+                        if (!window.winData)
                             return;
                         if (event.button === Qt.LeftButton)
-                            Hyprland.dispatch(`focuswindow address:${window.windowData.address}`);
+                            root.dispatch(`hl.dsp.exec_raw("focuswindow address:${window.address}")`);
                         else if (event.button === Qt.MiddleButton)
-                            Hyprland.dispatch(`closewindow address:${window.windowData.address}`);
+                            root.dispatch(`hl.dsp.window.close({ window = "address:${window.address}" })`);
                         event.accepted = true;
                     }
 
                     StyledToolTip {
                         extraVisibleCondition: false
                         alternativeVisibleCondition: dragArea.containsMouse && !window.Drag.active
-                        content: window.windowData ? `${window.windowData.title ?? ""}\n[${window.windowData.class ?? ""}] ${window.windowData.xwayland ? "[XWayland] " : ""}\n` : ""
+                        content: window.winData ? `${window.winData.title ?? ""}\n[${window.winData.class ?? ""}]${window.winData.xwayland ? " [XWayland]" : ""}\n` : ""
                     }
                 }
             }
@@ -234,18 +237,17 @@ Item {
 
         Rectangle {
             id: focusedWorkspaceIndicator
-            property int activeRow: root.getRowIndex(root.activeWorkspaceId)
-            property int activeCol: root.getColIndex(root.activeWorkspaceId)
 
-            x: (root.workspaceImplicitWidth + root.workspaceSpacing) * activeCol
-            y: (root.workspaceImplicitHeight + root.workspaceSpacing) * activeRow
+            x: (root.workspaceImplicitWidth + root.workspaceSpacing) * root.colIndex(root.activeWorkspaceId)
+            y: (root.workspaceImplicitHeight + root.workspaceSpacing) * root.rowIndex(root.activeWorkspaceId)
             z: root.windowZ
+
             width: root.workspaceImplicitWidth
             height: root.workspaceImplicitHeight
-            color: "transparent"
             radius: Rounding.verylarge
+            color: "transparent"
             border.width: 2
-            border.color: root.activeBorderColor
+            border.color: Colors.colSecondary
 
             Behavior on x {
                 Anim {}

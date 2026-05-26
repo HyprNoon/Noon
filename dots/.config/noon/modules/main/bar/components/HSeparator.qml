@@ -7,7 +7,7 @@ import qs.store
 RowLayout {
     id: root
     visible: Mem.options.bar.appearance.enableSeparators
-    height: childrenRect.height
+    height: bg.height
     Layout.fillWidth: true
     Layout.leftMargin: Padding.large
     Layout.rightMargin: Padding.large
@@ -16,7 +16,6 @@ RowLayout {
     state: Mem.options.bar.appearance.separatorsMode
     Rectangle {
         id: bg
-        anchors.centerIn: parent
         color: Colors.colOutlineVariant
         state: root.state
         states: [

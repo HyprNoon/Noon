@@ -93,7 +93,7 @@ Singleton {
         },
         "Beats": {
             icon: "music_note",
-            activeIcon: "music_note_add",
+            activeIcon: "music_cast",
             shell: "main",
             componentPath: "beats/Beats",
             expandable: true,

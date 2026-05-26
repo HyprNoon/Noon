@@ -159,9 +159,9 @@ Scope {
 
         // function feedDownloadInfo(text: string): void {
         //     const msg = JSON.parse(text);
-        //     console.log(text, Array.from(DownloadService.model).toString());
+        //     console.log(text, Array.from(DownloadService.manager).toString());
         //     if (msg.type === "downloads.add")
-        //         DownloadService.model.handleAdd(msg);
+        //         DownloadService.manager.handleAdd(msg);
         // }
 
         function feedDownloadInfo(text: string): void {
@@ -186,7 +186,7 @@ Scope {
                 description: url,
                 acceptText: "Download " + (size < 1 ? "" : StringUtils.cleanFileSizeFromBytes(size)),
                 onAccepted: () => {
-                    DownloadService.model.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), JSON.parse(headers));
+                    DownloadService.manager.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), JSON.parse(headers));
                     Qt.callLater(() => NoonUtils.callIpc("sidebar reveal Downloads"));
                 }
             });

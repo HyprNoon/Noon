@@ -19,7 +19,7 @@ Singleton {
     readonly property var store: Mem.states.services.todo
     readonly property var statusNames: ["Not Started", "In Progress", "Final Touches", "Finished"]
     readonly property var statusLabels: ["todo", "in_progress", "final_touches", "done"]
-    readonly property bool useGoogleTasks: true
+    readonly property bool useGoogleTasks: false
     Component.onCompleted: Qt.callLater(pull)
 
     function _insertTask(desc, status, date, children) {
@@ -65,19 +65,19 @@ Singleton {
     }
 
     function nextStatus(index) {
-        if (index >= 0 && index < list.length && list[index].status < TodoService.Status.Done) {
+        if (index > -1 && index < list.length && list[index].status < TodoService.Status.Done) {
             setStatus(index, list[index].status + 1);
         }
     }
 
     function previousStatus(index) {
-        if (index >= 0 && index < list.length && list[index].status > TodoService.Status.Todo) {
+        if (index > -1 && index < list.length && list[index].status > TodoService.Status.Todo) {
             setStatus(index, list[index].status - 1);
         }
     }
 
     function deleteItem(index) {
-        if (index >= 0 && index < list.length) {
+        if (index > -1 && index < list.length) {
             store.tasks.splice(index, 1).slice(0);
             Qt.callLater(push);
         }

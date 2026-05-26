@@ -28,6 +28,11 @@ Scope {
             exclusiveZone: root.pinned ? bg?.height + Sizes.elevationMargin : -1
             fill: true
             anchors.top: false
+            Binding {
+                target: GlobalStates.main
+                property: "dock"
+                value: dockRoot
+            }
             mask: Region {
                 item: mouseArea
             }

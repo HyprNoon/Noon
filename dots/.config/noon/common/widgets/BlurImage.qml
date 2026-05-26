@@ -22,7 +22,7 @@ Image {
     fillMode: Image.PreserveAspectCrop
     layer.enabled: root.blur
 
-    Rectangle {
+    StyledRect {
         visible: root.tint
         anchors.fill: parent
         color: root.tintColor
