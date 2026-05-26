@@ -67,7 +67,8 @@ LayerRect {
             implicitWidth: 400
             implicitHeight: 400
             anchors.centerIn: parent
-            icon: "download"
+            shape: listRoot.finished ? MaterialShape.Cookie9Sided : MaterialShape.PixelCircle
+            icon: listRoot.finished ? "check" : "download"
             shown: list.count === 0
             title: listRoot.finished ? "No Finished Downloads" : "No Active Downloads"
             description: listRoot.finished ? "Your completed downloads will appear here" : "Your active downloads will appear here"

@@ -218,7 +218,7 @@ Singleton {
 
     Connections {
         target: player
-        enabled: false // root.player && root.player.dbusName.includes("mpd")
+        enabled: false // root.queue.length === 0 && root.player && root.player.dbusName.includes("mpd")
         function onTrackTitleChanged() {
             root.getQueue();
         }

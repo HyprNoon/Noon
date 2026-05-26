@@ -80,13 +80,24 @@ StyledRect {
                         anchors.centerIn: parent
                         spacing: Padding.small
 
-                        Symbol { font.pixelSize: 14; text: "close"; color: Colors.colOnLayer2 }
-                        StyledText { text: "Cancel"; color: Colors.colOnLayer2; font.pixelSize: Fonts.sizes.small }
+                        Symbol {
+                            font.pixelSize: 14
+                            text: "close"
+                            color: Colors.colOnLayer2
+                        }
+                        StyledText {
+                            text: "Cancel"
+                            color: Colors.colOnLayer2
+                            font.pixelSize: Fonts.sizes.small
+                        }
                     }
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: { root.moveSrc = -1; root.moveSrcItem = null; }
+                        onClicked: {
+                            root.moveSrc = -1;
+                            root.moveSrcItem = null;
+                        }
                     }
                 }
             }
@@ -117,19 +128,17 @@ StyledRect {
                     return titleMatch || artistMatch;
                 });
             }
-
-            currentIndex: {
-                let currentTitle = BeatsService.player.trackTitle;
-                if (!model || currentTitle === undefined)
-                    return -1;
-
-                let modelArray = Array.isArray(model) ? model : [];
-                for (let i = 0; i < modelArray.length; i++) {
-                    if (modelArray[i] && modelArray[i].title === currentTitle) {
-                        return i;
-                    }
+            currentIndex: updateIndex()
+            Connections {
+                target: BeatsService
+                function onTitleChanged() {
+                    list.updateIndex();
                 }
-                return -1;
+            }
+            function updateIndex() {
+                const title = BeatsService.player.trackTitle;
+                const model = BeatsService.queue;
+                list.currentIndex = model?.findIndex(t => t.title === title) ?? -1;
             }
 
             highlight: Item {
@@ -140,7 +149,9 @@ StyledRect {
                     anchors.left: parent.left
                     anchors.leftMargin: Padding.huge
                     anchors.verticalCenter: parent.verticalCenter
-                    height: 24; radius: 6; width: 6
+                    height: 24
+                    radius: 6
+                    width: 6
                     color: Colors.colPrimary
                 }
             }
@@ -185,7 +196,10 @@ StyledRect {
                     anchors.leftMargin: Padding.normal
                     spacing: Padding.massive
 
-                    Item { height: 24; width: 6 }
+                    Item {
+                        height: 24
+                        width: 6
+                    }
 
                     ColumnLayout {
                         Layout.fillWidth: true
