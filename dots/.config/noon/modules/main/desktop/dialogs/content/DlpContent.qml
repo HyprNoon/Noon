@@ -18,34 +18,18 @@ Item {
     property var segmentedButtonsContent: ["Audio", "Video"]
     signal dismiss
 
-    // Simplified quality options mapped to yt-dlp parameters
     readonly property var qualityOptions: ({
-            "video": {
-                options: ["1080p", "720p", "480p", "360p"],
-                default: "720p",
-                toParams: quality => {
-                    let height = quality.replace("p", "");
-                    // Format: "yt-dlp-format|post-processing-args"
-                    return `bestvideo[height<=${height}]+bestaudio/best[height<=${height}]|`;
-                }
-            },
-            "audio": {
-                options: ["Best", "Medium", "Low"],
-                default: "Best",
-                toParams: quality => {
-                    let qualityMap = {
-                        "Best": "0",
-                        "Medium": "5",
-                        "Low": "9"
-                    };
-                    let q = qualityMap[quality];
-                    // Passes the audio format and the conversion/metadata flags
-                    return `bestaudio|--extract-audio --audio-format mp3 --audio-quality ${q} --embed-thumbnail --add-metadata`;
-                }
-            }
+            "audio": ["Best", "Standard", "Low"],
+            "video": ["Best", "Standard", "Low"]
         })
 
-    readonly property var avilableActions: [
+    readonly property var qualityMap: ({
+            "Best": "best",
+            "Standard": "standard",
+            "Low": "low"
+        })
+
+    readonly property var availableActions: [
         {
             text: "Download",
             action: () => {
@@ -60,23 +44,23 @@ Item {
             }
         }
     ]
-    function execute() {
-        let url = root.url;
-        if (!url)
-            return;
-        let mode = segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase();
-        const isAudio = mode === "audio";
-        let dir = isAudio ? FileUtils.trimFileProtocol(Directories.standard.music) : FileUtils.trimFileProtocol(Directories.standard.videos);
-        let config = qualityOptions[mode];
-        let quality = qualityRow.model[qualityRow.currentIndex] || config.default;
-        let params = config.toParams(quality);
 
-        BeatsService.downloadWithDLP({
-            parameters: params,
+    function execute() {
+        if (!root.url)
+            return;
+
+        const mode = segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase();
+        const isAudio = mode === "audio";
+        const dir = isAudio ? FileUtils.trimFileProtocol(Directories.standard.music) : FileUtils.trimFileProtocol(Directories.standard.videos);
+        const label = qualityRow.model[qualityRow.currentIndex] ?? "Best";
+
+        DlpService.request({
             url: root.url,
-            destination: dir
+            audio: isAudio,
+            video: !isAudio,
+            quality: root.qualityMap[label],
+            directory: dir
         });
-        root.dismiss();
     }
 
     ColumnLayout {
@@ -88,6 +72,7 @@ Item {
             implicitWidth: placeholder.implicitWidth
             Layout.preferredHeight: 200
             Layout.alignment: Qt.AlignHCenter
+
             PagePlaceholder {
                 id: placeholder
                 icon: "play_arrow"
@@ -111,9 +96,9 @@ Item {
 
         OptionRow {
             id: qualityRow
-            property string currentMode: segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase()
+            readonly property string currentMode: segmentedButtonsContent[segmentedButtons.selectedIndex].toLowerCase()
             text: "Download Quality"
-            model: currentMode === "video" ? qualityOptions.video.options : qualityOptions.audio.options
+            model: root.qualityOptions[currentMode]
             Layout.maximumWidth: root.width * 0.7
         }
     }
@@ -127,7 +112,7 @@ Item {
             margins: Padding.massive
         }
         Repeater {
-            model: root.avilableActions
+            model: root.availableActions
             delegate: DialogButton {
                 required property var modelData
                 buttonText: modelData.text

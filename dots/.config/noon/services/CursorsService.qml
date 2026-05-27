@@ -7,13 +7,25 @@ import qs.common
 
 Singleton {
     id: root
-    property var cursors
+    readonly property var cursors: Mem.store.services.cursors?.availableCursors ?? []
+
+    function reload() {
+        if (!getProc.running) {
+            Mem.store.services.cursors.availableCursors = [];
+            getProc.running = true;
+        }
+    }
+
     Process {
         id: getProc
-        running: true
+        running: Mem.store.services.cursors.availableCursors.length === 0
         command: ["bash", "-c", Directories.scriptsDir + "/get_cursors.sh"]
-        stdout: StdioCollector {
-            onStreamFinished: root.cursors = text.trim().split("\n")
+        stdout: SplitParser {
+            onRead: line => {
+                var current = Mem.store.services.cursors.availableCursors;
+                current.push(line);
+                Mem.store.services.cursors.availableCursors = current;
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ BottomDialog {
         anchors.fill: parent
         anchors.margins: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: root.isRecording ? "Recording Now" : "Screen Recording"
             subTitle: root.isRecording ? RecordingService.getFormattedDuration() : "Configure and Record"
             target: root
@@ -29,7 +29,7 @@ BottomDialog {
         Item {
             Layout.preferredHeight: 35
             Layout.fillWidth: true
-            BottomDialogSeparator {
+            PageSeparator {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.right: parent.right

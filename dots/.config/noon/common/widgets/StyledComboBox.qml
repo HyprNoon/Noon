@@ -17,16 +17,15 @@ ComboBox {
         width: ListView.view.width
         height: 45
         highlighted: root.highlightedIndex === index
-
+        readonly property bool isSelected: index === root.currentIndex
         contentItem: RowLayout {
             anchors.centerIn: parent
             spacing: Padding.normal
 
             Symbol {
-                fill: 1
-                text: modelData?.icon ?? ""
-                font.pixelSize: 20
-                color: delegated.highlighted ? Colors.m3.m3primary : Colors.colOnLayer1
+                text: isSelected ? "check" : modelData?.icon ?? ""
+                font.pixelSize: 24
+                color: delegated.highlighted ? Colors.m3.m3onPrimary : Colors.colOnSurface
             }
 
             StyledText {
@@ -34,30 +33,29 @@ ComboBox {
                 text: modelData?.name ?? modelData ?? ""
                 font.pixelSize: 14
                 truncate: true
-                color: delegated.highlighted ? Colors.m3.m3primary : Colors.colOnLayer1
+                color: delegated.highlighted ? Colors.m3.m3onPrimary : Colors.colOnSurface
             }
         }
 
         background: Rectangle {
-            color: parent.highlighted ? Colors.m3.m3primaryContainer : "transparent"
+            color: parent.highlighted ? Colors.m3.m3primary : "transparent"
             radius: Rounding.large
         }
     }
 
     contentItem: StyledText {
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
+        font.variableAxes: Fonts.variableAxes.main
         text: root.displayText
-        color: Colors.colOnLayer1
-        leftPadding: Padding.large
-        rightPadding: Padding.verylarge
+        color: Colors.colOnLayer2
+        leftPadding: Padding.huge
+        rightPadding: Padding.huge
         truncate: true
     }
 
     background: Rectangle {
-        color: Colors.colLayer2
+        color: Colors.colLayer3
         radius: Rounding.small
     }
 
@@ -68,8 +66,8 @@ ComboBox {
 
     popup: Popup {
         id: popup
-        width: root.width + Padding.massive * 3
-        padding: Padding.large
+        padding: Padding.normal
+        implicitWidth: root.width + padding * 4
         implicitHeight: Math.min(contentItem.implicitHeight + padding, 300)
         height: 0
         opacity: 0
@@ -88,7 +86,7 @@ ComboBox {
         }
 
         background: StyledRect {
-            color: Colors.colLayer2
+            color: Colors.colSurfaceContainerHigh
             radius: Rounding.verylarge
             // enableBorders: true
         }

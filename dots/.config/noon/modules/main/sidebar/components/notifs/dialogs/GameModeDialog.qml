@@ -9,11 +9,6 @@ BottomDialog {
     id: root
     collapsedHeight: 450
     enableStagedReveal: false
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
 
     property var cmd: []
     property var properties: [
@@ -47,12 +42,12 @@ BottomDialog {
         anchors.fill: parent
         anchors.margins: Padding.massive
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Game Mode"
             subTitle: "Choose what to disable"
             target: root
         }
-        BottomDialogSeparator {}
+        PageSeparator {}
         Repeater {
             model: root.properties
             delegate: OptionRow {

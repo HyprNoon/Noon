@@ -26,7 +26,6 @@ Item {
     }
     StyledRectangularShadow {
         target: bg
-        intensity: 0.5
     }
     StyledRect {
         id: bg

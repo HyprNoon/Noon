@@ -6,14 +6,10 @@ JsonAdapter {
         property list<string> systemCommands: []
     }
 
-    property JO secrets: JO {
-        property string wallhaven: ""
-        property string unsplash: ""
-    }
-
     property JO services: JO {
         property JO ambientSounds
         property JO icons
+        property JO cursors
         property JO emojis
         property JO backlight
         property JO cheats
@@ -236,7 +232,9 @@ JsonAdapter {
         backlight: JO {
             property list<var> devices: []
         }
-
+        cursors: JO {
+            property list<string> availableCursors: []
+        }
         icons: JO {
             property list<var> availableIconThemes: []
         }

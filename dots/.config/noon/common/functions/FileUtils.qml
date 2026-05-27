@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import Quickshell
 import Quickshell.Io
 import qs.common
+import Noon.Protocols
 
 Singleton {
     id: root
@@ -190,14 +191,20 @@ Singleton {
             return null;
         }
     }
-    function handleTelda(filePath: string) {
+    function collapsePath(path) {
+        if (!path)
+            return;
+        return path.trim().replace(/^file:\/\/\/home\/[^\/]+/, "~");
+    }
+
+    function expandPath(filePath) {
         if (!filePath)
             return;
         if (filePath.startsWith("~")) {
             return Directories.standard.home + filePath.substring(1);
         }
     }
-    function mkdir(directories: var) {
+    function mkdir(directories) {
         if (!directories)
             return;
 
@@ -205,12 +212,23 @@ Singleton {
         NoonUtils.execDetached(`mkdir -p '${trimmedDirs.join("' '")}'`);
     }
 
-    function copyItem(item: string, target: string) {
+    function copyItem(item, target) {
         NoonUtils.execDetached(`cp ${trimFileProtocol(item)} ${trimFileProtocol(target)}`);
     }
     // by its same name
-    function moveItem(item: string, target: string) {
+    function moveItem(item, target) {
         const fileName = getEscapedFileName(item);
         NoonUtils.execDetached(`mv ${trimFileProtocol(item)} ${trimFileProtocol(target)}/${fileName}`);
+    }
+
+    function createFileWith(path, content) {
+        NoonUtils.execDetached(["echo", `"${content}"`, ">", path]);
+    }
+    function exists(path) {
+        var p = path;
+        if (p.startsWith('/'))
+            "file://" + p;
+
+        return FileProtocols.exists(p);
     }
 }

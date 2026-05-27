@@ -31,7 +31,7 @@ StyledText {
     opacity: 1
     font.pixelSize: Fonts.sizes.normal
     color: Colors.m3.m3onSurfaceVariant
-    text: activeWindow?.activated ? activeWindow?.appId : qsTr("HyprNoon")
+    text: activeWindow?.activated ? activeWindow?.appId : qsTr("Noon")
     elide: Text.ElideLeft
     Layout.alignment: Qt.AlignVCenter
 }

@@ -11,6 +11,7 @@ import mpd
 from .config import get_player_conf
 
 WORKERS = os.cpu_count() or 4
+TEMP_FILE = os.path.expanduser("~/.local/state/noon/user/generated/beats_library.json")
 
 
 def _process_chunk(args: tuple) -> list:
@@ -219,6 +220,8 @@ class LibraryManager:
                     "cover": cover_map.get(rel, ""),
                 }
             )
+        with open(TEMP_FILE, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
         return result
 
     def list_artists(self) -> list:

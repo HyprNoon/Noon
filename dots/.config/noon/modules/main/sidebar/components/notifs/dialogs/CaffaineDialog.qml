@@ -9,23 +9,18 @@ BottomDialog {
     id: root
 
     collapsedHeight: parent.height * 0.4
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.large
         spacing: Padding.verylarge
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Caffeine"
             subTitle: "Control inactive timeout"
         }
 
-        BottomDialogSeparator {}
+        PageSeparator {}
 
         ColumnLayout {
             Layout.fillWidth: true

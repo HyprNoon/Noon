@@ -9,22 +9,28 @@ RedunduntMultiViewPanel {
     signal searchFocusRequested
     signal contentFocusRequested
     signal dismiss
+    property bool expanded
     property string searchQuery: ""
     lazy: false
+    onExpandedChanged: console.log("Root.expanded: ", expanded)
     tabButtonList: [
         {
             "icon": "window",
             "name": "Group",
             "component": "AppsGrid",
-            "preload": "searchQuery",
-            "preloadData": searchQuery
+            "preloadTable": {
+                "searchQuery": searchQuery,
+                "expanded": expanded
+            }
         },
         {
             "icon": "list",
             "name": "All",
             "component": "AppsList",
-            "preload": "searchQuery",
-            "preloadData": searchQuery
+            "preloadTable": {
+                "searchQuery": searchQuery,
+                "expanded": expanded
+            }
         }
     ]
     Connections {

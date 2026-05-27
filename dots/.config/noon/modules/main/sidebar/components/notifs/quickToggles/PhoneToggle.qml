@@ -3,13 +3,9 @@ import qs.common
 import qs.services
 
 QuickToggleButton {
-    readonly property var device: KdeConnectService?.availableDevices[0] || KdeConnectService?.devices[0]
-    readonly property bool isAvailable: KdeConnectService.availableDevices.length > 0
-
+    buttonName: KdeConnectService?.selectedDeviceName || "Offline"
     dialogName: "Phone"
-    buttonName: "Phone"
-    buttonSubtext: device?.name ?? "No Devices"
-    toggled: isAvailable
-    buttonIcon: isAvailable ? "phonelink" : "phonelink_off"
-    onClicked: KdeConnectService.togglePower()
+    buttonSubtext: KdeConnectService?.selectedDeviceStatus || "No Reachable Devices"
+    toggled: KdeConnectService?.selectedDeviceName.length > 0
+    buttonIcon: toggled ? "phonelink" : "phonelink_off"
 }

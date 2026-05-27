@@ -6,7 +6,7 @@ import Quickshell.Hyprland
 import qs.common
 import qs.common.functions
 import qs.common.widgets
-import qs.modules.main.desktop.bg
+import qs.modules.common.bg
 import qs.services
 import qs.store
 

@@ -25,7 +25,7 @@ Item {
         anchors.margins: Padding.massive * 1.5
         spacing: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Thawb  -  ثوب"
             subTitle: "Get New Thawb"
             showCloseButton: false

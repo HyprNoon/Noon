@@ -119,25 +119,6 @@ class WallpaperSwitcher:
             self.state_data["desktop"]["appearance"]["isBright"] = bool(is_bright)
         self._save_state()
 
-    def update_colors(self, chroma=None, tone=None):
-        if chroma is not None:
-            try:
-                self.state_data["desktop"]["colors"]["chroma"] = float(chroma)
-            except (ValueError, TypeError):
-                print(f"ERROR: Invalid chroma value: {chroma}")
-                return
-        if tone is not None:
-            try:
-                self.state_data["desktop"]["colors"]["tone"] = float(tone)
-            except (ValueError, TypeError):
-                print(f"ERROR: Invalid tone value: {tone}")
-                return
-        self._save_state()
-
-    def update_icon_theme(self, theme):
-        self.state_data["desktop"]["icons"]["currentIconTheme"] = theme
-        self._save_state()
-
     def update_bg(self, image_path="", video_path="", is_live=False):
         if image_path:
             self.state_data["desktop"]["bg"]["currentBg"] = f"file://{image_path}"
@@ -279,43 +260,6 @@ class WallpaperSwitcher:
             print("WARNING: matugen not found")
 
         time.sleep(0.2)
-
-        if shutil.which("kde-material-you-colors"):
-            self.shell_run("killall kde-material-you-colors 2>/dev/null")
-            time.sleep(0.1)
-
-            sv_num = SCHEME_VARIANT_MAP.get(curr_scheme, 5)
-            mode_flag = "-d" if shell_mode == "dark" else "-l"
-            icon_theme = self.get_icon_theme()
-            chroma = self.get_chroma_multiplier()
-            tone = self.get_tone_multiplier()
-
-            cmd_list = [
-                "kde-material-you-colors",
-                mode_flag,
-                "--color",
-                f"#{hex_color}",  # needs # prefix
-                "--manual-fetch",  # skip plasmashell DBus wallpaper read
-                "--scheme-variant",
-                str(sv_num),
-                "--iconslight",
-                icon_theme,
-                "--iconsdark",
-                icon_theme,
-                "--chroma-multiplier",
-                str(chroma),
-                "--tone-multiplier",
-                str(tone),
-            ]
-
-            with open(os.devnull, "w") as devnull:
-                subprocess.Popen(
-                    cmd_list, stdout=devnull, stderr=devnull, start_new_session=True
-                )
-
-            print(f"KDE theme applied (chroma: {chroma}, tone: {tone})")
-        else:
-            print("WARNING: kde-material-you-colors not found")
 
         return True
 
@@ -471,24 +415,6 @@ class WallpaperSwitcher:
             return self.get_current_scheme()
 
         return requested_scheme or self.get_current_scheme()
-
-    def needs_icon_update(self, target_mode):
-        if self.get_current_shell_mode() == target_mode:
-            return False
-        return any(
-            shutil.which(t)
-            for t in ["lookandfeeltool", "kicontool", "gtk-update-icon-cache"]
-        )
-
-    def update_icons_if_needed(self, mode):
-        if not self.needs_icon_update(mode):
-            return
-        print(f"Updating icons for {mode} mode")
-        current_theme = self.get_icon_theme()
-        if shutil.which("lookandfeeltool"):
-            self.shell_run(f"lookandfeeltool -i {current_theme}")
-        elif shutil.which("gtk-update-icon-cache"):
-            self.shell_run(f"gtk-update-icon-cache -f /usr/share/icons/{current_theme}")
 
     def setup_gnome_theme(self, mode=None):
         if not mode:
@@ -689,9 +615,13 @@ class WallpaperSwitcher:
         color=None,
         force_cli=False,
         color_source_override=None,
+        no_gen=False,
     ):
         try:
             if color:
+                if no_gen:
+                    print("--no-gen: ignoring color mode\n")
+                    return
                 print("\n--- Color Mode ---")
                 if color_source_override:
                     print("INFO: --extract-col-from is ignored in color mode")
@@ -710,7 +640,6 @@ class WallpaperSwitcher:
                 self.apply_colors(color=color, mode=current_mode, scheme=current_scheme)
                 self.update_appearance(current_mode, current_scheme, is_bright=False)
                 self.setup_gnome_theme(current_mode)
-                self.update_icons_if_needed(current_mode)
                 print("Color mode complete\n")
                 return
 
@@ -724,48 +653,56 @@ class WallpaperSwitcher:
             if is_vid:
                 print("\n--- Video Wallpaper ---")
                 print(f"File: {imgpath.name}")
-                self.update_bg(video_path=str(imgpath), is_live=True)
                 self.play_video_wallpaper(imgpath)
 
-                if color_source_override:
-                    override = Path(color_source_override)
-                    if override.is_file():
-                        color_source = override
-                        print(
-                            f"Color source: {color_source.name} (override — skipping ffmpeg)"
-                        )
+                if not no_gen:
+                    if color_source_override:
+                        override = Path(color_source_override)
+                        if override.is_file():
+                            color_source = override
+                            print(
+                                f"Color source: {color_source.name} (override — skipping ffmpeg)"
+                            )
+                        else:
+                            print(
+                                "WARNING: --extract-col-from path not found, falling back to frame extraction"
+                            )
+                            if not self.extract_video_frame(imgpath):
+                                print("WARNING: Skipping colour generation (no frame)")
+                                return
+                            color_source = TEMP_FRAME
                     else:
-                        print(
-                            "WARNING: --extract-col-from path not found, falling back to frame extraction"
-                        )
                         if not self.extract_video_frame(imgpath):
                             print("WARNING: Skipping colour generation (no frame)")
                             return
                         color_source = TEMP_FRAME
-                else:
-                    if not self.extract_video_frame(imgpath):
-                        print("WARNING: Skipping colour generation (no frame)")
-                        return
-                    color_source = TEMP_FRAME
 
             else:
                 print("\n--- Image Wallpaper ---")
                 print(f"File: {imgpath.name}")
                 self.kill_mpvpaper()
-                self.update_bg(image_path=str(imgpath), is_live=False)
 
-                if color_source_override:
-                    override = Path(color_source_override)
-                    if override.is_file():
-                        color_source = override
-                        print(f"Color source: {color_source.name} (override)")
+                if not no_gen:
+                    if color_source_override:
+                        override = Path(color_source_override)
+                        if override.is_file():
+                            color_source = override
+                            print(f"Color source: {color_source.name} (override)")
+                        else:
+                            print(
+                                "WARNING: --extract-col-from path not found, falling back to wallpaper"
+                            )
+                            color_source = imgpath
                     else:
-                        print(
-                            "WARNING: --extract-col-from path not found, falling back to wallpaper"
-                        )
                         color_source = imgpath
-                else:
-                    color_source = imgpath
+
+            if no_gen:
+                final_mode = mode or self.get_current_shell_mode()
+                final_scheme = scheme or self.get_current_scheme()
+                self.update_appearance(final_mode, final_scheme)
+                self.setup_gnome_theme(final_mode)
+                print("Wallpaper set (--no-gen: color generation disabled)\n")
+                return
 
             current_mode = self.get_effective_shell_mode(
                 requested_mode=mode,
@@ -794,7 +731,6 @@ class WallpaperSwitcher:
             )
             self.update_appearance(current_mode, current_scheme, is_bright=is_bright)
             self.setup_gnome_theme(current_mode)
-            self.update_icons_if_needed(current_mode)
             print("Wallpaper switch complete\n")
 
         except Exception as e:
@@ -815,7 +751,7 @@ def main():
         help="Force CLI arguments to override automatic mode / scheme detection",
     )
 
-    parser.add_argument("--image", "-i", help="Image or video path")
+    parser.add_argument("--source", "-i", help="Wallpaper source path (image or video)")
     parser.add_argument("--color", "-c", help="Hex colour (#RRGGBB or RRGGBB)")
     parser.add_argument("--pick", "-p", action="store_true", help="Open colour picker")
     parser.add_argument(
@@ -825,6 +761,11 @@ def main():
         "--random-no-recursive",
         action="store_true",
         help="Don't recurse subdirectories for random selection",
+    )
+    parser.add_argument(
+        "--choose",
+        action="store_true",
+        help="Open file picker to choose a wallpaper",
     )
     parser.add_argument(
         "--noswitch",
@@ -838,7 +779,13 @@ def main():
     )
 
     parser.add_argument(
-        "--restore-live",
+        "--no-gen",
+        action="store_true",
+        help="Skip color generation (matugen), set wallpaper only",
+    )
+
+    parser.add_argument(
+        "--restore",
         "-r",
         action="store_true",
         help="Restore last live video wallpaper",
@@ -912,7 +859,7 @@ def main():
             )
             sys.exit(0)
 
-        if args.restore_live:
+        if args.restore:
             switcher.restore_live()
             sys.exit(0)
 
@@ -920,65 +867,92 @@ def main():
         if args.mode:
             if args.mode.lower() in ("dark", "light"):
                 mode_arg = args.mode.lower()
+                switcher.set_shell_mode(mode_arg)
+                imgpath = switcher.state_data["desktop"]["bg"]["currentBg"].replace(
+                    "file://", ""
+                )
+                if imgpath and Path(imgpath).is_file() and not args.source:
+                    switcher.switch(
+                        imgpath,
+                        mode=mode_arg,
+                        force_cli=True,
+                        color_source_override=args.extract_col_from,
+                        scheme=args.scheme,
+                        no_gen=args.no_gen,
+                    )
+                    sys.exit(0)
             else:
                 print(f"ERROR: Invalid mode '{args.mode}'. Use dark, light, or toggle")
                 sys.exit(1)
 
-        if args.random:
-            imgpath = switcher.get_random_image(
-                args.random, recursive=not args.random_no_recursive
-            )
-            if not imgpath:
-                sys.exit(1)
-        else:
-            imgpath = args.image or (remaining[0] if remaining else "")
-            if args.noswitch:
-                imgpath = switcher.state_data["desktop"]["bg"]["currentBg"].replace(
-                    "file://", ""
-                )
-                if imgpath:
-                    print(f"INFO: Using current wallpaper: {Path(imgpath).name}\n")
-
-        if args.pick or args.color:
-            if args.extract_col_from:
-                print("INFO: --extract-col-from is ignored in colour/picker mode")
-            color = args.color
+        if args.pick:
+            color = switcher.pick_color()
             if color:
-                if re.match(r"^#?[A-Fa-f0-9]{6}$", color):
-                    color = color.lstrip("#")
-                else:
-                    print("ERROR: Invalid colour format (use #RRGGBB or RRGGBB)")
-                    sys.exit(1)
-            else:
-                color = switcher.pick_color()
-                if not color:
-                    sys.exit(1)
+                switcher.switch(
+                    None,
+                    mode=mode_arg,
+                    scheme=args.scheme,
+                    color=color,
+                    force_cli=args.force,
+                )
+            sys.exit(0)
+
+        if args.color:
+            color = args.color.lstrip("#")
             switcher.switch(
-                "", mode_arg, args.scheme, color=color, force_cli=args.force
+                None,
+                mode=mode_arg,
+                scheme=args.scheme,
+                color=color,
+                force_cli=args.force,
             )
             sys.exit(0)
 
-        if not imgpath:
+        imgpath = None
+        if args.source:
+            imgpath = args.source
+        elif args.random:
+            imgpath = switcher.get_random_image(
+                args.random, recursive=not args.random_no_recursive
+            )
+        elif args.choose:
             imgpath = switcher.pick_file()
-            if not imgpath or not Path(imgpath).is_file():
-                print("ERROR: No file selected")
+        elif args.noswitch:
+            current_bg = switcher.state_data["desktop"]["bg"]["currentBg"]
+            if current_bg and current_bg.startswith("file://"):
+                imgpath = current_bg.replace("file://", "")
+            else:
+                print("ERROR: No current wallpaper found in state")
                 sys.exit(1)
 
-        switcher.switch(
-            imgpath,
-            mode_arg,
-            args.scheme,
-            force_cli=args.force,
-            color_source_override=args.extract_col_from,
-        )
-        sys.exit(0)
+        if imgpath:
+            resolved_path = Path(imgpath).expanduser().resolve()
+            if resolved_path.is_file():
+                if switcher.is_image(resolved_path):
+                    switcher.update_bg(image_path=str(resolved_path), is_live=False)
+                elif switcher.is_video(resolved_path):
+                    switcher.update_bg(video_path=str(resolved_path), is_live=True)
+
+                switcher.switch(
+                    str(resolved_path),
+                    mode=mode_arg,
+                    scheme=args.scheme,
+                    force_cli=args.force,
+                    color_source_override=args.extract_col_from,
+                    no_gen=args.no_gen,
+                )
+            else:
+                print(f"ERROR: File not found: {resolved_path}")
+                sys.exit(1)
+        else:
+            if mode_arg or args.scheme:
+                print("Updating global appearance states only")
+                switcher.update_appearance(mode=mode_arg, scheme=args.scheme)
+                switcher.setup_gnome_theme(mode_arg)
 
     except KeyboardInterrupt:
-        print("\nInterrupted by user")
+        print("\nOperation cancelled by user")
         sys.exit(130)
-    except Exception as e:
-        print(f"ERROR: Fatal error: {e}")
-        sys.exit(1)
 
 
 if __name__ == "__main__":

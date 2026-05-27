@@ -9,22 +9,17 @@ BottomDialog {
     id: root
 
     collapsedHeight: 440
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.verylarge
         spacing: 0
 
-        BottomDialogHeader {
+        PageHeader {
             title: qsTr("Transparency")
         }
 
-        BottomDialogSeparator {}
+        PageSeparator {}
 
         ColumnLayout {
             Layout.fillWidth: true
@@ -61,7 +56,7 @@ BottomDialog {
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: "Shell Alpha"
+                        text: "Shell Transparency"
                         color: Colors.colOnSurfaceVariant
                     }
 
@@ -86,7 +81,7 @@ BottomDialog {
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: "Applications alpha"
+                        text: "Apps Transparency"
                         color: Colors.colOnSurfaceVariant
                     }
 
@@ -95,8 +90,8 @@ BottomDialog {
                         Layout.fillWidth: true
                         from: 0
                         to: 1
-                        value: Mem.hypr.applications_opacity
-                        onMoved: Mem.hypr.applications_opacity = value
+                        value: 1 - Mem.hypr.applications_opacity
+                        onMoved: Mem.hypr.applications_opacity = 1 - value
                     }
                 }
             }

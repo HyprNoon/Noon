@@ -20,6 +20,7 @@ LayerRect {
 
     onQueryChanged: debounceTimer.restart()
     onContentFocusRequested: listView.forceActiveFocus()
+    Component.onCompleted: OnlineWallpaperService._doFetch(1, false)
 
     Timer {
         id: debounceTimer

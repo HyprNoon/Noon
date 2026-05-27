@@ -5,11 +5,11 @@ import qs.common
 import qs.common.widgets
 
 StyledRect {
-    id: dropHint
+    id: root
     z: 999
     opacity: isActive ? 1 : 0
     anchors.fill: parent
-
+    property color hintColor: Colors.colPrimaryContainer
     property string text: "You Can Drop it Now!"
     property string icon: "keyboard_double_arrow_down"
     required property var target
@@ -24,18 +24,18 @@ StyledRect {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             color: Colors.colOnLayer0
-            font.pixelSize: 120 * dropHint.scale
-            text: dropHint.icon
+            font.pixelSize: 120 * root.scale
+            text: root.icon
             fill: 1
         }
 
         StyledText {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: Fonts.sizes.title * dropHint.scale
+            font.pixelSize: Fonts.sizes.title * root.scale
             font.variableAxes: Fonts.variableAxes.title
             color: Colors.colOnLayer0
-            text: dropHint.text
+            text: root.text
         }
     }
 
@@ -46,7 +46,7 @@ StyledRect {
         }
         GradientStop {
             position: 0.999
-            color: Colors.colPrimaryContainer
+            color: root.hintColor
         }
     }
 }

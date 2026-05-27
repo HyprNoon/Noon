@@ -11,7 +11,7 @@ RippleButton {
     horizontalPadding: Rounding.large
     verticalPadding: 12
     clip: true
-    // pointingHandCursor: !active
+    pointingHandCursor: !active
     implicitWidth: contentItem.implicitWidth + horizontalPadding * 2
     implicitHeight: contentItem.implicitHeight + verticalPadding * 2
     colBackground: ColorUtils.transparentize(Colors.colLayer3)
@@ -20,9 +20,6 @@ RippleButton {
     buttonRadius: Rounding.small
 
     Behavior on implicitHeight {
-        Anim {
-        }
-
+        Anim {}
     }
-
 }

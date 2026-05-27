@@ -104,31 +104,20 @@ class Player:
         self._run(fn)
 
     def play_url(self, url: str):
-        if self.name == "preview":
-            main = Player("main")
-            was_playing = main._run(lambda c: c.status().get("state") == "play")
-            if was_playing:
-                main._run(lambda c: c.pause(1))
+        try:
+            import yt_dlp
+            with yt_dlp.YoutubeDL({
+                "quiet": True, "noplaylist": True, "format": "bestaudio/best",
+            }) as ydl:
+                url = ydl.extract_info(url, download=False).get("url", url)
+        except Exception:
+            pass
+        def fn(c):
+            c.clear()
+            c.add(url)
+            c.play(0)
 
-            def fn(c):
-                c.clear()
-                c.add(url)
-                c.play(0)
-
-            self._run(fn)
-            from .config import set_player_conf
-
-            set_player_conf("preview", "resumeMain", bool(was_playing))
-        else:
-            self._run(lambda c: c.add(url))
-
-    def resume_main(self):
-        from .config import get_player_conf, set_player_conf
-
-        conf = get_player_conf("preview")
-        if conf.get("resumeMain", False):
-            Player("main")._run(lambda c: c.pause(0))
-            set_player_conf("preview", "resumeMain", False)
+        self._run(fn)
 
     def build_playlist(self, titles: str):
         title_list = [t.strip() for t in titles.split(",") if t.strip()]

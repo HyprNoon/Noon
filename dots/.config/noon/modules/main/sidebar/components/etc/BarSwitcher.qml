@@ -12,7 +12,7 @@ LayerRect {
     radius: Rounding.verylarge
 
     property string searchQuery: ""
-    readonly property bool isVerticalBar: BarData.position === "left" || BarData.position === "right"
+    readonly property bool isVerticalBar: BarData.isVertical
 
     signal searchFocusRequested
     signal contentFocusRequested
@@ -23,12 +23,11 @@ LayerRect {
     ScriptModel {
         id: barModel
         values: {
-            const currentLayout = Mem.options.bar.currentLayout;
             const query = root.searchQuery.toLowerCase().trim();
-
+            const opt = Mem.options.bar;
             return BarData.bars.filter(name => !query || name.toLowerCase().includes(query)).map(name => {
-                const isVertical = name[0] === name[0].toUpperCase() && name.startsWith("V");
-                const isActive = currentLayout === name;
+                const isVertical = name && name.startsWith("V");
+                const isActive = [opt.horizontalLayout, opt.verticalLayout].includes(name);
 
                 return {
                     name: `${name} (${isVertical ? 'Vertical' : 'Horizontal'})`,
@@ -41,6 +40,13 @@ LayerRect {
                 };
             });
         }
+    }
+
+    function execute(bar) {
+        if (bar.isVertical)
+            Mem.options.bar.verticalLayout = bar.layoutName;
+        else
+            Mem.options.bar.horizontalLayout = bar.layoutName;
     }
 
     StyledListView {
@@ -64,17 +70,10 @@ LayerRect {
                 extraVisibleCondition: parent.hovered
                 itemData: modelData
             }
-            releaseAction: () => {
-                root.dismiss();
-                // Set layout and adjust position if needed
-                Mem.options.bar.currentLayout = modelData.layoutName;
 
-                // If switching orientation, update position appropriately
-                if (modelData.isVertical && !root.isVerticalBar) {
-                    Mem.options.bar.behavior.position = "left";
-                } else if (!modelData.isVertical && root.isVerticalBar) {
-                    Mem.options.bar.behavior.position = "top";
-                }
+            releaseAction: () => {
+                root.execute(modelData);
+                Qt.callLater(root.dismiss);
             }
         }
 
@@ -86,15 +85,7 @@ LayerRect {
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0) {
                     const data = model.values[currentIndex];
-                    Mem.options.bar.currentLayout = data.layoutName;
-
-                    // Adjust position if switching orientation
-                    if (data.isVertical && !root.isVerticalBar) {
-                        Mem.options.bar.behavior.position = "left";
-                    } else if (!data.isVertical && root.isVerticalBar) {
-                        Mem.options.bar.behavior.position = "top";
-                    }
-
+                    root.execute(data);
                     root.dismiss();
                 }
             } else {
@@ -103,6 +94,7 @@ LayerRect {
             event.accepted = true;
         }
     }
+
     component Preview: StyledToolTip {
         required property var itemData
 

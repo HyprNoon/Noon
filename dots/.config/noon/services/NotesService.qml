@@ -9,7 +9,7 @@ Singleton {
     id: root
 
     readonly property string folderPath: Directories.standard.documents + "/Notes/"
-    property string fileName: "noon_notes.md"
+    property string fileName: Mem.states.services.notes?.currentFile ?? "noon_notes.md"
     property string filePath: folderPath + fileName
     property string content: ""
     property bool isDirty: false
@@ -43,10 +43,10 @@ Singleton {
         }
     }
 
-    function createNote(name: string) {
+    function createNote(name) {
         if (!name?.trim())
             return;
-        root.fileName = name.trim();
+        openNote(name.trim());
         root.content = "";
         root.isLoaded = false;
         root.isDirty = false;
@@ -54,10 +54,9 @@ Singleton {
         noteFile.reload();
     }
 
-    function openNote(name: string) {
-        if (!name)
-            return;
-        root.fileName = name.trim();
+    function openNote(name) {
+        if (name)
+            Mem.states.services.notes.currentFile = name.trim();
     }
 
     function save() {

@@ -38,59 +38,93 @@ StyledRect {
         }
     }
 
-    StyledListView {
-        id: list
+    ColumnLayout {
         anchors.fill: parent
-        hint: true
-        popin: false
-        animateAppearance: false
-        model: itemsModel
-        reuseItems: false
-        spacing: Padding.huge
-        delegate: ColumnLayout {
-            required property var modelData
-            required property int index
-            anchors.right: parent?.right
-            anchors.left: parent?.left
-            StyledText {
-                text: modelData?.section ?? ""
-                color: Colors.colOnLayer1
-                font.pixelSize: Fonts.sizes.normal
-                font.variableAxes: Fonts.variableAxes.title
-                leftPadding: Padding.huge
-                Layout.bottomMargin: Padding.small
-            }
 
-            Repeater {
-                id: itemsRepeater
-                model: ScriptModel {
-                    values: modelData.items
-                }
-                delegate: SettingsItem {
-                    required property var modelData
-                    required property int index
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+        AccountInfoSection {
+            color: "transparent"
+            Layout.margins: Padding.large
 
-                    topRadius: index === 0 ? Rounding.large : Rounding.tiny
-                    bottomRadius: index === itemsRepeater.count - 1 ? Rounding.large : Rounding.tiny
-                    icon: modelData?.icon ?? "settings"
-                    name: modelData?.name ?? ""
-                    key: modelData?.key ?? ""
-                    type: modelData?.type ?? "switch"
-                    store: modelData?.store ?? false
-                    sliderMinValue: modelData?.sliderMinValue ?? 0.0
-                    sliderMaxValue: modelData?.sliderMaxValue ?? 100.0
-                    reloadOnChange: modelData?.reloadOnChange ?? false
-                    actionName: modelData?.actionName ?? ""
-                    comboBoxValues: modelData?.comboBoxValues ?? []
-                    fillHeight: modelData?.fillHeight ?? false
-                    visible: modelData?.visible ?? true
-                    colors: root.colors
+            account: ({
+                    name: SysInfoService.username,
+                    image: SysInfoService.userPfp,
+                    handler: SysInfoService.distroId
+                })
+        }
+
+        StyledListView {
+            id: list
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            radius: Rounding.verylarge
+            clip: true
+            hint: true
+            popin: false
+            animateAppearance: false
+            model: itemsModel
+            reuseItems: false
+            spacing: Padding.veryhuge
+            delegate: StyledRect {
+                required property var modelData
+                required property int index
+                anchors.right: parent?.right
+                anchors.left: parent?.left
+                implicitHeight: sectionContent.implicitHeight + Padding.massive
+                radius: Rounding.veryhuge
+                color: Colors.colLayer1
+
+                ColumnLayout {
+                    id: sectionContent
+                    spacing: 4
+                    anchors.fill: parent
+                    anchors.margins: Padding.large
+
+                    StyledText {
+                        text: modelData?.section ?? ""
+                        color: Colors.colOnLayer1
+                        font.pixelSize: Fonts.sizes.normal
+                        // font.variableAxes: Fonts.variableAxes.title
+                        leftPadding: Padding.massive
+                        Layout.preferredHeight: 20
+                        Layout.bottomMargin: Padding.small
+                    }
+
+                    Repeater {
+                        id: itemsRepeater
+                        model: ScriptModel {
+                            values: modelData.items
+                        }
+                        delegate: SettingsItem {
+                            required property var modelData
+                            required property int index
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            topRadius: index === 0 ? Rounding.verylarge : Rounding.verytiny + 1
+                            bottomRadius: index === itemsRepeater.count - 1 ? Rounding.verylarge : Rounding.verytiny + 1
+                            icon: modelData?.icon ?? "settings"
+                            name: modelData?.name ?? ""
+                            key: modelData?.key ?? ""
+                            type: modelData?.type ?? "switch"
+                            store: modelData?.store ?? false
+                            canRefresh: modelData?.canRefresh ?? false
+                            refreshAction: () => modelData?.refreshAction() ?? null
+                            sliderMinValue: modelData?.sliderMinValue ?? 0.0
+                            sliderMaxValue: modelData?.sliderMaxValue ?? 100.0
+                            reloadOnChange: modelData?.reloadOnChange ?? false
+                            actionName: modelData?.actionName ?? ""
+                            comboBoxValues: modelData?.comboBoxValues ?? []
+                            fillHeight: modelData?.fillHeight ?? false
+                            visible: modelData?.visible ?? true
+                            colors: root.colors
+                        }
+                    }
                 }
             }
         }
     }
+
     PagePlaceholder {
         anchors.centerIn: parent
         shown: list.count === 0

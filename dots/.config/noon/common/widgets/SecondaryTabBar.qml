@@ -9,7 +9,7 @@ ColumnLayout {
     spacing: 0
     clip: true
     required property var tabButtonList // Something like [{"icon": "notifications", "name": qsTr("Notifications")}, {"icon": "volume_up", "name": qsTr("Volume mixer")}]
-    required property var externalTrackedTab
+    property var externalTrackedTab
 
     property bool enableIndicatorAnimation: false
     property bool enableSpacing: false

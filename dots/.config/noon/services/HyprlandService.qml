@@ -5,7 +5,7 @@ import QtQuick
 import Quickshell
 import qs.common
 import qs.common.utils
-import Noon.Utils.Hypr
+import Noon.Hypr
 
 Singleton {
     id: root
@@ -20,14 +20,34 @@ Singleton {
     readonly property var activeWorkspace: bridge.activeWorkspace
     readonly property string currentKeyboardLayout: bridge?.currentKeyboardLayout
     readonly property string keyboardLayoutShortName: currentKeyboardLayout.substring(0, 2).toUpperCase()
+    readonly property list<string> availableAnimations: root.availableAnimationsModel.getArray("fileBaseName")
+
+    readonly property FolderListModel availableAnimationsModel: FolderListModel {
+        folder: Directories.standard.config + "/hypr/lua/animations/"
+        nameFilters: ["*.lua"]
+    }
 
     onKeyboardLayoutShortNameChanged: NoonUtils.toast({
         id: 7,
         content: "Keyboard layout changed to " + root.keyboardLayoutShortName,
         icon: "keyboard_command_key"
     })
-
+    Component.onCompleted: bindVars()
     function switchKeyboardLayout() {
         NoonUtils.execDetached(["hyprctl", "switchxkblayout", "current", "next"]);
+    }
+    function bindVars() {
+        const mappings = {
+            "apps.fileManager": "file_manager",
+            "apps.terminal": "terminal",
+            "apps.browser": "browser",
+            "apps.borwser": "browser_alt",
+            "apps.terminal_alt": "browser",
+            "apps.editor": "editor"
+        };
+
+        for (const [cfgPath, qmlProp] of Object.entries(mappings)) {
+            Mem.hypr[cfgPath] = qmlProp;
+        }
     }
 }

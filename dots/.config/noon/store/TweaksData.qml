@@ -55,6 +55,8 @@ Singleton {
                     "type": "combobox",
                     "reloadOnChange": true,
                     "store": "state",
+                    "canRefresh": true,
+                    "refreshAction": () => IconThemesService.reload(),
                     "comboBoxValues": IconThemesService.availableIconThemeIds
                 },
                 {
@@ -63,15 +65,17 @@ Singleton {
                     "store": "hypr",
                     "key": "cursor_theme",
                     "type": "combobox",
+                    "canRefresh": true,
+                    "refreshAction": () => CursorsService.reload(),
                     "comboBoxValues": CursorsService.cursors
-                }
-            ]
-        },
-        {
-            "section": "Fonts & Typography",
-            "icon": "font_download",
-            "shell": "Global",
-            "items": [
+                },
+                {
+                    "icon": "ads_click",
+                    "name": "Cursor Size",
+                    "store": "hypr",
+                    "key": "cursor_size",
+                    "type": "spin"
+                },
                 {
                     "icon": "font_download",
                     "name": "UI Font",
@@ -82,21 +86,151 @@ Singleton {
                     "icon": "font_download",
                     "name": "Sync Family",
                     "key": "appearance.fonts.syncFamily"
+                },
+                {
+                    "icon": "palette",
+                    "name": "Shell Mode",
+                    "type": "combobox",
+                    "comboBoxValues": ["main", "zen", "xp", "nobuntu"],
+                    "key": "desktop.shell.mode"
+                },
+                {
+                    "icon": "crop",
+                    "name": "Depth Wallpaper",
+                    "enableTooltip": false,
+                    "key": "desktop.bg.depthMode"
+                },
+                {
+                    "icon": "palette",
+                    "name": "Widgets Bg Mode",
+                    "key": "desktop.widgets.mode",
+                    "type": "combobox",
+                    "comboBoxValues": ["col", "grad"]
                 }
             ]
         },
         {
-            "section": "Hyprland",
-            "icon": "water_drop",
+            "section": "Desktop",
+            "icon": "wallpaper",
             "shell": "Global",
             "items": [
                 {
-                    "icon": "ads_click",
-                    "name": "Cursor Size",
-                    "store": "hypr",
-                    "key": "cursor_size",
-                    "type": "spin"
+                    "icon": "timer",
+                    "name": "Desktop Clock",
+                    "key": "desktop.clock.enabled"
                 },
+                {
+                    "icon": "brand_family",
+                    "name": "Arabic Mode",
+                    "key": "desktop.clock.arabicMode"
+                },
+                {
+                    "icon": "timer",
+                    "name": "Center Clock",
+                    "store": "state",
+                    "enableTooltip": false,
+                    "key": "desktop.clock.center"
+                },
+                {
+                    "icon": "schedule",
+                    "name": "Layer Clock Font",
+                    "key": "desktop.clock.font",
+                    "type": "combobox",
+                    "comboBoxValues": Fonts.family.preferredLayerClockFonts
+                },
+                {
+                    "icon": "notifications_active",
+                    "name": "Notifications Position",
+                    "key": "desktop.popups.notifications",
+                    "type": "combobox",
+                    "comboBoxValues": ["TopCenter", "TopRight", "TopLeft", "BottomCenter", "BottomRight", "bottomLeft"]
+                },
+                {
+                    "store": "state",
+                    "icon": "font_download",
+                    "name": "Clock Weight",
+                    "key": "fonts.variableAxes.display.wght",
+                    "type": "slider",
+                    "sliderMinValue": 100,
+                    "sliderValue": 100,
+                    "sliderMaxValue": 1000
+                },
+                {
+                    "store": "state",
+                    "icon": "font_download",
+                    "name": "Clock Width",
+                    "key": "fonts.variableAxes.display.wdth",
+                    "type": "slider",
+                    "sliderMinValue": 0,
+                    "sliderValue": 10,
+                    "sliderMaxValue": 800
+                },
+                {
+                    "icon": "height",
+                    "name": "Vertical Mode",
+                    "key": "desktop.clock.verticalMode"
+                },
+                {
+                    "store": "state",
+                    "icon": "timer",
+                    "name": "Clock Size",
+                    "key": "desktop.clock.scale",
+                    "type": "slider",
+                    "sliderMinValue": 0.25,
+                    "sliderValue": 0.25,
+                    "sliderMaxValue": 4
+                },
+                {
+                    "icon": "extension",
+                    "name": "Widgets",
+                    "key": "desktop.widgets.enabled"
+                },
+                {
+                    "icon": "apps",
+                    "name": "Desktop Icons",
+                    "key": "desktop.icons.enabled"
+                },
+                {
+                    "icon": "keyboard_command_key",
+                    "name": "Super Key",
+                    "type": "combobox",
+                    "comboBoxValues": Mem.store.services.cheats.superKeys,
+                    "key": "cheats.superKey"
+                },
+                {
+                    "icon": "width",
+                    "name": "Parallax Effect",
+                    "key": "desktop.bg.parallax.enabled"
+                },
+                {
+                    "icon": "height",
+                    "name": "Vertical Parallax",
+                    "key": "desktop.bg.parallax.verticalParallax"
+                },
+                {
+                    "icon": "image",
+                    "name": "Deload On Fullscreen",
+                    "key": "desktop.shell.deloadOnFullscreen"
+                },
+                {
+                    "icon": "width",
+                    "name": "Sidebar Parallax",
+                    "key": "desktop.bg.parallax.widgetParallax"
+                },
+                {
+                    "icon": "zoom_in_map",
+                    "name": "Parallax Strength",
+                    "type": "slider",
+                    "sliderMaxValue": 1,
+                    "key": "desktop.bg.parallax.parallaxStrength"
+                }
+            ]
+        },
+        {
+            "section": "Window Management",
+            "icon": "dashboard",
+            "shell": "Global",
+            "items": [
                 {
                     "icon": "rounded_corner",
                     "name": "Window Rounding",
@@ -122,6 +256,18 @@ Singleton {
                     "store": "hypr",
                     "key": "blur_size",
                     "type": "spin"
+                },
+                {
+                    "icon": "blur_on",
+                    "name": "X Ray",
+                    "store": "hypr",
+                    "key": "xray"
+                },
+                {
+                    "icon": "dark_mode",
+                    "name": "Shadows",
+                    "store": "hypr",
+                    "key": "shadows"
                 },
                 {
                     "icon": "collapse_content",
@@ -159,18 +305,6 @@ Singleton {
                     "type": "spin"
                 },
                 {
-                    "icon": "blur_on",
-                    "name": "X Ray",
-                    "store": "hypr",
-                    "key": "xray"
-                },
-                {
-                    "icon": "dark_mode",
-                    "name": "Shadows",
-                    "store": "hypr",
-                    "key": "shadows"
-                },
-                {
                     "icon": "dashboard",
                     "name": "Tiling Layout",
                     "type": "combobox",
@@ -184,7 +318,7 @@ Singleton {
                     "type": "combobox",
                     "store": "hypr",
                     "key": "animation_style",
-                    "comboBoxValues": ["standard", "snappy", "cinematic"]
+                    "comboBoxValues": HyprlandService?.availableAnimations ?? []
                 },
                 {
                     "icon": "monitor",
@@ -192,114 +326,20 @@ Singleton {
                     "type": "combobox",
                     "store": "hypr",
                     "key": "external_monitor_mode",
-                    "comboBoxValues": Mem.options.desktop.hyprland.externalMonitorProfiles
+                    "comboBoxValues": MonitorsInfo?.availableResolutions ?? []
                 },
-            ]
-        },
-        {
-            "section": "OSDs",
-            "icon": "notifications",
-            "shell": "Main",
-            "items": [
                 {
-                    "icon": "notifications",
-                    "name": "OSD Mode",
-                    "key": "desktop.osd.mode",
+                    "icon": "animation",
+                    "name": "Beam Animation Style",
                     "type": "combobox",
-                    "comboBoxValues": ["Pixel", "BottomPill", "Nobuntu", "CenterIsland", "SideBay"]
-                }
-            ]
-        },
-        {
-            "section": "Clock Settings",
-            "icon": "schedule",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "timer",
-                    "name": "Desktop Clock",
-                    "key": "desktop.clock.enabled"
+                    "comboBoxValues": BeamData.availableAnimationStyles,
+                    "key": "beam.appearance.animationStyle"
                 },
                 {
-                    "icon": "brand_family",
-                    "name": "Arabic Mode",
-                    "key": "desktop.clock.arabicMode"
-                },
-                {
-                    "icon": "timer",
-                    "name": "Center Clock",
-                    "store": "state",
-                    "enableTooltip": false,
-                    "key": "desktop.clock.center"
-                },
-                {
-                    "icon": "schedule",
-                    "name": "Layer Clock Font",
-                    "key": "desktop.clock.font",
-                    "type": "combobox",
-                    "comboBoxValues": ["Badeen Display", "Ndot 55", "Six Caps", "Alfa Slab One", "Notable", "Monoton", "Titan One", "Bebas Neue", "Rubik", "UnifrakturCook"]
-                },
-                {
-                    "store": "state",
-                    "icon": "font_download",
-                    "name": "Clock Weight",
-                    "key": "fonts.variableAxes.display.wght",
-                    "type": "slider",
-                    "sliderMinValue": 100,
-                    "sliderValue": 100,
-                    "sliderMaxValue": 1000
-                },
-                {
-                    "store": "state",
-                    "icon": "font_download",
-                    "name": "Clock Width",
-                    "key": "fonts.variableAxes.display.wdth",
-                    "type": "slider",
-                    "sliderMinValue": 0,
-                    "sliderValue": 10,
-                    "sliderMaxValue": 800
-                },
-                {
-                    "icon": "height",
-                    "name": "Vertical Mode",
-                    "key": "desktop.clock.verticalMode"
-                },
-                {
-                    "store": "state",
-                    "icon": "timer",
-                    "name": "Clock Size",
-                    "key": "desktop.clock.scale",
-                    "type": "slider",
-                    "sliderMinValue": 0.25,
-                    "sliderValue": 0.25,
-                    "sliderMaxValue": 4
-                }
-            ]
-        },
-        {
-            "section": "Modules",
-            "icon": "dashboard_customize",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "menu",
-                    "name": "Bar",
-                    "key": "bar.enabled"
-                },
-                {
-                    "icon": "dock",
-                    "name": "Dock",
-                    "key": "dock.enabled"
-                },
-                {
-                    "icon": "notifications",
-                    "name": "OSD",
-                    "key": "osd.enabled"
-                },
-                {
-                    "icon": "lock",
-                    "name": "Lock Screen",
-                    "key": "desktop.lock.enabled"
+                    "icon": "masked_transitions",
+                    "name": "Beam Animation Scale",
+                    "type": "text",
+                    "key": "beam.appearance.animationScale"
                 }
             ]
         },
@@ -308,11 +348,6 @@ Singleton {
             "icon": "toolbar",
             "shell": "Main",
             "items": [
-                {
-                    "icon": "palette",
-                    "name": "Background",
-                    "key": "bar.appearance.useBg"
-                },
                 {
                     "icon": "border_all",
                     "name": "BarGroup",
@@ -330,9 +365,10 @@ Singleton {
                 },
                 {
                     "icon": "tune",
-                    "name": "Bar Mode",
-                    "key": "bar.appearance.mode",
-                    "type": "spin"
+                    "name": "Style",
+                    "key": "bar.appearance.style",
+                    "type": "combobox",
+                    "comboBoxValues": BarData.appearanceModes
                 },
                 {
                     "icon": "width_full",
@@ -359,8 +395,7 @@ Singleton {
                 {
                     "icon": "graphic_eq",
                     "name": "Visualizer",
-                    "key": "bar.modules.visualizer",
-                    "condition": "Mem.options.bar.currentLayout === 5"
+                    "key": "bar.modules.visualizer"
                 },
                 {
                     "icon": "graphic_eq",
@@ -377,25 +412,57 @@ Singleton {
             "shell": "Main",
             "items": [
                 {
+                    "icon": "dock",
+                    "name": "Dock",
+                    "key": "dock.enabled"
+                },
+                {
                     "icon": "straighten",
                     "name": "Icon Size",
                     "key": "dock.appearance.iconSizeMultiplier",
                     "type": "slider",
                     "sliderMinValue": 0.4,
                     "sliderMaxValue": 1
+                },
+                {
+                    "icon": "tune",
+                    "name": "Style",
+                    "key": "dock.appearance.style",
+                    "type": "combobox",
+                    "comboBoxValues": ["float", "convex", "sharp"]
                 }
             ]
         },
         {
-            "section": "Sidebar Launcher",
+            "section": "Notifications",
+            "icon": "notifications",
+            "shell": "Main",
+            "items": [
+                {
+                    "icon": "notifications",
+                    "name": "OSD",
+                    "key": "osd.enabled"
+                },
+                {
+                    "icon": "notifications",
+                    "name": "OSD Mode",
+                    "key": "desktop.osd.mode",
+                    "type": "combobox",
+                    "comboBoxValues": ["Pixel", "BottomPill", "CenterIsland", "SideBay"]
+                }
+            ]
+        },
+        {
+            "section": "Sidebar",
             "icon": "view_sidebar",
             "shell": "Main",
             "items": [
                 {
                     "icon": "tune",
-                    "name": "Mode",
-                    "key": "sidebar.appearance.mode",
-                    "type": "spin"
+                    "name": "Style",
+                    "key": "sidebar.appearance.style",
+                    "comboBoxValues": SidebarData.appearanceModes,
+                    "type": "combobox"
                 },
                 {
                     "icon": "width",
@@ -416,18 +483,16 @@ Singleton {
                     "icon": "linear_scale",
                     "name": "Show Sliders",
                     "key": "sidebar.appearance.showSliders"
-                }
-            ]
-        },
-        {
-            "section": "Sidebar Content",
-            "icon": "dashboard",
-            "shell": "Main",
-            "items": [
+                },
                 {
                     "icon": "api",
                     "name": "APIs",
                     "key": "sidebar.content.apis"
+                },
+                {
+                    "icon": "supervisor_account",
+                    "name": "Screen Time",
+                    "key": "sidebar.content.screenTime"
                 },
                 {
                     "icon": "view_agenda",
@@ -443,6 +508,11 @@ Singleton {
                     "icon": "history",
                     "name": "History",
                     "key": "sidebar.content.history"
+                },
+                {
+                    "icon": "bookmark",
+                    "name": "Bookmarks",
+                    "key": "sidebar.content.bookmarks"
                 },
                 {
                     "icon": "emoji_emotions",
@@ -482,27 +552,7 @@ Singleton {
             ]
         },
         {
-            "section": "Beam",
-            "icon": "api",
-            "shell": "Main",
-            "items": [
-                {
-                    "icon": "animation",
-                    "name": "Animation Style",
-                    "type": "combobox",
-                    "comboBoxValues": BeamData.availableAnimationStyles,
-                    "key": "beam.appearance.animationStyle"
-                },
-                {
-                    "icon": "masked_transitions",
-                    "name": "Animation Scale",
-                    "type": "text",
-                    "key": "beam.appearance.animationScale"
-                }
-            ]
-        },
-        {
-            "section": "Media Player",
+            "section": "Media & Gaming",
             "icon": "music_note",
             "shell": "Main",
             "items": [
@@ -530,91 +580,18 @@ Singleton {
                     "icon": "graphic_eq",
                     "name": "Visualizer Mode",
                     "type": "combobox",
-                    "comboBoxValues": ["filled", "thickbars", "bars", "circular", "waveform", "particles", "gradient", "fluid", "neural", "ripple", "plasma", "crystal", "wave3d", "atom"],
+                    "comboBoxValues": ["Filled", "Bars", "Waveform", "CapsuleWaves", "LineGlow"],
                     "key": "mediaPlayer.visualizerMode"
-                }
-            ]
-        },
-        {
-            "section": "Games Launcher",
-            "icon": "stadia_controller",
-            "shell": "Main",
-            "items": [
+                },
                 {
                     "icon": "palette",
-                    "name": "Adaptive Theme",
+                    "name": "Games Adaptive Theme",
                     "key": "services.games.adaptiveTheme"
                 }
             ]
         },
         {
-            "section": "Desktop & Wallpaper",
-            "icon": "wallpaper",
-            "shell": "Global",
-            "items": [
-                {
-                    "icon": "extension",
-                    "name": "Widgets",
-                    "key": "desktop.widgets.enabled"
-                },
-                {
-                    "icon": "palette",
-                    "name": "Widgets Bg Mode",
-                    "key": "desktop.widgets.mode",
-                    "type": "combobox",
-                    "comboBoxValues": ["col", "grad"]
-                },
-                {
-                    "icon": "palette",
-                    "name": "Shell Mode",
-                    "type": "combobox",
-                    "comboBoxValues": ["main", "zen", "xp", "nobuntu"],
-                    "key": "desktop.shell.mode"
-                },
-                {
-                    "icon": "crop",
-                    "name": "Depth Wallpaper",
-                    "enableTooltip": false,
-                    "key": "desktop.bg.depthMode"
-                },
-                {
-                    "icon": "keyboard_command_key",
-                    "name": "Super Key",
-                    "type": "combobox",
-                    "comboBoxValues": Mem.store.services.cheats.superKeys,
-                    "key": "cheats.superKey"
-                },
-                {
-                    "icon": "width",
-                    "name": "Parallax Effect",
-                    "key": "desktop.bg.parallax.enabled"
-                },
-                {
-                    "icon": "height",
-                    "name": "Vertical Parallax",
-                    "key": "desktop.bg.parallax.verticalParallax"
-                },
-                {
-                    "icon": "image",
-                    "name": "Deload On Fullscreen",
-                    "key": "desktop.shell.deloadOnFullscreen"
-                },
-                {
-                    "icon": "width",
-                    "name": "Sidebar Parallax",
-                    "key": "desktop.bg.parallax.widgetParallax"
-                },
-                {
-                    "icon": "zoom_in_map",
-                    "name": "Parallax Strength",
-                    "type": "slider",
-                    "sliderMaxValue": 1,
-                    "key": "desktop.bg.parallax.parallaxStrength"
-                }
-            ]
-        },
-        {
-            "section": "System & Behavior",
+            "section": "System",
             "icon": "settings",
             "shell": "Global",
             "items": [
@@ -629,16 +606,22 @@ Singleton {
                     "key": "interactions.scrolling.fasterTouchpadScroll"
                 },
                 {
+                    "icon": "pets",
+                    "name": "Pokemon in terminal",
+                    "store": "env",
+                    "key": "USE_POKEMON"
+                },
+                {
                     "icon": "mouse",
                     "name": "Mouse Oriented",
                     "key": "interactions.mouseOriented"
                 },
                 {
-                    "icon": "dashboard",
-                    "name": "Expose Mode",
+                    "icon": "globe",
+                    "name": "Search Engine",
                     "type": "combobox",
-                    "comboBoxValues": ['smartgrid', 'justified', 'bands', 'masonry', 'hero', 'spiral', 'satellite', 'staggered', 'columnar'],
-                    "key": "desktop.view.mode"
+                    "comboBoxValues": ["google", "duckduckgo", "yandex", "brave", "startpage"],
+                    "key": "networking.searchEngine"
                 },
                 {
                     "icon": "location_on",
@@ -649,44 +632,50 @@ Singleton {
             ]
         },
         {
-            "section": "Default Apps",
+            "section": "Default Applications",
             "icon": "apps",
             "shell": "Global",
             "items": [
                 {
                     "icon": "folder_open",
+                    "store": "hypr",
                     "name": "File Manager",
-                    "key": "apps.fileManager",
+                    "key": "file_manager",
                     "type": "text"
                 },
                 {
                     "icon": "language",
+                    "store": "hypr",
                     "name": "Browser",
-                    "key": "apps.browser",
+                    "key": "browser",
                     "type": "text"
                 },
                 {
                     "icon": "web",
+                    "store": "hypr",
                     "name": "Browser Alt",
-                    "key": "apps.browserAlt",
+                    "key": "browser_alt",
                     "type": "text"
                 },
                 {
                     "icon": "terminal",
+                    "store": "hypr",
                     "name": "Terminal",
-                    "key": "apps.terminal",
+                    "key": "terminal",
                     "type": "text"
                 },
                 {
                     "icon": "code",
+                    "store": "hypr",
                     "name": "Terminal Alt",
-                    "key": "apps.terminalAlt",
+                    "key": "terminal_alt",
                     "type": "text"
                 },
                 {
                     "icon": "edit_note",
+                    "store": "hypr",
                     "name": "Editor",
-                    "key": "apps.editor",
+                    "key": "editor",
                     "type": "text"
                 }
             ]

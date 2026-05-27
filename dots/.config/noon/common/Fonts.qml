@@ -24,6 +24,7 @@ Singleton {
         readonly property string iconNerd: "Nerd Font"
         readonly property string quran: "Amiri Quran"
         readonly property bool syncFamily: Mem.options.appearance.fonts.syncFamily
+        readonly property var preferredLayerClockFonts: ["Badeen Display", "Ndot 55", "Six Caps", "Alfa Slab One", "Notable", "Monoton", "Titan One", "Bebas Neue", "Rubik", "UnifrakturCook"]
     }
 
     sizes: QtObject {

@@ -1,12 +1,12 @@
 import QtQuick
+import qs.common
 
 QtObject {
     id: root
 
-    property string apiKey: ""
+    property string apiKey: Mem.options.keys.wallhaven
 
     readonly property string endpoint: "https://wallhaven.cc/api/v1/search"
-
     readonly property var categories: [
         {
             label: "Hot",

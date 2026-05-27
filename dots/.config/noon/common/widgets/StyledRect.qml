@@ -9,6 +9,7 @@ import QtQuick.Effects
 Rectangle {
     id: root
     readonly property int diaglonal: Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+    property bool enableAnimations: true
     property bool enableShadows: false
     property bool enableBorders: false
     property int rightRadius
@@ -40,45 +41,61 @@ Rectangle {
             bottomLeftRadius: root?.bottomLeftRadius
         }
     }
+    transitions: Transition {
+        Anim {
+            properties: "topRightRadius,bottomRightRadius,topLeftRadius,bottomLeftRadius,anchors.topMargin,anchors.bottomMargin,radius,opacity"
+        }
+        CAnim {
+            property: "color"
+        }
+    }
 
     Behavior on color {
+        enabled: root.enableAnimations
         CAnim {
             duration: animationDuration
         }
     }
 
     Behavior on opacity {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
     Behavior on width {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
     Behavior on height {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
     Behavior on scale {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
     Behavior on y {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
 
     Behavior on implicitWidth {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }
     }
     Behavior on implicitHeight {
+        enabled: root.enableAnimations
         Anim {
             duration: animationDuration
         }

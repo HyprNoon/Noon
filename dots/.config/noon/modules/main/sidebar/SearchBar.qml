@@ -73,7 +73,7 @@ Item {
                 }
 
                 onAccepted: if (SidebarData._get(root.category).acceptOnlyOnEnter || false)
-                    GlobalStates.web_session.url = Mem.options.networking.searchPrefix + text
+                    GlobalStates.web_session.url = Mem.options.networking.searchEngine + text
 
                 Keys.onPressed: event => {
                     if (!root.effectiveSearchable)

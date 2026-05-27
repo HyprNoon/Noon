@@ -25,7 +25,7 @@ BarGroup {
             visible: AudioService.sink?.audio.muted
         },
         {
-            icon: NetworkService.materialSymbol,
+            icon: NetworkService.manager.materialSymbol,
             dialog: "Wifi",
             hoverItem: networkPopup
         },

@@ -10,7 +10,7 @@ import Quickshell.Wayland
 
 LazyLoader {
     id: root
-    property string name: "popup"
+    property string name: "blurred_layer"
     property Item hoverTarget
     default property Item contentItem
     property real popupBackgroundMargin: Padding.verylarge
@@ -112,7 +112,7 @@ LazyLoader {
             target: popupBackground
         }
 
-        Rectangle {
+        StyledRect {
             id: popupBackground
 
             anchors {
@@ -122,14 +122,12 @@ LazyLoader {
                 topMargin: Sizes.elevationMargin + root.popupBackgroundMargin * (barPosition !== "top")
                 bottomMargin: Sizes.elevationMargin + root.popupBackgroundMargin * (barPosition !== "bottom")
             }
-
+            color: Colors.colLayer0
             implicitWidth: root.contentItem.implicitWidth + root.contentMargins
             implicitHeight: root.contentItem.implicitHeight + root.contentMargins
-            border.width: 1
-            border.color: Colors.colOutline
-            color: ColorUtils.applyAlpha(Colors.colLayer0, 1 - Colors.transparency)
+            enableBorders: true
+            enableAnimations: false
             radius: Rounding.verylarge
-
             children: [root.contentItem]
         }
     }

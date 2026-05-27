@@ -15,28 +15,22 @@ Singleton {
     }
 
     readonly property string mainDir: Directories.services.screenshots
-    readonly property string tempPath: "/tmp/noon/temp_screen_shot.png"
-    readonly property bool isBusy: proc.running
+    readonly property string tempPath: "/tmp/temp_screen_shot.png"
+    readonly property bool isBusy: mainProc.running
+    readonly property bool hasRegion: regionW > 0 && regionH > 0
+    readonly property Process sattyProc: Process {}
     property bool isSelecting: false
     property real regionX: 0
     property real regionY: 0
     property real regionW: 0
     property real regionH: 0
-    readonly property bool hasRegion: regionW > 0 && regionH > 0
 
     signal screenshotCompleted(string path)
 
-    onScreenshotCompleted: {
-        NoonUtils.toast({
-            id: 10,
-            content: "Screen Shot Saved",
-            icon: "camera",
-            status: "success"
-        });
-    }
     function delete_temp(): void {
-        NoonUtils.execDetached("rm -rf " + tempPath);
+        NoonUtils.execDetached(["rm", "-rf", tempPath]);
     }
+
     function startRegionSelect(): void {
         isSelecting = true;
     }
@@ -56,43 +50,69 @@ Singleton {
         regionH = 0;
     }
 
-    function request(obj): void {
-        if (!obj || isBusy)
-            return;
-
-        var shellCmd;
-        const temp = obj.temp ?? false;
-        const mode = obj.region ?? ScreenShotService.Regions.Full;
-        const outPath = temp ? root.tempPath : root.mainDir + "/screenshot-" + new Date().toISOString().replace(/[:.]/g, "-") + ".png";
-        delete_temp();
-        if (mode === ScreenShotService.Regions.Window) {
-            NoonUtils.execDetached(Directories.scriptsDir + "/screenshot_helper.sh " + outPath);
-            return;
-        } else if (mode === ScreenShotService.Regions.Part) {
-            if (!root.hasRegion) {
-                shellCmd = `grim "${outPath}"`;
-            } else {
-                const r = n => Math.round(n);
-                shellCmd = `grim -g "${r(root.regionX)},${r(root.regionY)} ${r(root.regionW)}x${r(root.regionH)}" "${outPath}"`;
-            }
-        } else
-            shellCmd = `grim "${outPath}"`;
-
-        proc.outPath = outPath;
-        proc.command = ["bash", "-c", shellCmd];
-        proc.running = true;
+    function execute(out: string, args: list<string>): void {
+        mainProc.running = false;
+        mainProc.outPath = out;
+        mainProc.command = args;
+        mainProc.running = true;
     }
+
     Process {
-        id: proc
+        id: mainProc
         property string outPath: ""
-
+        onStarted: console.log("started", mainProc.command.join(" "))
         environment: ({
-                XDG_SCREENSHOTS_DIR: Directories.services.screenshots
+                "XDG_SCREENSHOTS_DIR": FileUtils.trimFileProtocol(mainDir)
             })
-
-        onExited: exitCode => {
-            if (exitCode === 0)
+        onExited: code => {
+            if (code === 0) {
                 root.screenshotCompleted(outPath);
+                mainProc.outPath = "";
+            }
         }
+    }
+
+    function takeWindowScreenshot(path: string): void {
+        if (!path)
+            return;
+        execute(path, ["grimblast", "save", "area", path]);
+    }
+
+    function takeFullScreenshot(path: string): void {
+        if (!path)
+            return;
+        execute(path, ["grim", path]);
+    }
+
+    function takeRegionScreenshot(path: string): void {
+        if (!path)
+            return;
+        const r = n => Math.round(n);
+        execute(path, ["grim", "-g", `${r(root.regionX)},${r(root.regionY)} ${r(root.regionW)}x${r(root.regionH)}`, path]);
+    }
+
+    function request(obj): void {
+        if (!obj)
+            return;
+
+        GlobalStates.main.showScreenshot = false;
+
+        const outPath = obj.temp ? root.tempPath : root.mainDir + "/screenshot-" + new Date().toISOString().replace(/[:.]/g, "-") + ".png";
+        const actions = {
+            [ScreenShotService.Regions.Full]: () => root.takeFullScreenshot(outPath),
+            [ScreenShotService.Regions.Window]: () => root.takeWindowScreenshot(outPath),
+            [ScreenShotService.Regions.Part]: () => root.takeRegionScreenshot(outPath)
+        };
+
+        NoonUtils.singleshot(() => {
+            actions[obj.region]();
+        }, 50);
+
+        if (!obj.temp)
+            root.screenshotCompleted.connect(path => {
+                sattyProc.running = false;
+                sattyProc.command = ["satty", "--filename", path];
+                sattyProc.running = true;
+            });
     }
 }

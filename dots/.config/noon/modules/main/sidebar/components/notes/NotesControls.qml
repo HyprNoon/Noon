@@ -26,7 +26,7 @@ BottomDialog {
         anchors.fill: parent
         anchors.margins: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Notes"
             subTitle: NotesService.filePath.replace(Directories.standard.home, '~ ')
         }

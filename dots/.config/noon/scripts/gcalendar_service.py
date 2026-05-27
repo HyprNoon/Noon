@@ -9,10 +9,11 @@ from pathlib import Path
 
 from oauth_service import NoonAuthenticator
 
-STATES_FILE = Path("~/.local/state/noon/states.json").expanduser()
-GID_MAP_FILE = Path("~/.local/state/noon/calendar_gid_map.json").expanduser()
+STORE_FILE = Path("~/.local/state/noon/user/generated/todo.json").expanduser()
+GID_MAP_FILE = Path(
+    "~/.local/state/noon/user/generated/calendar_gid_map.json"
+).expanduser()
 SCOPES = "https://www.googleapis.com/auth/calendar"
-STATES_KEY = ["services", "calendar", "events"]
 CALENDAR_ID = "primary"
 
 
@@ -74,20 +75,14 @@ def fetch_remote():
     ).get("items", [])
 
 
-def load_states():
-    data = json.loads(STATES_FILE.read_text())
-    events = data
-    for k in STATES_KEY:
-        events = events[k]
-    return data, events
+def load_events():
+    data = json.loads(STORE_FILE.read_text())
+    return data, data["events"]
 
 
-def write_states(data, events):
-    d = data
-    for k in STATES_KEY[:-1]:
-        d = d[k]
-    d[STATES_KEY[-1]] = events
-    STATES_FILE.write_text(json.dumps(data, indent=2))
+def write_events(data, events):
+    data["events"] = events
+    STORE_FILE.write_text(json.dumps(data, indent=4))
 
 
 def load_gid_map():
@@ -136,7 +131,7 @@ def format_event(event):
 
 
 def pull():
-    data, _ = load_states()
+    data, _ = load_events()
     gid_map = {}
     events = []
     for item in fetch_remote():
@@ -155,13 +150,13 @@ def pull():
         }
         events.append(event)
         gid_map[event_key(event)] = item["id"]
-    write_states(data, events)
+    write_events(data, events)
     print(events)
     save_gid_map(gid_map)
 
 
 def push():
-    _, events = load_states()
+    _, events = load_events()
     gid_map = load_gid_map()
     local_keys = set()
     for event in events:

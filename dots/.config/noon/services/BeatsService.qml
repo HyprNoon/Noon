@@ -11,16 +11,17 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Qt.labs.folderlistmodel
+import QtMultimedia
 import Noon.Utils
 
 Singleton {
     id: root
-
+    readonly property alias previewer: preview
     readonly property QtObject colors: palette.colors
     readonly property alias daemonOptions: daemonView.data
 
-    readonly property string tracksDir: Qt.resolvedUrl(getCurrentLibraryPath())
-    readonly property alias library: libraryFetcher.data
+    readonly property string tracksDir: Qt.resolvedUrl(daemonOptions.players.main.musicDirectory)
+    readonly property var library: daemonOptions.players.main.library
     readonly property alias queue: queueFetcher.data
 
     readonly property int defaultPlayerIndex: getCurrentPlayerIndex()
@@ -36,8 +37,8 @@ Singleton {
     readonly property var players: Mpris?.players.values ?? []
     readonly property MprisPlayer player: meaningfulPlayers[selectedPlayerIndex] ?? null
 
-    readonly property bool _downloading: dlpHelperProc.running
     readonly property bool _playing: player && player.playbackState === MprisPlaybackState.Playing
+    readonly property var dlpBaseCmd: ["uv", "run", Directories.scriptsDir + "/dlpHelper.py"]
     readonly property var baseCmd: ["python3", Directories.scriptsDir + "/beats_daemon.py"]
     readonly property var meaningfulPlayers: {
         const source = root.players;
@@ -62,16 +63,21 @@ Singleton {
         return Array.from(map.values());
     }
 
-    onPlayersChanged: handleOverlappingPlayers()
-    Component.onCompleted: NoonUtils.execDetached([...baseCmd, "init"])
+    // onPlayersChanged: handleOverlappingPlayers()
+
     function getCurrentPlayerIndex() {
         const players = meaningfulPlayers;
         const currentlyActivePlayer = players.find(player => player.playbackState === MprisPlaybackState.Playing);
         return Math.max(0, players?.indexOf(currentlyActivePlayer)) ?? 0;
     }
+
+    function restartDaemon() {
+        NoonUtils.execDetached(["killall", "-9", "mpd"]);
+        Qt.callLater(() => _daemonCmd(["init"]));
+    }
+
     function refreshTracks() {
-        NoonUtils.execDetached([...baseCmd, "update-db"]);
-        Qt.callLater(() => NoonUtils.execDetached([...baseCmd, "rebuild-covers"]));
+        NoonUtils.execDetached([...baseCmd, "fetch"]);
     }
 
     function fetchLibrary() {
@@ -109,11 +115,8 @@ Singleton {
 
     function _daemonCmd(args) {
         mainProc.running = false;
-        mainProc.command = ["python3", Directories.scriptsDir + "/beats_daemon.py"].concat(args);
+        mainProc.command = baseCmd.concat(args);
         mainProc.running = true;
-    }
-    function getCurrentLibraryPath() {
-        return "/mnt/Data/General_Archive/Music";
     }
 
     function terminatePlayer() {
@@ -125,7 +128,19 @@ Singleton {
     }
 
     function previewURL(url) {
-        _daemonCmd(["--player", "preview", "play-url", "--url", url]);
+        if (!url)
+            return;
+
+        const isYoutube = /^(https?:\/\/)?(www\.|music\.)?(youtube\.com|youtu\.be)\//.test(url);
+
+        if (isYoutube) {
+            dlpDecodeProc.running = false;
+            dlpDecodeProc.command = ["python3", Directories.scriptsDir + "/sanitize_youtube_url.sh", url];
+            dlpDecodeProc.running = true;
+        } else {
+            preview.source = url;
+            preview.play();
+        }
     }
 
     function killPreview() {
@@ -176,10 +191,10 @@ Singleton {
     }
 
     function isRealPlayer(player) {
-        if (!player || !player.dbusName)
-            return false;
         if (!filterPlayersEnabled)
             return true;
+        if (!player || !player.dbusName)
+            return false;
         const name = player.dbusName.toLowerCase();
         return !excludedPlayers.some(p => name.includes(p.toLowerCase()));
     }
@@ -188,23 +203,6 @@ Singleton {
         return player?.desktopEntry?.toLowerCase() === "mpd";
     }
 
-    function downloadCurrentSong() {
-        dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh --download-song "${root.title}" "${root.artist}" "${info.destination}"`];
-        dlpHelperProc.running = true;
-    }
-
-    function downloadSong(downloadURL) {
-        downloadWithDLP({
-            parameters: "bestaudio/best|-x --audio-format mp3 --audio-quality 0  --embed-thumbnail --add-metadata",
-            destination: FileUtils.trimFileProtocol(root.tracksDir),
-            url: downloadURL
-        });
-    }
-
-    function downloadWithDLP(info) {
-        dlpHelperProc.command = ["bash", "-c", `${Directories.scriptsDir}/dlpHelper.sh '${info.parameters}' '${info.url}' '${info.destination}'`];
-        dlpHelperProc.running = true;
-    }
     function openUrl() {
         Qt.openUrlExternally("http://localhost:" + daemonOptions.players.webClient.port);
     }
@@ -214,6 +212,9 @@ Singleton {
         } else {
             openUrl();
         }
+    }
+    function addNewFolder() {
+        addFolderDialog.open();
     }
 
     Connections {
@@ -227,9 +228,18 @@ Singleton {
         }
     }
 
+    FolderDialog {
+        id: addFolderDialog
+        title: "Select Folder"
+        onAccepted: {
+            root.daemonOptions.folders.push(FileUtils.trimFileProtocol(currentFolder));
+            Qt.callLater(fetchLibrary);
+        }
+    }
+
     Timer {
         id: positionTimer
-        interval: 1000
+        interval: 100
         repeat: true
         running: root.player && root._playing
         onTriggered: root.player.positionChanged()
@@ -247,6 +257,8 @@ Singleton {
     Fetcher {
         id: libraryFetcher
         command: [...baseCmd, "--player", "main", "library"]
+        onDataChanged: if (data)
+            daemonOptions.players.main.library = data
     }
 
     Fetcher {
@@ -261,7 +273,26 @@ Singleton {
     }
 
     Process {
+        id: dlpDecodeProc
+    }
+
+    Process {
         id: dlpHelperProc
+    }
+
+    MediaPlayer {
+        id: preview
+        readonly property bool isDecoding: dlpDecodeProc.running
+        function toggle() {
+            if (playbackState === MediaPlayer.PlayingState) {
+                stop();
+            } else {
+                play();
+            }
+        }
+        audioOutput: AudioOutput {
+            volume: 0.75
+        }
     }
 
     ConfigFileView {

@@ -73,10 +73,31 @@ Scope {
                     width: content.implicitWidth
                     height: content.implicitHeight
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottomMargin: Sizes.elevationMargin
                     anchors.bottom: parent.bottom
-                    radius: Rounding.verylarge
-
+                    state: Mem.options.dock.appearance?.style ?? "float"
+                    states: [
+                        State {
+                            name: "float"
+                            PropertyChanges {
+                                target: bg
+                                anchors.bottomMargin: Sizes.elevationMargin
+                                radius: Rounding.verylarge
+                            }
+                        },
+                        State {
+                            name: "convex"
+                            PropertyChanges {
+                                target: bg
+                                topRadius: Rounding.verylarge
+                            }
+                        },
+                        State {
+                            name: "sharp"
+                            PropertyChanges {
+                                target: bg
+                            }
+                        }
+                    ]
                     RowLayout {
                         id: content
                         anchors.centerIn: parent

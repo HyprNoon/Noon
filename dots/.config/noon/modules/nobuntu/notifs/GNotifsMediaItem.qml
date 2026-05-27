@@ -32,7 +32,6 @@ StyledRect {
 
     StyledRectangularShadow {
         target: bg
-        intensity: 0.2
     }
 
     StyledRect {

@@ -72,12 +72,6 @@ Item {
                 anchors.fill: parent
                 source: SysInfoService?.userPfp
             }
-            Rectangle {
-                z: 999
-                anchors.fill: parent
-                color: Colors.colPrimary
-                opacity: 0.15
-            }
             layer.enabled: true
             layer.effect: MultiEffect {
                 maskEnabled: true
@@ -106,21 +100,6 @@ Item {
             font {
                 variableAxes: Fonts.variableAxes.title
                 pixelSize: Fonts.sizes.title * 1.25
-            }
-        }
-        StyledText {
-            visible: Mem.options.desktop.lock.showAzkar
-            text: AzkarService?.currentZekr?.content ?? ""
-            color: Colors.colSubtext
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            Layout.maximumWidth: greets.contentWidth
-            lineHeight: 1.5
-            font {
-                weight: 600
-                pixelSize: Fonts.sizes.huge
-                family: "Rubik"
             }
         }
     }

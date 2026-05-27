@@ -13,26 +13,17 @@ BottomDialog {
 
     Timer {
         id: scanTimer
-        interval: 3000
-        onTriggered: isScanning = false
-    }
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
+        interval: 4000
+        onTriggered: root.isScanning = false
     }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Padding.verylarge
-        spacing: 0
+        anchors.margins: Padding.massive
+        spacing: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Connect to Wi-Fi"
-        }
-
-        BottomDialogSeparator {
-            visible: !root.isScanning
         }
 
         StyledIndeterminateProgressBar {
@@ -41,26 +32,17 @@ BottomDialog {
         }
 
         StyledListView {
+            id: nwList
             Layout.fillHeight: true
             Layout.fillWidth: true
             clip: true
-            spacing: 4  // Add spacing between items
-
-            model: {
-                const networks = [...NetworkService.wifiNetworks];
-                return networks.sort((a, b) => {
-                    if (a.active && !b.active)
-                        return -1;
-                    if (!a.active && b.active)
-                        return 1;
-                    return b.strength - a.strength;
-                });
-            }
-
+            spacing: 4
+            reuseItems: false
+            _model: NetworkService.manager.wifiNetworks
             delegate: WifiNetworkItem {
                 required property var modelData
                 required property int index
-
+                list: nwList
                 width: ListView.view.width
                 network: modelData
             }
@@ -78,7 +60,7 @@ BottomDialog {
                 buttonText: qsTr("Refresh")
                 onClicked: {
                     root.isScanning = true;
-                    NetworkService.rescanWifi();
+                    NetworkService.manager.rescanWifi();
                     scanTimer.restart();
                 }
             }
@@ -87,7 +69,7 @@ BottomDialog {
                 buttonText: qsTr("Details")
                 onClicked: {
                     root.show = false;
-                    const app = NetworkService.ethernet ? Mem.options.apps.networkEthernet : Mem.options.apps.network;
+                    const app = NetworkService.manager.ethernet ? Mem.options.apps.networkEthernet : Mem.options.apps.network;
                     NoonUtils.execDetached(app);
                     NoonUtils.callIpc("sidebar hide");
                 }

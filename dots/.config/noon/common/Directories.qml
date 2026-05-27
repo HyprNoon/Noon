@@ -11,15 +11,16 @@ Singleton {
     // misc directories
     readonly property string venv: FileUtils.trimFileProtocol(standard.state + "/.venv")
     readonly property string records: FileUtils.trimFileProtocol(standard.videos + "/records")
-    readonly property string sounds: FileUtils.trimFileProtocol(assets + "/sounds/")
+    readonly property string sounds: FileUtils.trimFileProtocol(assets + "/sounds")
     readonly property string store: FileUtils.trimFileProtocol(standard.config + "/noon/store")
     readonly property string assets: FileUtils.trimFileProtocol(standard.config + "/noon/assets")
     readonly property string gallery: FileUtils.trimFileProtocol(standard.pictures + "/Gallary/")
-    readonly property string shellConfigs: FileUtils.trimFileProtocol(standard.config + "/HyprNoon")
+    readonly property string shellConfigs: FileUtils.trimFileProtocol(standard.home + "/.noon")
     readonly property string shellDir: FileUtils.trimFileProtocol(standard.config + "/noon")
     readonly property string scriptsDir: shellDir + "/scripts"
     readonly property string favicons: FileUtils.trimFileProtocol(standard.cache + "/media/favicons")
     readonly property string hyprConfigs: FileUtils.trimFileProtocol(standard.config + "/hypr")
+
     // standard directories
     readonly property QtObject standard: QtObject {
         readonly property string home: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
@@ -43,11 +44,12 @@ Singleton {
         readonly property string m3path: FileUtils.trimFileProtocol(standard.state + "/user/generated/colors.json")
         readonly property string gamesCoverArts: FileUtils.trimFileProtocol(standard.state + "/user/generated/gamesCoverArts")
         readonly property string screenshots: FileUtils.trimFileProtocol(standard.pictures + "/Screenshots")
+        readonly property string screenTimeDB: FileUtils.trimFileProtocol(standard.state + "/screenTime")
     }
 
     // wallpapers directories
     readonly property QtObject wallpapers: QtObject {
-        readonly property string switchScript: FileUtils.trimFileProtocol(root.scriptsDir + "/appearance_service.py")
+        readonly property string colGenScript: FileUtils.trimFileProtocol(root.scriptsDir + "/colgen_service.py")
         readonly property string thumbScript: FileUtils.trimFileProtocol(root.scriptsDir + "/thumbnails_service.py")
         readonly property string main: FileUtils.trimFileProtocol(standard.pictures + "/Wallpapers/")
         readonly property string depthDir: FileUtils.trimFileProtocol(standard.cache + "/user/generated/depth/")
@@ -80,9 +82,9 @@ Singleton {
             // misc
             venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
-            services.latex, services.gamesCoverArts, services.screenshots,
+            services.latex, services.gamesCoverArts, services.screenshots, services.screenTimeDB,
             // wallpapers
-            wallpapers.main, wallpapers.switchScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
+            wallpapers.main, wallpapers.colGenScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats
             beats.main, beats.mpd, beats.coverArt, beats.lyrics, beats.tracks,
             // plugins

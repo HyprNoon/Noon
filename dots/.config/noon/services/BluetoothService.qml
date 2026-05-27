@@ -42,13 +42,14 @@ Singleton {
 
     function startDiscovery() {
         if (adapter && enabled && !discovering) {
-            adapter.startDiscovery();
+            adapter.discovering = true;
+            discoverTimeout.running = true;
         }
     }
 
     function stopDiscovery() {
         if (adapter && discovering) {
-            adapter.stopDiscovery();
+            adapter.discovering = false;
         }
     }
 
@@ -331,5 +332,10 @@ Singleton {
         if (!devices)
             return [];
         return devices.filter(dev => dev && dev.connected);
+    }
+    Timer {
+        id: discoverTimeout
+        interval: 2000
+        onTriggered: stopDiscovery()
     }
 }

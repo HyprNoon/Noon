@@ -71,15 +71,13 @@ StyledRect {
         id: controls
         songData: Mem.states.services.beats.previewData
     }
-
-    MaterialLoadingIndicator {
+    StyledIndeterminateProgressBar {
         z: 2
-        visible: loading
-        loading: BeatsHitsService.isBusy
+        height: 4
+        visible: BeatsHitsService.isBusy
         anchors.top: parent.top
-        anchors.topMargin: Padding.massive
-        anchors.horizontalCenter: parent.horizontalCenter
-        implicitSize: 54
+        anchors.right: parent.right
+        anchors.left: parent.left
     }
     StyledRect {
         z: controls.z - 1

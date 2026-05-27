@@ -70,7 +70,7 @@ StyledRect {
         property int columns: root.expanded ? 4 : 2
         cellWidth: width / columns
         cellHeight: cellWidth
-        property string libPath: BeatsService.getCurrentLibraryPath() + "/"
+        property string libPath: BeatsService.daemonOptions.players.main.musicDirectory + "/"
         delegate: TrackItem {
             implicitSize: grid.cellWidth - Padding.large
             title: modelData?.title ?? ""

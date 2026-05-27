@@ -38,7 +38,7 @@ MouseArea {
             cursorShape: Qt.PointingHandCursor
             onEntered: hovered = true
             onExited: hovered = false
-            onClicked: NoonUtils.callIpc("sidebar reveal Notifs")
+            onClicked: NoonUtils.callIpc("sidebar reveal Apps")
         }
 
         CustomIcon {

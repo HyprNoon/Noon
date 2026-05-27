@@ -4,7 +4,7 @@ import qs.services
 import qs.common
 import qs.common.widgets
 
-SquareComponent {
+WidgetContainer {
     id: root
     readonly property int implicitCircSize: 72
     readonly property var resourcesModel: [
@@ -28,17 +28,17 @@ SquareComponent {
     GridLayout {
         columns: expanded ? 4 : 2
         rows: expanded ? 2 : 1
-        rowSpacing: Padding.huge
-        columnSpacing: Padding.huge
+        rowSpacing: expanded ? Padding.huge : Padding.normal
+        columnSpacing: expanded ? Padding.huge : Padding.normal
         anchors.centerIn: parent
         Repeater {
             model: ScriptModel {
                 values: resourcesModel
             }
             delegate: ColumnLayout {
-                spacing: Padding.huge
+                spacing: Padding.small
                 Item {
-                    Layout.topMargin: 5
+                    Layout.topMargin: expanded ? Padding.huge : 0
                     implicitHeight: root.implicitCircSize
                     implicitWidth: root.implicitCircSize
                     ClippedFilledCircularProgress {
@@ -57,10 +57,10 @@ SquareComponent {
                 StyledText {
                     visible: expanded
                     text: 100 * modelData.percentage.toFixed(1) + (modelData.iconName === "thermometer" ? "°C" : "%")
-                    color: Colors.colOnSurfaceDisabled
+                    color: Colors.colOnSurface
                     font.family: Fonts.family.variable
-                    font.variableAxes: Fonts.variableAxes.numbers
-                    font.pixelSize: Fonts.sizes.verylarge
+                    font.variableAxes: Fonts.variableAxes.longNumbers
+                    font.pixelSize: Fonts.sizes.huge
                     Layout.alignment: Qt.AlignHCenter
                 }
             }

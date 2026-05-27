@@ -6,12 +6,16 @@ import qs.common
 import qs.common.widgets
 import qs.services
 
-Item {
+StyledRect {
     id: root
 
+    required property var modelData
+    required property int index
+    required property var list
     readonly property PwNode node: modelData
 
-    implicitHeight: rowLayout.implicitHeight
+    implicitHeight: rowLayout.implicitHeight + Padding.massive
+    color: Colors.colLayer2
 
     PwObjectTracker {
         objects: [node]
@@ -20,12 +24,15 @@ Item {
     RowLayout {
         id: rowLayout
 
+        anchors.leftMargin: Padding.huge
+        anchors.rightMargin: Padding.huge + Padding.huge
+        spacing: Padding.huge
+
         anchors.fill: parent
-        spacing: Padding.large
 
         StyledIconImage {
             visible: source != ""
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.alignment: Qt.AlignVCenter
             implicitSize: 50
             source: {
                 let icon;
@@ -40,7 +47,8 @@ Item {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: -1
+            Layout.fillHeight: true
+            spacing: -Padding.tiny
 
             StyledText {
                 Layout.fillWidth: true

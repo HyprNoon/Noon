@@ -17,15 +17,12 @@ BottomDialog {
 
     contentItem: ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Padding.verylarge
+        anchors.margins: Padding.huge
         spacing: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: qsTr("Bluetooth devices")
-        }
-
-        BottomDialogSeparator {
-            extraVisibleCondition: !loading.visible
+            subTitle: qsTr("Configure Connected Devices")
         }
 
         StyledIndeterminateProgressBar {
@@ -35,10 +32,12 @@ BottomDialog {
         }
 
         StyledListView {
+            id: listView
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.margins: Padding.large
             clip: true
-            spacing: 0
+            spacing: 3
 
             model: ScriptModel {
                 values: [...Bluetooth.devices.values].sort((a, b) => {
@@ -61,28 +60,32 @@ BottomDialog {
 
             delegate: BluetoothDeviceItem {
                 required property BluetoothDevice modelData
+                required property int index
                 device: modelData
-                anchors {
-                    left: parent?.left
-                    right: parent?.right
-                }
+                list: listView
+
+                anchors.left: parent?.left
+                anchors.right: parent?.right
             }
         }
 
         RowLayout {
+
             Layout.preferredHeight: 50
             Layout.fillWidth: true
+            spacing: Padding.tiny
 
             StyledSwitch {
-                checked: BluetoothService.currentDevice.discoverable
-                onCheckedChanged: BluetoothService.currentDevice.discoverable = !BluetoothService.currentDevice.discoverable
-                Layout.rightMargin: Padding.large
+                checked: BluetoothService.adapter.discoverable
+                onClicked: BluetoothService.adapter.discoverable = checked
+                Layout.leftMargin: Padding.huge
             }
 
             StyledText {
-                text: "Discoverable"
+                text: "Visible"
                 color: Colors.colOnLayer0
                 Layout.fillWidth: true
+                leftPadding: Padding.large
             }
 
             DialogButton {
@@ -92,6 +95,11 @@ BottomDialog {
                     NoonUtils.execDetached(Mem.options.apps.bluetooth);
                     NoonUtils.callIpc("sidebar hide");
                 }
+            }
+
+            DialogButton {
+                buttonText: qsTr("Discover")
+                onClicked: BluetoothService.startDiscovery()
             }
 
             DialogButton {

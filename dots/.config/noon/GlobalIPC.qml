@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Services.Mpris
 import qs.common
 import qs.common.utils
-import qs.modules.main.view
 import qs.common.functions
 import qs.common.widgets
 import qs.services
@@ -12,17 +11,32 @@ import qs.store
 Scope {
     IpcHandler {
         target: "global"
+
         function build_shaders(): void {
             Shaders.rebuild();
         }
         function open_note(fileName: string): void {
             NotesService.openNote(fileName);
         }
+
         function note(content: string): void {
             NotesService.note(content);
         }
+
         function toggle_screenshot(): void {
             GlobalStates.main.showScreenshot = !GlobalStates.main.showScreenshot;
+        }
+
+        function trigger_autostart_apps(): void {
+            const apps = Mem.options.services.autoExecAppsList;
+            apps.forEach(app => {
+                NoonUtils.execDetached([app]);
+            });
+        }
+
+        function preview_url(url: string): void {
+            console.log(url);
+            BeatsService.previewURL(url);
         }
 
         function say(text: string): void {
@@ -88,22 +102,13 @@ Scope {
                 icon: "image"
             });
         }
-        function todoist_key(key: string) {
-            const trimmed = key.trim();
-            KeyringStorage.setNestedField(["todoistApiKey"], trimmed);
-            TodoService.todoistApiToken = trimmed;
-            console.log("API token set (trimmed):", TodoService.todoistApiToken);
-        }
 
         function add_alarm(time: string, name: string) {
-            AlarmService.addTimer(time, name);
-        }
-        function wake(message: string) {
-            NoonUtils.wake(message);
+            TimerService.wake(time, name);
         }
 
-        function edit_json() {
-            NoonUtils.edit(Quickshell.env('SHELL_CONFIG_PATH'));
+        function wake(message: string) {
+            NoonUtils.wake(message);
         }
 
         function lock() {
@@ -134,18 +139,31 @@ Scope {
             GlobalStates.main.dmenu.action = callback;
             NoonUtils.callIpc("sidebar reveal DMenu");
         }
+
         function toggle_playing(): void {
             MprisController.togglePlaying();
         }
+
         function previous_track(): void {
             MprisController.previous();
         }
+
         function next_track(): void {
             MprisController.next();
         }
+
+        function volume_down(): void {
+            AudioService.sink.audio.volume -= 0.1;
+        }
+
+        function volume_up(): void {
+            AudioService.sink.audio.volume += 0.1;
+        }
     }
+
     IpcHandler {
         target: "mirsal"
+
         function feedBookmarks(content: string) {
             var data;
             try {
@@ -155,41 +173,6 @@ Scope {
                 return;
             }
             Mem.states.services.bookmarks.firefoxBookmarks = data;
-        }
-
-        // function feedDownloadInfo(text: string): void {
-        //     const msg = JSON.parse(text);
-        //     console.log(text, Array.from(DownloadService.manager).toString());
-        //     if (msg.type === "downloads.add")
-        //         DownloadService.manager.handleAdd(msg);
-        // }
-
-        function feedDownloadInfo(text: string): void {
-            let parsed;
-            try {
-                parsed = JSON.parse(text);
-            } catch (e) {
-                console.error("Failed to parse download info: ", e);
-                return;
-            }
-
-            const data = parsed.data;
-            const headers = JSON.stringify(data.headers);
-            console.log("[Mirsal] Download Requested: ", headers);
-            download(data.url, data.destination, data.filename, data.mime, data.fileSize, headers);
-        }
-
-        function download(url: string, destination: string, name: string, mime: string, size: int, headers: string) {
-            console.log(headers);
-            NoonUtils.requestDialog("assure", {
-                title: "Download " + name,
-                description: url,
-                acceptText: "Download " + (size < 1 ? "" : StringUtils.cleanFileSizeFromBytes(size)),
-                onAccepted: () => {
-                    DownloadService.manager.add(Qt.resolvedUrl(url), Qt.resolvedUrl(destination), name.trim(), JSON.parse(headers));
-                    Qt.callLater(() => NoonUtils.callIpc("sidebar reveal Downloads"));
-                }
-            });
         }
     }
 }

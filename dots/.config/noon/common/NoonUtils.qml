@@ -11,7 +11,7 @@ import qs.common.widgets
 import Noon.Utils.Dialogs
 import QtMultimedia
 
-/* Bundled Custom QS Functions For Noon */
+/* Bundled Custom Functions For Noon */
 
 Singleton {
     id: root
@@ -21,7 +21,7 @@ Singleton {
     property bool ipcReady: false
     property bool commandsReady: false
 
-    function requestDialog(dialog: string, data) {
+    function requestDialog(dialog, data) {
         if (!dialog)
             return;
         if (data)
@@ -29,18 +29,35 @@ Singleton {
         GlobalStates.main.sysDialogs.mode = dialog;
     }
 
-    function deleteFile(path: string) {
+    function clearSysDialogs() {
+        GlobalStates.main.sysDialogs.pendingData = null;
+        GlobalStates.main.sysDialogs.mode = "";
+    }
+
+    function searchOnline(query) {
+        const dict = {
+            "google": "https://www.google.com/search?q=",
+            "duckduckgo": "https://duckduckgo.com/?q=",
+            "yandex": "https://yandex.com/search/?text=",
+            "brave": "https://search.brave.com/search?q=",
+            "startpage": "https://www.startpage.com/do/dsearch?query="
+        };
+        const prefix = dict[Mem.options.networking.searchEngine] ?? dict["google"];
+        execDetached(["gio", "open", prefix + query]);
+    }
+
+    function deleteFile(path) {
         const f = FileUtils.trimFileProtocol(path);
         execDetached(["gio", "trash", `"${f}"`]);
     }
 
-    function openFile(path: string) {
+    function openFile(path) {
         const f = FileUtils.trimFileProtocol(path);
         execDetached(["gio", "open", `"${f}"`]);
     }
 
-    function iconPath(icon: string, fallback = "image-missing-symbolic"): string {
-        const noon_icon = `noon-${Mem.states.desktop.appearance.mode}.png`;
+    function iconPath(icon, fallback = "image-missing-symbolic") {
+        const noon_icon = `noon-${Mem.looks.mode}.png`;
         const subs = ({
                 "org.quickshell": noon_icon,
                 "dev.zed.zed": "zed"
@@ -53,31 +70,53 @@ Singleton {
         execDetached(["pkexec", content]);
     }
 
-    function playSound(name, pack, repeat) {
+    function stopPlayer() {
+        if (player.playbackState === MediaPlayer.PlayingState)
+            player.stop();
+    }
+
+    function startPlayer(obj) {
+        const pack = `/${(obj.pack ?? "ui")}/`;
+        const path = Qt.resolvedUrl(Directories.sounds) + pack + obj.name + ".ogg";
+        const repeats = obj.repeats < 0 ? MediaPlayer.Infinite : (obj?.repeats ?? 1);
+
+        if (player.playbackState === MediaPlayer.PlayingState)
+            player.stop();
+
+        player.loops = repeats;
+        player.audioOutput.volume = obj?.volume ?? 0.15;
+        player.source = path;
+        player.play();
+    }
+
+    function playSound(sound) {
         if (Mem.ready && Mem.options.desktop.behavior.sounds.enabled && !Mem.options.services.notifications.silent) {
-            let baseDir = Directories.sounds.endsWith("/") ? Directories.sounds : Directories.sounds + "/";
-            let packName = pack ? pack + "/" : "ui/";
-            let path = "file://" + baseDir + packName + name + ".ogg";
-
-            if (player.playbackState === MediaPlayer.PlayingState)
-                player.stop();
-
-            player.remainingRepeats = repeat || 1;
-            player.source = path;
-
-            player.play();
+            startPlayer({
+                name: sound,
+                pack: "ui",
+                repeats: 1,
+                volume: 0.15
+            });
         }
     }
 
-    function wake(name: string) {
-        let path = Directories.sounds + "ui/alarm.ogg";
-        let volume = 1.0 * 65536;
-        let cmd = `while true; do paplay --client-name "HyprNoon-Alarm" --volume ${volume} ${path}; done`;
-        execDetached([cmd]);
-
-        let icon = Directories.assets + "/icons/noon-symbolic.svg";
-        let notifyCmd = `notify-send -i ${icon} -a "HyprNoon" -u critical -A "stop=Got it" "Wake Up !" "${name}" && pkill -f "paplay.*HyprNoon-Alarm"`;
-        execDetached([notifyCmd]);
+    function wake(name = "Wake Up!", message = "Click Below to Dismiss") {
+        startPlayer({
+            name: "alarm",
+            repeats: -1,
+            volume: 1
+        });
+        requestDialog("assure", {
+            title: name,
+            description: message,
+            acceptText: "OK",
+            canDismiss: false,
+            canCancel: false,
+            onAccepted: () => {
+                stopPlayer();
+                clearSysDialogs();
+            }
+        });
     }
 
     function toast(obj) {
@@ -86,11 +125,11 @@ Singleton {
             title: obj?.header ?? "Noon",
             message: obj?.content ?? "",
             icon: obj?.materialIcon ?? "check",
-            status: obj?.state ?? ""
+            status: obj?.status ?? ""
         };
 
         let currentData = [...GlobalStates.toasts.data];
-        const itemId = currentData.findIndex((item) => item.id === info.id);
+        const itemId = currentData.findIndex(item => item.id === info.id);
 
         if (itemId !== -1) {
             currentData[itemId] = info;
@@ -104,17 +143,18 @@ Singleton {
         GlobalStates.toasts.data = currentData;
     }
 
-    function notify(content: string, title: string) {
+    function notify(content, title) {
         let icon = Directories.assets + "/icons/noon-symbolic.svg";
-        let titleStr = title ?? "HyprNoon";
+        let titleStr = title ?? "Noon";
         execDetached(["notify-send", "-i", icon, "-a", titleStr, content]);
     }
-    function notifyPhone(content: string) {
+
+    function notifyPhone(content) {
         KdeConnectService.pingSelectedDevice(content);
     }
-    function callIpc(request: string) {
-        const cmd = `qs -c ~/.config/noon ipc call ${request}`;
-        execDetached([cmd]);
+
+    function callIpc(request) {
+        execDetached(["qs", "-c", Directories.shellDir, "ipc", "call", request]);
     }
 
     function execDetached(command, log = false) {
@@ -132,15 +172,15 @@ Singleton {
     }
 
     // Atomic Changes
-    function setHyprKey(key: string, value) {
+    function setHyprKey(key, value) {
         Mem.hypr[key] = value;
     }
 
-    function runInTerminal(command: string) {
-        const terminal = Mem.options.apps.terminal || "kitty";
+    function runInTerminal(command) {
         execDetached(["kitty", "-e", "fish", "-c", command]);
     }
-    function installPkg(app: string) {
+
+    function installPkg(app) {
         runInTerminal("yay -S --noconfirm  " + app);
     }
 
@@ -156,6 +196,17 @@ Singleton {
         return avList.some(domain => url.toLowerCase().includes(domain));
     }
 
+    function singleshot(callback, delay) {
+        let timer = Qt.createQmlObject("import QtQml 2.15; Timer {}", root);
+        timer.interval = delay;
+        timer.repeat = false;
+        timer.triggered.connect(() => {
+            callback();
+            timer.destroy();
+        });
+        timer.start();
+    }
+
     function isOnline(url) {
         return url.startsWith("http") || url.startsWith("https" || url.contains("www"));
     }
@@ -167,12 +218,6 @@ Singleton {
                 GlobalStates.main.sysDialogs.mode = "dlp";
             }
         }
-    }
-
-    function edit(filePath) {
-        if (!filePath)
-            return;
-        callIpc(`apps noon_edit ${filePath}`);
     }
 
     function fetchCommands() {
@@ -234,7 +279,6 @@ Singleton {
     MediaPlayer {
         id: player
         audioOutput: AudioOutput {
-            id: audioOutput
             volume: 0.15
         }
 

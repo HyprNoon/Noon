@@ -32,10 +32,11 @@ Singleton {
     function handle_init(mode) {
         KeyringStorage.reload();
         NightLightService.reload();
+        FirstRunService.setup();
+
         switch (mode) {
         case "main":
             TimerService.reload();
-            AlarmService.reload();
             NoonUtils.playSound("device_unlocked");
             break;
         case "zen":

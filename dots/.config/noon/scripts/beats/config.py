@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-CONF_PATH = os.path.expanduser("~/.config/HyprNoon/beats.json")
+CONF_PATH = os.path.expanduser("~/.noon/beats.json")
 
 DEFAULTS = {
     "players": {

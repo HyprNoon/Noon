@@ -10,8 +10,8 @@ LayerRect {
     visible: opacity > 0
     opacity: width > 320 ? 1 : 0
     radius: Rounding.verylarge
-
-    readonly property int columns: 3
+    property bool expanded
+    readonly property int columns: expanded ? 6 : 3
     property string searchQuery: ""
 
     signal searchFocusRequested
@@ -41,8 +41,7 @@ LayerRect {
     StyledGridView {
         id: gridView
         anchors.fill: parent
-        cellWidth: Math.floor(width / root.columns)
-        cellHeight: cellWidth
+        columns: root.columns
         clip: true
         currentIndex: -1
         model: filteredModel

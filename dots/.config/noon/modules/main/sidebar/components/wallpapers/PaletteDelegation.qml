@@ -10,7 +10,7 @@ import qs.store
 GroupButton {
     id: root
     required property var modelData
-    readonly property var currentData: modelData[Mem.states.desktop.appearance.mode]
+    readonly property var currentData: modelData[Mem.looks.mode]
 
     baseWidth: 65
     baseHeight: 65

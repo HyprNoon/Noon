@@ -121,7 +121,6 @@ PopupWindow {
         }
         StyledRectangularShadow {
             target: bg
-            intensity: 0.5
         }
     }
 }

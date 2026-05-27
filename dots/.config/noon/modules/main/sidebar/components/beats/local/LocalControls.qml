@@ -47,6 +47,21 @@ StyledRect {
         }
     ]
 
+    // Connections {
+    //     target: BeatsService.daemonOptions.players.main
+    //     function onMusicDirectoryChanged() {
+    //         BeatsService._daemonCmd(["kill"]);
+    //         Qt.callLater(() => {
+    //             BeatsService._daemonCmd(["init"]);
+    //             BeatsService.fetchLibrary();
+    //         });
+    //     }
+    // }
+
+    function switchToFolder(folder) {
+        BeatsService.daemonOptions.players.main.musicDirectory = folder;
+    }
+
     StyledLoader {
         readonly property var dict: {
             "folders": foldersComp
@@ -63,7 +78,7 @@ StyledRect {
 
             anchors.fill: parent
             orientation: Qt.Horizontal
-            model: Mem.states.mediaPlayer.folders.concat(["ADD"])
+            model: BeatsService.daemonOptions.folders.concat(["ADD"])
             spacing: Padding.small
             delegate: GroupButtonWithIcon {
                 required property var modelData
@@ -78,14 +93,14 @@ StyledRect {
                     if (isAdd) {
                         BeatsService.addNewFolder();
                     } else {
-                        // Mem.states.mediaPlayer.currentTrackPath = Qt.resolvedUrl(modelData);
+                        bg.switchToFolder(modelData);
                     }
                 }
                 altAction: () => {
                     if (!isAdd) {
-                        let currentFolders = Mem.states.mediaPlayer.folders;
+                        let currentFolders = BeatsService.daemonOptions.folders;
                         let updatedFolders = currentFolders.filter(path => path !== modelData);
-                        Mem.states.mediaPlayer.folders = updatedFolders;
+                        BeatsService.daemonOptions.folders = updatedFolders;
                     }
                 }
 

@@ -5,9 +5,9 @@ import qs.services
 
 QuickToggleButton {
     dialogName: "Wifi"
-    buttonName: NetworkService.wifiStatus.length > 0 && NetworkService.wifiEnabled ? NetworkService.networkName || StringUtils.capitalizeFirstLetter(NetworkService.wifiStatus) : "Disconnected"
-    buttonSubtext: NetworkService.wifiEnabled ? "enabled" : "disabled"
-    toggled: NetworkService.networkName.length > 0 && NetworkService.networkName !== "lo"
-    buttonIcon: NetworkService.materialSymbol
-    onClicked: NetworkService.toggleWifi()
+    buttonName: NetworkService.manager.wifiStatus.length > 0 && NetworkService.manager.wifiEnabled ? NetworkService.manager.networkName || StringUtils.capitalizeFirstLetter(NetworkService.manager.wifiStatus) : "Disconnected"
+    buttonSubtext: NetworkService.manager.wifiEnabled ? "enabled" : "disabled"
+    toggled: NetworkService.manager.networkName.length > 0 && NetworkService.manager.networkName !== "lo"
+    buttonIcon: NetworkService.manager.materialSymbol
+    onClicked: NetworkService.manager.toggleWifi()
 }

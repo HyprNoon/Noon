@@ -23,6 +23,7 @@ ColumnLayout {
     property bool fadeChunkSplitting: !forceDisableChunkSplitting && !editing && !/\n\|/.test(shownText) && Mem.options.sidebar.behavior.aiTextFadeIn
 
     property var textLineOpacities: []
+    property var _formulaMap: ({})
 
     Layout.fillWidth: true
     spacing: 0
@@ -30,7 +31,29 @@ ColumnLayout {
     function processText(input) {
         if (!input)
             return "";
-        return editing ? input : LatexService.cleanFormula(input);
+
+        const parts = input.split(/(\$\$[\s\S]*?\$\$)/g);
+        let result = "";
+        for (let i = 0; i < parts.length; i++) {
+            const p = parts[i];
+            if (p.startsWith("$$") && p.endsWith("$$")) {
+                const formula = p.slice(2, -2).trim();
+                if (formula) {
+                    const [hash, ready] = LatexService.requestRender(formula);
+                    const imagePath = `${LatexService.latexOutputPath}/${hash}.png`;
+                    if (_formulaMap[hash] !== undefined) {
+                        result += `![formula](${_formulaMap[hash]})`;
+                    } else {
+                        _formulaMap[hash] = imagePath;
+                        if (ready)
+                            result += `![formula](${imagePath})`;
+                    }
+                }
+            } else {
+                result += p;
+            }
+        }
+        return result;
     }
 
     function computeChunks() {
@@ -57,8 +80,10 @@ ColumnLayout {
     }
 
     onSegmentContentChanged: {
-        if (segmentContent)
+        if (segmentContent) {
+            _formulaMap = ({});
             shownText = processText(segmentContent);
+        }
     }
 
     onShownTextChanged: {
@@ -71,6 +96,20 @@ ColumnLayout {
         const chunks = computeChunks();
         syncOpacities(chunks);
         chunksModel.values = chunks;
+    }
+
+    Timer {
+        id: _refreshTimer
+        interval: 50
+        onTriggered: root.shownText = root.processText(root.segmentContent)
+    }
+
+    Connections {
+        target: LatexService
+        function onRenderFinished(hash) {
+            if (root._formulaMap[hash] !== undefined)
+                _refreshTimer.start();
+        }
     }
 
     Repeater {
@@ -95,7 +134,7 @@ ColumnLayout {
             renderType: Text.NativeRendering
             font.family: Fonts.family.reading
             font.hintingPreference: Font.PreferNoHinting
-            font.pixelSize: Fonts.sizes.large * Mem.states.sidebar.apis.fontScale
+            font.pixelSize: Fonts.sizes.verylarge * Mem.states.sidebar.apis.fontScale
             selectedTextColor: Colors.m3.m3onSecondaryContainer
             selectionColor: Colors.colSecondaryContainer
             wrapMode: TextEdit.Wrap

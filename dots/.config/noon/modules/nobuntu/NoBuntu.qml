@@ -6,17 +6,12 @@ import qs.common.utils
 import qs.modules.main
 import qs.modules.main.sidebar
 import qs.modules.main.osd
-import "desktop"
 import "bar"
 import "dock"
 import "notifs"
 import "db"
 
 Scope {
-    WidgetLoader {
-        enabled: WallpaperService._loaded
-        GWallpaper {}
-    }
     WidgetLoader {
         GBar {}
     }

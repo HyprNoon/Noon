@@ -15,7 +15,7 @@ Item {
     implicitWidth: listView.implicitWidth
     StyledListView {
         id: listView
-        spacing: 4
+        spacing: 2
         orientation: ListView.Horizontal
         anchors {
             top: parent.top
@@ -29,7 +29,7 @@ Item {
         model: ScriptModel {
             objectProp: "appId"
             values: {
-                const pinned = Mem.states.favorites.apps ?? [];
+                const pinned = Mem.states.favorites.apps.map(app => app.appId) ?? [];
                 const values = [];
                 const pinnedSet = new Set();
 
@@ -120,7 +120,7 @@ Item {
         colBackground: appIsActive ? colBackgroundHover : "transparent"
         anchors.verticalCenter: parent.verticalCenter
         implicitWidth: height
-        implicitHeight: 46
+        implicitHeight: 40
         buttonRadius: Rounding.normal
 
         property int lastFocused: -1

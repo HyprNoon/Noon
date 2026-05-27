@@ -19,13 +19,17 @@ Scope {
 
             required property var modelData
 
-            name: "fade_layer"
+            name: "blurred_layer"
             shell: "noon"
             fill: true
             visible: GlobalStates.main.showScreenshot
             screen: modelData
-
+            keyboardFocus: true
+            mask: Region {
+                item: canvas
+            }
             RegionSelectorCanvas {
+                id: canvas
                 anchors.fill: parent
                 active: ScreenShotService.isSelecting
                 onRegionCommitted: (x, y, w, h) => {
@@ -41,7 +45,8 @@ Scope {
 
             FocusHandler {
                 windows: [panel]
-                active: visible
+                active: GlobalStates.main.showScreenshot
+                onCleared: GlobalStates.main.showScreenshot = false
             }
 
             ScreenShotBottomControls {

@@ -15,10 +15,13 @@ Singleton {
     property string selectedLocation: ""
     readonly property bool developmentMode: true
     readonly property bool enablePlugins: true
+    readonly property list<string> plugins: allPlugins.map(plugin => plugin.group)
+
     readonly property alias sidebarPlugins: sidebar?.plugins
     readonly property alias dockPlugins: dock?.plugins
     readonly property alias beamPlugins: beam?.plugins
-    readonly property list<string> plugins: allPlugins.map(plugin => plugin.group)
+    readonly property alias desktopWidgetsPlugins: desktopWidgets?.plugins
+
     readonly property var allPlugins: [
         {
             group: "sidebar",
@@ -31,6 +34,10 @@ Singleton {
         {
             group: "beam",
             data: PluginsManager.beamPlugins
+        },
+        {
+            group: "widgets",
+            data: PluginsManager.desktopWidgetsPlugins
         }
     ]
 
@@ -50,9 +57,16 @@ Singleton {
         group: "sidebar"
         onPluginsChanged: SidebarData.rebuildAll()
     }
+
+    PluginExtractor {
+        id: desktopWidgets
+        group: "widgets"
+    }
+
     function select() {
         selectionDialog.open();
     }
+
     function selectAndInstall() {
         selectionDialog.open();
         selectionDialog.onAccepted.connect(() => {
@@ -99,11 +113,13 @@ Singleton {
             NoonUtils.callIpc("sidebar reveal Plugins");
         }
     }
+
     function refreshAll() {
         dock.refresh();
         sidebar.refresh();
         beam.refresh();
     }
+
     Process {
         id: actionProc
         onStarted: console.log(command.join())

@@ -30,12 +30,12 @@ Rectangle {
         StyledText {
             color: Colors.m3.m3onSurface
             text: {
-                if (NetworkService.ethernet)
+                if (NetworkService.manager.ethernet)
                     return "\udb80\udea8";  // nf-md-ethernet_cable (ethernet connected)
-                if (!NetworkService.wifiEnabled)
+                if (!NetworkService.manager.wifiEnabled)
                     return "\udb82\udd2f";  // nf-md-wifi_off
-                if (NetworkService.wifi && (NetworkService.networkName ?? "") !== "") {
-                    const strength = NetworkService.networkStrength ?? 0;
+                if (NetworkService.manager.wifi && (NetworkService.manager.networkName ?? "") !== "") {
+                    const strength = NetworkService.manager.networkStrength ?? 0;
                     if (strength > 80)
                         return "\udb82\udd29";  // nf-md-wifi_strength_4
                     if (strength > 60)

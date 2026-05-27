@@ -16,7 +16,7 @@ Singleton {
     }
 
     readonly property var list: store.tasks
-    readonly property var store: Mem.states.services.todo
+    readonly property var store: Mem.todo
     readonly property var statusNames: ["Not Started", "In Progress", "Final Touches", "Finished"]
     readonly property var statusLabels: ["todo", "in_progress", "final_touches", "done"]
     readonly property bool useGoogleTasks: false

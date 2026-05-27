@@ -95,16 +95,16 @@ StyledRect {
     }
 
     function getNetIcon() {
-        if (NetworkService.ethernet) {
+        if (NetworkService.manager.ethernet) {
             return "network-wired";
         }
 
-        if (!NetworkService.wifiEnabled) {
+        if (!NetworkService.manager.wifiEnabled) {
             return "network-wireless-offline";
         }
 
-        if (NetworkService.wifi && NetworkService.networkName !== "") {
-            const s = NetworkService.networkStrength;
+        if (NetworkService.manager.wifi && NetworkService.manager.networkName !== "") {
+            const s = NetworkService.manager.networkStrength;
             if (s > 80)
                 return "network-wireless-signal-excellent";
             if (s > 60)

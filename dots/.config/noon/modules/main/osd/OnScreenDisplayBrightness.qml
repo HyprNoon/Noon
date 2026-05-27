@@ -7,6 +7,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import "variants"
 
 Scope {
     id: root
@@ -70,7 +71,7 @@ Scope {
         active: showOsdValues && GlobalStates.main.canNotify
 
         value: root.brightnessMonitor?.brightness ?? 50
-        icon: "sunny"
+        icon: "routine"
         targetScreen: root.focusedScreen
 
         onInteractionStarted: {

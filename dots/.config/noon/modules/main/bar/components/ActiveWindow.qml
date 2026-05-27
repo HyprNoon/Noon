@@ -33,7 +33,7 @@ MouseArea {
             font.pixelSize: Math.round(appId.font.pixelSize * 1.3)
             color: Colors.colOnLayer0
             truncate: true
-            text: MonitorsInfo.topLevel?.title ?? `${qsTr("Workspace")} ${monitor?.activeWorkspace?.id ?? 0}`
+            text: MonitorsInfo.topLevel?.title ?? `${qsTr("Workspace")} ${MonitorsInfo.focused?.activeWorkspace?.id ?? 0}`
             animateChange: true
             horizontalAlignment: Text.AlignLeft
         }

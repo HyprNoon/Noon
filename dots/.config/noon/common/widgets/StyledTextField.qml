@@ -10,7 +10,7 @@ TextField {
 
     property QtObject colors: Colors
     property alias radius: rect.radius
-
+    property alias bg: rect
     placeholderTextColor: colors.colOnLayer1
     color: colors.colOnLayer1
     Keys.onEscapePressed: focus = false

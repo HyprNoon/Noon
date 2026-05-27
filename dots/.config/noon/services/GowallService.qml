@@ -11,7 +11,7 @@ Singleton {
     id: root
 
     property bool isBusy: proc.running
-    property string inputPath: FileUtils.trimFileProtocol(Mem.states.desktop.bg.currentBg)
+    property string inputPath: FileUtils.trimFileProtocol(Mem.looks.currentBg)
     property string current_processed_wall: Directories.wallpapers.gowallDir + Qt.md5(inputPath) + ".png"
     property string upscale_output: FileUtils.trimFileExt(inputPath) + "_upscaled.png"
     property string _pendingOutput: ""
@@ -30,17 +30,18 @@ Singleton {
 
     function removeBackground(input: string): void {
         const inputPath = FileUtils.trimFileProtocol(WallpaperService.currentWallpaper);
-        depthProc.command = ["bash", "-c", `[ -f '${WallpaperService.currentFgPath}' ] || gowall bg --output --yes '${WallpaperService.currentFgPath}' '${inputPath}'`];
+        depthProc.command = ["bash", "-c", `[ -f '${WallpaperService.currentFgPath}' ] || gowall bg --output '${WallpaperService.currentFgPath}' '${inputPath}'`];
         depthProc.running = true;
     }
+
     Process {
         id: depthProc
     }
+
     Process {
         id: proc
-        onStarted: console.log("[Gowall Service] Started With Command: ", command.join(","))
-        onExited: exitCode => {
-            if (exitCode === 0)
+        onExited: code => {
+            if (code === 0)
                 WallpaperService.applyWallpaper(Qt.resolvedUrl(root._pendingOutput));
         }
     }

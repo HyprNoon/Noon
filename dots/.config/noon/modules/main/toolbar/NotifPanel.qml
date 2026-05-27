@@ -142,7 +142,6 @@ Scope {
                 z: -1
                 target: bg
                 opacity: bg.opacity
-                intensity: 0.25
             }
         }
     }

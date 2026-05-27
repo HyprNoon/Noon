@@ -14,6 +14,7 @@ Singleton {
     property int _limit: searchLimit
     property var searchResults
     property string lastQuery: ""
+
     function search(query, limit = _limit) {
         lastQuery = query;
         _limit = limit;
@@ -34,7 +35,7 @@ Singleton {
         if (Mem.states.services.beats.discoverMode) {
             cmd.push("discover");
         } else {
-            cmd.push("recommend", FileUtils.trimFileProtocol(BeatsService._metadataPath));
+            cmd.push("recommend", FileUtils.trimFileProtocol(Directories.standard.state + "/user/generated/beats_library.json"));
         }
 
         cmd.push("--limit", limit.toString());
@@ -67,6 +68,7 @@ Singleton {
     }
     Process {
         id: fetchProc
+        onStarted: console.log("fetchProc started", command.join(" "))
         stdout: StdioCollector {
             onStreamFinished: {
                 const out = JSON.parse(text.trim());

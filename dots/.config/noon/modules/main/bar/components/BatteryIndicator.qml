@@ -7,10 +7,8 @@ import qs.services
 BarGroup {
     id: root
 
-    implicitHeight: 70
-    implicitWidth: 70
-
-    // visible: BatteryService.available
+    implicitHeight: 80
+    implicitWidth: 80
 
     MouseArea {
         id: mouseArea
@@ -18,47 +16,51 @@ BarGroup {
         anchors.fill: parent
         hoverEnabled: true
     }
+
     BatteryPopup {
         id: batteryPopup
         hoverTarget: mouseArea
     }
 
-    ClippedProgressBar {
-        id: batteryProgress
-        anchors.margins: Padding.small
+    StyledRect {
+        id: bg
         anchors.fill: parent
-        vertical: root.verticalMode
-        value: BatteryService.percentage
-        trackColor: Colors.colLayer3
-        highlightColor: (BatteryService.percentage <= Mem.options.battery.low / 100 && !BatteryService.isCharging) ? Colors.m3.m3error : Colors.colPrimary
-        showEndPoint: root.verticalMode
-        Item {
-            anchors.centerIn: parent
-            width: batteryProgress.valueBarWidth
-            height: batteryProgress.valueBarHeight
+        anchors.margins: Padding.verysmall
+        color: Colors.colSurfaceContainer
+        radius: Rounding.huge
+        clip: true
 
-            RowLayout {
-                anchors.centerIn: parent
-                spacing: Padding.small
+        Symbol {
+            z: 0
+            color: Colors.colOnSurface
+            fill: 1
+            text: "electric_bolt"
+            font.pixelSize: Fonts.sizes.small
+            visible: BatteryService.isCharging && BatteryService.percentage < 1
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: Padding.normal
+        }
 
-                Symbol {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.leftMargin: -2
-                    Layout.rightMargin: -2
-                    color: Colors.colOnPrimary
-                    fill: 1
-                    text: "bolt"
-                    font.pixelSize: Fonts.sizes.small
-                    visible: BatteryService.isCharging && BatteryService.percentage < 1
-                }
+        StyledRect {
+            z: 1
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: (bg.width * BatteryService.percentage)
+            rightRadius: Rounding.huge
+            color: Colors.colPrimary
 
-                StyledText {
-                    visible: !root.vertical
-                    color: Colors.colOnPrimary
-                    Layout.alignment: Qt.AlignVCenter
-                    font.pixelSize: Fonts.sizes.small
-                    text: Math.round(BatteryService.percentage * 100)
-                }
+            StyledText {
+                z: 2
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: Padding.small
+                text: Math.round(BatteryService.percentage * 100)
+                font.family: Fonts.family.variable
+                color: Colors.colOnPrimary
+                font.pixelSize: 12
+                font.weight: Font.Bold
             }
         }
     }

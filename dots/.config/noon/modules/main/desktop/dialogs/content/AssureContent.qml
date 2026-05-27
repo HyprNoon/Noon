@@ -16,10 +16,9 @@ Item {
     clip: true
     property var content
 
-    BottomDialogHeader {
+    PageHeader {
         title: root.content.title
         subTitle: root.content.description
-        showCloseButton: false
 
         anchors {
             top: parent.top
@@ -45,11 +44,10 @@ Item {
 
         DialogButton {
             id: cancelButton
+            visible: root.content?.canCancel ?? true
             buttonText: "Cancel"
             toggled: false
-            releaseAction: () => {
-                root.dismiss();
-            }
+            releaseAction: () => root.dismiss()
         }
 
         DialogButton {
@@ -57,8 +55,8 @@ Item {
             toggled: true
             colText: Colors.colOnPrimary
             releaseAction: () => {
-                root.content.onAccepted();
                 Qt.callLater(() => root.dismiss());
+                root.content.onAccepted();
             }
         }
     }

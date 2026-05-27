@@ -7,13 +7,11 @@ import qs.common
 Singleton {
     id: root
 
-    // Direct binding to JsonAdapter
     property var timers: Mem.states.services.timers.timers
     property int nextTimerId: Mem.states.services.timers.nextTimerId
 
     signal timerFinished(int timerId, string name)
-
-    readonly property list<var> presets: [
+    readonly property list<var> stdPresets: [
         {
             "duration": 1500,
             "icon": "timer",
@@ -55,6 +53,15 @@ Singleton {
             "name": "Meeting"
         }
     ]
+    readonly property list<var> presets: [...Mem.options.services.timers.customPresets, ...stdPresets]
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: timers.some(t => t?.isRunning)
+        onTriggered: tick()
+    }
+
     function reload() {
         tick();
     }
@@ -65,50 +72,47 @@ Singleton {
         let changed = false;
 
         for (let i = 0; i < timers.length; i++) {
-            const timer = timers[i];
-            if (!timer.isRunning) {
-                updated.push(timer);
+            const t = timers[i];
+            if (!t.isRunning) {
+                updated.push(t);
                 continue;
             }
 
-            const elapsed = Math.floor((now - timer.startTime) / 1000);
-            const remaining = Math.max(0, timer.originalDuration - elapsed);
+            const elapsed = Math.floor((now - t.startTime) / 1000);
+            const remaining = Math.max(0, t.originalDuration - elapsed);
 
             if (remaining === 0) {
                 NoonUtils.playSound("record_stopped");
-                NoonUtils.toast({
-                    id: 15,
-                    content: `'Timer Complete , ${timer.name} finished!'`,
-                    icon: "timer",
-                    status: "success"
-                });
-                timerFinished(timer.id, timer.name);
+                NoonUtils.wake(`${t.name} is Done !`);
+                timerFinished(t.id, t.name);
                 changed = true;
             } else {
                 updated.push({
-                    id: timer.id,
-                    name: timer.name,
-                    originalDuration: timer.originalDuration,
+                    id: t.id,
+                    name: t.name,
+                    originalDuration: t.originalDuration,
                     remainingTime: remaining,
                     isRunning: true,
-                    startTime: timer.startTime,
-                    preset: timer.preset,
-                    icon: timer.icon
+                    startTime: t.startTime,
+                    preset: t.preset,
+                    wakeTime: t.wakeTime,
+                    icon: t.icon
                 });
                 changed = true;
             }
         }
 
-        if (changed) {
+        if (changed)
             Mem.states.services.timers.timers = updated;
-        }
     }
+
     function addAndStartTimer(name, duration) {
         const id = addTimer(name, duration, false);
         Qt.callLater(() => startTimer(id));
         return id;
     }
-    function addTimer(name: string, duration: int, isPreset: bool, autoStart = false) {
+
+    function addTimer(name, duration, isPreset, autoStart = false, wakeTime = null) {
         const newTimer = {
             id: nextTimerId,
             name: name,
@@ -117,22 +121,22 @@ Singleton {
             isRunning: autoStart,
             startTime: autoStart ? Date.now() : 0,
             preset: isPreset,
-            icon: root.presets.find(p => p.duration === duration)?.icon ?? "timer"
+            wakeTime: wakeTime,
+            icon: root.presets.find(p => p.duration === duration)?.icon ?? (wakeTime ? "alarm" : "timer")
         };
-
         Mem.states.services.timers.nextTimerId = nextTimerId + 1;
         Mem.states.services.timers.timers = timers.concat([newTimer]);
-
         if (autoStart)
             NoonUtils.playSound("record_started");
         return newTimer.id;
     }
+
     function removeTimer(timerId) {
         Mem.states.services.timers.timers = timers.filter(t => t.id !== timerId);
     }
 
     function startTimer(timerId) {
-        const updated = timers.map(t => {
+        Mem.states.services.timers.timers = timers.map(t => {
             if (t.id !== timerId || t.remainingTime <= 0)
                 return t;
             return {
@@ -143,25 +147,21 @@ Singleton {
                 isRunning: true,
                 startTime: Date.now() - (t.originalDuration - t.remainingTime) * 1000,
                 preset: t.preset,
+                wakeTime: t.wakeTime,
                 icon: t.icon
             };
         });
-
-        Mem.states.services.timers.timers = updated;
         NoonUtils.playSound("record_started");
     }
 
     function pauseTimer(timerId) {
-        const updated = timers.map(t => {
+        Mem.states.services.timers.timers = timers.map(t => {
             if (t.id !== timerId)
                 return t;
-
             let remaining = t.remainingTime;
             if (t.isRunning && t.startTime > 0) {
-                const elapsed = Math.floor((Date.now() - t.startTime) / 1000);
-                remaining = Math.max(0, t.originalDuration - elapsed);
+                remaining = Math.max(0, t.originalDuration - Math.floor((Date.now() - t.startTime) / 1000));
             }
-
             return {
                 id: t.id,
                 name: t.name,
@@ -170,15 +170,14 @@ Singleton {
                 isRunning: false,
                 startTime: 0,
                 preset: t.preset,
+                wakeTime: t.wakeTime,
                 icon: t.icon
             };
         });
-
-        Mem.states.services.timers.timers = updated;
     }
 
     function resetTimer(timerId) {
-        const updated = timers.map(t => {
+        Mem.states.services.timers.timers = timers.map(t => {
             if (t.id !== timerId)
                 return t;
             return {
@@ -189,23 +188,20 @@ Singleton {
                 isRunning: false,
                 startTime: 0,
                 preset: t.preset,
+                wakeTime: t.wakeTime,
                 icon: t.icon
             };
         });
-
-        Mem.states.services.timers.timers = updated;
     }
 
     function updateTimer(timerId, newDuration) {
         const timer = timers.find(t => t.id === timerId);
         if (!timer)
             return;
-
         const wasRunning = timer.isRunning;
         if (wasRunning)
             pauseTimer(timerId);
-
-        const updated = timers.map(t => {
+        Mem.states.services.timers.timers = timers.map(t => {
             if (t.id !== timerId)
                 return t;
             return {
@@ -219,8 +215,6 @@ Singleton {
                 icon: t.icon
             };
         });
-
-        Mem.states.services.timers.timers = updated;
         if (wasRunning)
             Qt.callLater(() => startTimer(timerId));
     }
@@ -236,14 +230,10 @@ Singleton {
         if (!input)
             return 0;
         input = String(input).trim().toLowerCase();
-
         const regex = /(\d+)([hms])/g;
-        let total = 0;
-        let match;
-
+        let total = 0, match;
         while ((match = regex.exec(input)) !== null) {
-            const val = parseInt(match[1]);
-            const unit = match[2];
+            const val = parseInt(match[1]), unit = match[2];
             if (unit === "h")
                 total += val * 3600;
             else if (unit === "m")
@@ -251,41 +241,74 @@ Singleton {
             else if (unit === "s")
                 total += val;
         }
-
         if (total === 0 && /^\d+$/.test(input))
             total = parseInt(input) * 60;
         return total;
     }
-    Timer {
-        interval: 1000
-        repeat: true
-        running: timers.some(t => t?.isRunning)
-        onTriggered: tick()
+
+    function wake(timeStr, name) {
+        const target = parseWakeTime(timeStr);
+        if (!target || isNaN(target.getTime())) {
+            console.warn("TimerService.wake: invalid time string:", timeStr);
+            return -1;
+        }
+        const now = Date.now();
+        const duration = Math.max(60, Math.floor((target.getTime() - now) / 1000));
+        return addTimer(name || "Wake Alarm", duration, false, true, target.toISOString());
     }
 
-    // Ai Helpers
-    function formatTimers() {
-        if (TimerService.timers.length === 0) {
-            return "No timers currently";
+    function formatWakeTime(isoTime) {
+        const date = new Date(isoTime);
+        const h = date.getHours() % 12 || 12;
+        const m = String(date.getMinutes()).padStart(2, '0');
+        return `${h}:${m} ${date.getHours() >= 12 ? "PM" : "AM"}`;
+    }
+
+    function parseWakeTime(timeStr) {
+        if (!timeStr)
+            return null;
+        const now = new Date();
+        let target = new Date();
+        const cleaned = String(timeStr).trim().toLowerCase();
+
+        if (cleaned.includes(":")) {
+            const isPM = cleaned.includes("pm");
+            const isAM = cleaned.includes("am");
+            const timeOnly = cleaned.replace(/[ap]m/gi, "").trim();
+            const parts = timeOnly.split(":");
+            const hours = parseInt(parts[0]);
+            const minutes = parts.length > 1 ? parseInt(parts[1]) : 0;
+            if (isNaN(hours))
+                return null;
+
+            let hour = hours;
+            if (isPM && hour !== 12)
+                hour += 12;
+            if (isAM && hour === 12)
+                hour = 0;
+            target.setHours(hour, isNaN(minutes) ? 0 : minutes, 0, 0);
+            if (target <= now)
+                target.setDate(target.getDate() + 1);
+            return target;
         }
 
+        return null;
+    }
+
+    function formatTimers() {
+        if (TimerService.timers.length === 0)
+            return "No timers currently";
         let output = "Current timers:\n\n";
-
         TimerService.timers.forEach(timer => {
-            const status = timer.isRunning ? "Running" : timer.isPaused ? "Paused" : "Stopped";
-
+            const status = timer.isRunning ? "Running" : "Stopped";
             const remaining = TimerService.formatTime(timer.remainingTime);
             const total = TimerService.formatTime(timer.originalDuration);
-            const progress = (total - remaining) / total;
-
             output += `ID: ${timer.id}\n`;
             output += `Name: ${timer.name}\n`;
             output += `Status: ${status}\n`;
-            output += `Time: ${remaining} / ${total} (${progress}% complete)\n`;
-            output += `Icon: ${timer.icon}\n`;
-            output += `\n`;
+            output += `Time: ${remaining} / ${total}\n`;
+            output += `Icon: ${timer.icon}\n\n`;
         });
-
         return output;
     }
 }

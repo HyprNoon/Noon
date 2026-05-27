@@ -41,7 +41,7 @@ Singleton {
     }
     osd: QtObject {
         readonly property size nobuntu: Qt.size(220, 64)
-        readonly property size bottomPill: Qt.size(180, 42)
+        readonly property size bottomPill: Qt.size(224, 68)
         readonly property size centerIsland: Qt.size(145, 145)
         readonly property size sideBay: Qt.size(48, 200)
         readonly property size windows_10: Qt.size(85, 240)
@@ -51,7 +51,7 @@ Singleton {
         readonly property real bar: 65
         readonly property real contentQuarter: Math.round(Screen.width * 0.24) - bar
         readonly property real half: Math.round(Screen.width * 0.46)
-        readonly property real quarter: Math.round(Screen.width * 0.256)
+        readonly property real quarter: Math.round(Screen.width * 0.27)
         readonly property real largerQuarter: Math.round(Screen.width * 0.275)
         readonly property real threeQuarter: Math.round(Screen.width * 0.85)
         readonly property real widgetsExpanded: Math.round(Screen.width * 0.501)

@@ -11,38 +11,30 @@ BottomDialog {
     enableStagedReveal: false
     bottomAreaReveal: true
     hoverHeight: 200
-    color: Colors.colLayer3
-
-    bgAnchors {
-        rightMargin: Padding.veryhuge
-        leftMargin: Padding.veryhuge
-    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.huge
         spacing: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Your Widgets"
             subTitle: "You Have " + (root.db.length - Mem.states.sidebar.widgets.enabled.length) + " disabled widgets !"
             showCloseButton: false
         }
 
-        BottomDialogSeparator {}
-
         StyledListView {
             clip: true
-            hint: false
+            radius: Rounding.verylarge
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Padding.small
+            spacing: 4
             _model: root.db
             delegate: StyledDelegateItem {
                 anchors.right: parent?.right
                 anchors.left: parent?.left
-                height: 72
-                title: modelData.component.replace(/_/g, " ")
+                height: 70
+                title: modelData?.name
                 subtext: {
                     let props = [];
                     if (modelData.expandable)
@@ -59,10 +51,10 @@ BottomDialog {
                 }
                 colSubtext: Colors.colSubtext
                 colTitle: Colors.colOnLayer2
-                materialIcon: modelData.materialIcon || "widgets"
+                materialIcon: modelData.icon || "widgets"
                 enabled: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) === -1
                 opacity: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) !== -1 ? 0.5 : 1
-
+                buttonRadius: Rounding.tiny
                 releaseAction: () => {
                     if (enabled)
                         Mem.states.sidebar.widgets.enabled.push(modelData.id);

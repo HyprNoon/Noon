@@ -20,86 +20,53 @@ StyledRect {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Padding.large
+        spacing: 0
 
-        StyledRect {
-            Layout.topMargin: Padding.huge
+        RowLayout {
+            Layout.maximumHeight: 36
             Layout.fillWidth: true
-            Layout.preferredHeight: 40
-            color: "transparent"
+            Layout.margins: Padding.massive
+            Layout.bottomMargin: Padding.verysmall
+            spacing: Padding.large
 
-            RowLayout {
-                height: 36
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.left: parent.left
-                anchors.leftMargin: Padding.massive
-                anchors.rightMargin: Padding.massive
+            Symbol {
+                icon: "search"
+                iconSize: 20
+                color: root.colors.colOnLayer1
+            }
 
-                Symbol {
-                    icon: "search"
-                    iconSize: 20
-                    color: root.colors.colOnLayer1
-                }
-                StyledTextField {
-                    id: searchInput
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    background: null
-                    placeholderText: "Search..."
-                    placeholderTextColor: focus ? colors.colOnSecondaryContainer : colors.colOutline
-                    selectionColor: searchBar.colors.colSecondary
-                    selectedTextColor: colors.colOnSecondary
-                    color: colors.colOnLayer1
-                    selectByMouse: true
-                    font {
-                        family: Fonts.family.main
-                        pixelSize: Fonts.sizes.small
-                    }
+            StyledTextField {
+                id: searchInput
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                background: null
+                placeholderText: "Search..."
+                placeholderTextColor: focus ? colors.colOnSecondaryContainer : colors.colOutline
+                selectionColor: searchBar.colors.colSecondary
+                selectedTextColor: colors.colOnSecondary
+                color: colors.colOnLayer1
+                selectByMouse: true
 
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Down) {
-                            list.forceActiveFocus();
-                            if (list.currentIndex === -1 && list.count > 0) {
-                                list.currentIndex = 0;
-                            }
-                            event.accepted = true;
-                        }
-                    }
+                font {
+                    family: Fonts.family.main
+                    pixelSize: Fonts.sizes.small
                 }
 
-                StyledRect {
-                    visible: root.moveSrc >= 0
-                    radius: Rounding.full
-                    color: colors.colLayer2
-                    height: 28
-                    Layout.preferredWidth: cancelRow.width + Padding.normal * 2
-
-                    RowLayout {
-                        id: cancelRow
-                        anchors.centerIn: parent
-                        spacing: Padding.small
-
-                        Symbol {
-                            font.pixelSize: 14
-                            text: "close"
-                            color: Colors.colOnLayer2
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Down) {
+                        list.forceActiveFocus();
+                        if (list.currentIndex === -1 && list.count > 0) {
+                            list.currentIndex = 0;
                         }
-                        StyledText {
-                            text: "Cancel"
-                            color: Colors.colOnLayer2
-                            font.pixelSize: Fonts.sizes.small
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            root.moveSrc = -1;
-                            root.moveSrcItem = null;
-                        }
+                        event.accepted = true;
                     }
                 }
+            }
+
+            RippleButtonWithIcon {
+                implicitSize: 28
+                materialIcon: "refresh"
+                releaseAction: () => BeatsService.getQueue()
             }
         }
 
@@ -152,7 +119,7 @@ StyledRect {
                     height: 24
                     radius: 6
                     width: 6
-                    color: Colors.colPrimary
+                    color: colors.colPrimary
                 }
             }
 
@@ -209,7 +176,7 @@ StyledRect {
                             truncate: true
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true
-                            color: Colors.colOnLayer2
+                            color: colors.colOnLayer2
                             font.pixelSize: Fonts.sizes.normal
                         }
                         StyledText {
@@ -217,7 +184,7 @@ StyledRect {
                             truncate: true
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true
-                            color: Colors.colSubtext
+                            color: colors.colSubtext
                             font.pixelSize: Fonts.sizes.small
                         }
                     }

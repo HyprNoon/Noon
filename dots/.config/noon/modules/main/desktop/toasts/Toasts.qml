@@ -1,63 +1,54 @@
+import QtQuick
+import Quickshell
 import qs.common
 import qs.common.widgets
 import qs.services
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Wayland
 
-StyledPanel {
-    id: root
-    visible: true
-    name: "toasts"
-    WlrLayershell.layer: WlrLayer.Overlay
-    exclusiveZone: 0
-    aboveWindows: true
-    color: "transparent"
-    implicitWidth: Sizes.toastWidth + (Sizes.elevationMargin * 2)
+Variants {
+    model: MonitorsInfo.main
+    StyledPanel {
+        id: root
+        name: "noanim_blurred_layer"
+        _layer: "Overlay"
+        exclusiveZone: 0
+        aboveWindows: true
+        color: "transparent"
+        screen: modelData
+        fill: true
+        required property var modelData
 
-    anchors {
-        top: true
-        bottom: true
-        right: GlobalStates.main?.sidebar?.rightMode ?? true
-        left: !GlobalStates.main?.sidebar?.rightMode ?? false
-    }
-
-    mask: Region {
-        item: Rectangle {
-            color: "transparent"
-            x: listview.x
-            y: listview.y + listview.height - listview.contentHeight
-            width: listview.width
-            height: listview.contentHeight
+        mask: Region {
+            item: container
         }
-    }
 
-    Timer {
-        interval: 3000
-        running: true
-        onTriggered: listview.visible = true
-    }
+        Item {
+            id: container
+            readonly property bool rightMode: !GlobalStates.main?.sidebar?.rightMode
+            anchors.right: rightMode ? parent.right : undefined
+            anchors.left: rightMode ? undefined : parent.left
+            anchors.bottom: parent.bottom
+            anchors.margins: Sizes.elevationMargin
+            implicitHeight: listview.implicitHeight
+            implicitWidth: Sizes.toastWidth
 
-    StyledListView {
-        id: listview
-        anchors.fill: parent
-        anchors.margins: Sizes.elevationMargin
-        hint: false
-        popin: true
-        visible: false
-        animateMovement: true
-        reverseRemoveDirection: root.anchors.left
-        animateAppearance: true
-        verticalLayoutDirection: ListView.BottomToTop
-        _model: GlobalStates.toasts.data
-        spacing: Padding.normal
-        reuseItems: false
-        delegate: Toast {
-            anchors.horizontalCenter: parent?.horizontalCenter
-            width: Sizes.toastWidth
+            StyledListView {
+                id: listview
+                implicitHeight: listview.contentItem.childrenRect.height
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                hint: false
+                reverseRemoveDirection: !container.rightMode
+                verticalLayoutDirection: ListView.BottomToTop
+                reuseItems: false
+                spacing: Padding.normal
+                _model: GlobalStates.toasts.data
+                delegate: Toast {
+                    anchors.horizontalCenter: parent?.horizontalCenter
+                    width: Sizes.toastWidth
+                    list: listview
+                }
+            }
         }
     }
 }

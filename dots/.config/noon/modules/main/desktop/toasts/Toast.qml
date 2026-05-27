@@ -10,6 +10,8 @@ import Quickshell
 Item {
     id: root
     required property var modelData
+    required property int index
+    required property Item list
     implicitHeight: Math.max(75, contentColumn.implicitHeight + Padding.massive * 2)
 
     Component.onCompleted: {
@@ -29,10 +31,11 @@ Item {
         NoonUtils.playSound(sound);
     }
 
+    state: modelData?.status ?? "normal"
+
     states: [
         State {
             name: "error"
-            when: modelData.status === "error"
             PropertyChanges {
                 target: shape
                 color: Colors.colErrorContainer
@@ -50,7 +53,6 @@ Item {
         },
         State {
             name: "success"
-            when: modelData.status === "success"
             PropertyChanges {
                 target: shape
                 color: Colors.colSuccessContainer
@@ -68,7 +70,6 @@ Item {
         },
         State {
             name: "warning"
-            when: modelData.status === "warn"
             PropertyChanges {
                 target: shape
                 color: Colors.colTertiary
@@ -82,7 +83,6 @@ Item {
         },
         State {
             name: "normal"
-            when: modelData.status === ""
             PropertyChanges {
                 target: shape
                 color: Colors.colPrimaryContainer
@@ -99,9 +99,9 @@ Item {
     ShaderRect {
         id: bg
         anchors.fill: parent
-        enableBorders: true
+        enableBorders: false
         color: Colors.colLayer2
-        radius: Rounding.verylarge
+        radius: Rounding.huge
 
         RowLayout {
             anchors.fill: parent
@@ -161,6 +161,5 @@ Item {
     }
     StyledRectangularShadow {
         target: bg
-        intensity: 0.5
     }
 }

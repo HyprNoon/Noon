@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from ytmusicapi import YTMusic
 
-CONFIG_PATH = os.path.expanduser("~/.config/HyprNoon/beats.json")
+CONFIG_PATH = os.path.expanduser("~/.noon/beats.json")
 CACHE_DIR = os.path.expanduser("~/.cache/noon/user/generated/beats/hitsCovers")
 CPU_COUNT = os.cpu_count() or 8
 
@@ -118,7 +118,10 @@ def cmd_recommend(args):
         return
     with open(args.file, "r") as f:
         lib = json.load(f)
-    raw = random.sample(list(lib.values()), min(len(lib), 5))
+    usable = [s for s in lib if s.get("artist") or s.get("title")]
+    if not usable:
+        return
+    raw = random.sample(usable, min(len(usable), 5))
     recs = []
     for s in raw:
         res = yt.search(f"{s.get('artist', '')} {s.get('title', '')}", filter="songs")
@@ -126,11 +129,7 @@ def cmd_recommend(args):
             try:
                 wp = yt.get_watch_playlist(videoId=res[0]["videoId"], limit=args.limit)
                 recs.extend(
-                    [
-                        build_track(t, "recommend")
-                        for t in wp["tracks"]
-                        if "videoId" in t
-                    ]
+                    build_track(t, "recommend") for t in wp["tracks"] if "videoId" in t
                 )
             except:
                 continue

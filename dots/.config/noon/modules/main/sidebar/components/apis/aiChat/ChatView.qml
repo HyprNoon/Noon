@@ -13,8 +13,8 @@ StyledRect {
     radius: Rounding.small
 
     property alias listView: messageListView
-
-    StyledListView {
+    // Usage of ScriptModel - StyledListView Adds Overhead and messes Wheel Behavior
+    ListView {
         id: messageListView
         z: 0
         anchors.fill: parent
@@ -24,7 +24,8 @@ StyledRect {
         onMovementStarted: userScrolledUp = !atYEnd
         onCountChanged: if (!userScrolledUp)
             Qt.callLater(positionViewAtEnd)
-        _model: Ai.messageIDs.filter(id => Ai.messageByID[id]?.visibleToUser ?? true)
+        model: Ai.messageIDs.filter(id => Ai.messageByID[id]?.visibleToUser ?? true)
+
         Keys.onPressed: event => {
             if (event.modifiers === Qt.NoModifier) {
                 if (event.key === Qt.Key_PageUp) {

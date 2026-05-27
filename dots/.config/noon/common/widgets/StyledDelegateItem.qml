@@ -32,7 +32,7 @@ RippleButton {
     colBackgroundToggled: colors.colPrimaryContainer
     colBackgroundHover: colors.colPrimaryContainerHover
     colBackgroundToggledHover: colors.colPrimaryContainerHover
-    colBackground: colors.colLayer2
+    colBackground: colors.colLayer3
     // buttonRadius: Rounding.large
     Loader {
         id: iconLoader

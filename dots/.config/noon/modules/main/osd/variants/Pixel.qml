@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import qs.common
 import qs.common.widgets
@@ -6,7 +7,7 @@ import qs.services
 
 StyledPanel {
     id: root
-    name: "slide_layer"
+    name: "blurred_layer"
 
     property real value
     property string icon
@@ -16,6 +17,7 @@ StyledPanel {
     signal valueModified(real newValue)
     signal interactionStarted
     signal interactionEnded
+
     anchors {
         right: volumeMode
         left: !volumeMode
@@ -35,58 +37,48 @@ StyledPanel {
         id: pill
         anchors.centerIn: parent
 
-        implicitWidth: 55
+        implicitWidth: 65
         implicitHeight: 280
 
         enableBorders: true
-        color: Colors.colLayer0
+        color: Colors.colLayer1
         radius: Rounding.full
-        Item {
-            id: symbol
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 4
 
-            anchors {
-                top: parent.top
-                topMargin: Padding.large
-                horizontalCenter: parent.horizontalCenter
-            }
-            implicitHeight: 40
+            Item {
+                id: symbol
 
-            // StyledRect {
-            //     color: root.value > 0 ? Colors.colPrimary : Colors.colLayer2
-            //     radius: Rounding.full
-            //     implicitSize: 35
-            //     anchors.centerIn: parent
-            // }
+                Layout.fillWidth: true
+                implicitHeight: width
 
-            MaterialShape {
-                implicitSize: 40
-                rotation: 360 * value
-                anchors.centerIn: parent
-                color: root.value > 0 ? Colors.colPrimary : Colors.colLayer2
-                shape: MaterialShape.Shape.Cookie9Sided
-                Behavior on rotation {
-                    Anim {}
+                MaterialShape {
+                    implicitSize: 40
+                    rotation: 360 * value
+                    anchors.centerIn: parent
+                    color: root.value > 0 ? Colors.colPrimary : Colors.colLayer2
+                    shape: MaterialShape.Shape.Cookie9Sided
+                    Behavior on rotation {
+                        Anim {}
+                    }
+                }
+
+                Symbol {
+                    fill: 1
+                    text: root.icon
+                    font.pixelSize: 18
+                    anchors.centerIn: symbol
+                    color: root.value > 0 ? Colors.colOnPrimary : Colors.colOnLayer2
                 }
             }
 
-            Symbol {
-                fill: 1
-                text: root.icon
-                font.pixelSize: 18
-                anchors.centerIn: symbol
-                color: root.value > 0 ? Colors.colOnPrimary : Colors.colOnLayer2
+            VStyledSlider {
+                Layout.bottomMargin: Padding.massive
+                Layout.alignment: Qt.AlignHCenter
+                icon: "music_note"
+                value: 1 - root.value
             }
-        }
-        VStyledSlider {
-            anchors {
-                top: symbol.bottom
-                topMargin: Padding.verylarge
-                horizontalCenter: parent.horizontalCenter
-                bottom: parent.bottom
-                bottomMargin: Padding.veryhuge
-            }
-            icon: "music_note"
-            value: 1 - root.value
         }
     }
 }

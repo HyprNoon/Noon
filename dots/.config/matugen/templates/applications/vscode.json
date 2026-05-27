@@ -1,5 +1,5 @@
 {
-  "name": "HyprNoon",
+  "name": "Noon",
   "type": "dark",
   "colors": {
     "editor.background": "{{colors.surface.default.hex}}",
@@ -21,20 +21,20 @@
     "editorIndentGuide.background": "{{colors.outline_variant.default.hex}}",
     "editorIndentGuide.activeBackground": "{{colors.outline.default.hex}}",
     "editorRuler.foreground": "{{colors.outline_variant.default.hex}}",
-    
+
     "sideBar.background": "{{colors.surface_container_low.default.hex}}",
     "sideBar.foreground": "{{colors.on_surface.default.hex}}",
     "sideBarTitle.foreground": "{{colors.on_surface.default.hex}}",
     "sideBarSectionHeader.background": "{{colors.surface_container.default.hex}}",
     "sideBarSectionHeader.foreground": "{{colors.on_surface_variant.default.hex}}",
-    
+
     "activityBar.background": "{{colors.surface_container_low.default.hex}}",
     "activityBar.foreground": "{{colors.on_surface.default.hex}}",
     "activityBar.inactiveForeground": "{{colors.on_surface_variant.default.hex}}",
     "activityBar.border": "{{colors.outline_variant.default.hex}}",
     "activityBarBadge.background": "{{colors.primary.default.hex}}",
     "activityBarBadge.foreground": "{{colors.on_primary.default.hex}}",
-    
+
     "statusBar.background": "{{colors.surface_container.default.hex}}",
     "statusBar.foreground": "{{colors.on_surface.default.hex}}",
     "statusBar.border": "{{colors.outline_variant.default.hex}}",
@@ -42,13 +42,13 @@
     "statusBar.debuggingForeground": "{{colors.on_error.default.hex}}",
     "statusBar.noFolderBackground": "{{colors.surface_container.default.hex}}",
     "statusBar.noFolderForeground": "{{colors.on_surface.default.hex}}",
-    
+
     "titleBar.activeBackground": "{{colors.surface_container.default.hex}}",
     "titleBar.activeForeground": "{{colors.on_surface.default.hex}}",
     "titleBar.inactiveBackground": "{{colors.surface_container_low.default.hex}}",
     "titleBar.inactiveForeground": "{{colors.on_surface_variant.default.hex}}",
     "titleBar.border": "{{colors.outline_variant.default.hex}}",
-    
+
     "tab.activeBackground": "{{colors.surface.default.hex}}",
     "tab.activeForeground": "{{colors.on_surface.default.hex}}",
     "tab.inactiveBackground": "{{colors.surface_container.default.hex}}",
@@ -57,17 +57,17 @@
     "tab.activeBorder": "{{colors.primary.default.hex}}",
     "tab.hoverBackground": "{{colors.surface_container_high.default.hex}}",
     "tab.hoverForeground": "{{colors.on_surface.default.hex}}",
-    
+
     "editorGroupHeader.tabsBackground": "{{colors.surface_container.default.hex}}",
     "editorGroupHeader.tabsBorder": "{{colors.outline_variant.default.hex}}",
     "editorGroupHeader.noTabsBackground": "{{colors.surface_container.default.hex}}",
-    
+
     "panel.background": "{{colors.surface_container_low.default.hex}}",
     "panel.border": "{{colors.outline_variant.default.hex}}",
     "panelTitle.activeBorder": "{{colors.primary.default.hex}}",
     "panelTitle.activeForeground": "{{colors.on_surface.default.hex}}",
     "panelTitle.inactiveForeground": "{{colors.on_surface_variant.default.hex}}",
-    
+
     "terminal.background": "{{colors.surface.default.hex}}",
     "terminal.foreground": "{{colors.on_surface.default.hex}}",
     "terminal.ansiBlack": "{{colors.surface_container_highest.default.hex}}",
@@ -86,7 +86,7 @@
     "terminal.ansiBrightMagenta": "{{colors.tertiary.default.hex}}",
     "terminal.ansiBrightCyan": "{{colors.primary.default.hex}}",
     "terminal.ansiBrightWhite": "{{colors.on_surface.default.hex}}",
-    
+
     "input.background": "{{colors.surface_container_highest.default.hex}}",
     "input.foreground": "{{colors.on_surface.default.hex}}",
     "input.border": "{{colors.outline.default.hex}}",
@@ -95,11 +95,11 @@
     "inputValidation.errorBackground": "{{colors.error_container.default.hex}}",
     "inputValidation.errorBorder": "{{colors.error.default.hex}}",
     "inputValidation.errorForeground": "{{colors.on_error_container.default.hex}}",
-    
+
     "dropdown.background": "{{colors.surface_container_high.default.hex}}",
     "dropdown.foreground": "{{colors.on_surface.default.hex}}",
     "dropdown.border": "{{colors.outline.default.hex}}",
-    
+
     "list.activeSelectionBackground": "{{colors.primary_container.default.hex}}",
     "list.activeSelectionForeground": "{{colors.on_primary_container.default.hex}}",
     "list.inactiveSelectionBackground": "{{colors.surface_container_highest.default.hex}}",
@@ -109,21 +109,21 @@
     "list.focusBackground": "{{colors.surface_container_highest.default.hex}}",
     "list.focusForeground": "{{colors.on_surface.default.hex}}",
     "list.highlightForeground": "{{colors.primary.default.hex}}",
-    
+
     "button.background": "{{colors.primary.default.hex}}",
     "button.foreground": "{{colors.on_primary.default.hex}}",
     "button.hoverBackground": "{{colors.primary.default.hex}}",
     "button.secondaryBackground": "{{colors.secondary_container.default.hex}}",
     "button.secondaryForeground": "{{colors.on_secondary_container.default.hex}}",
-    
+
     "badge.background": "{{colors.primary.default.hex}}",
     "badge.foreground": "{{colors.on_primary.default.hex}}",
-    
+
     "scrollbar.shadow": "{{colors.shadow.default.hex}}",
     "scrollbarSlider.background": "{{colors.surface_container_highest.default.hex}}",
     "scrollbarSlider.hoverBackground": "{{colors.outline.default.hex}}",
     "scrollbarSlider.activeBackground": "{{colors.outline.default.hex}}",
-    
+
     "editorWidget.background": "{{colors.surface_container_high.default.hex}}",
     "editorWidget.foreground": "{{colors.on_surface.default.hex}}",
     "editorWidget.border": "{{colors.outline.default.hex}}",
@@ -132,22 +132,22 @@
     "editorSuggestWidget.highlightForeground": "{{colors.primary.default.hex}}",
     "editorSuggestWidget.selectedBackground": "{{colors.surface_container_highest.default.hex}}",
     "editorSuggestWidget.border": "{{colors.outline.default.hex}}",
-    
+
     "editorError.foreground": "{{colors.error.default.hex}}",
     "editorWarning.foreground": "{{colors.secondary.default.hex}}",
     "editorInfo.foreground": "{{colors.primary.default.hex}}",
     "editorHint.foreground": "{{colors.tertiary.default.hex}}",
-    
+
     "diffEditor.insertedTextBackground": "{{colors.tertiary_container.default.hex}}40",
     "diffEditor.removedTextBackground": "{{colors.error_container.default.hex}}40",
-    
+
     "gitDecoration.addedResourceForeground": "{{colors.tertiary.default.hex}}",
     "gitDecoration.modifiedResourceForeground": "{{colors.secondary.default.hex}}",
     "gitDecoration.deletedResourceForeground": "{{colors.error.default.hex}}",
     "gitDecoration.untrackedResourceForeground": "{{colors.primary.default.hex}}",
     "gitDecoration.ignoredResourceForeground": "{{colors.on_surface_variant.default.hex}}",
     "gitDecoration.conflictingResourceForeground": "{{colors.error.default.hex}}",
-    
+
     "notificationCenter.border": "{{colors.outline.default.hex}}",
     "notificationCenterHeader.background": "{{colors.surface_container_high.default.hex}}",
     "notificationCenterHeader.foreground": "{{colors.on_surface.default.hex}}",
@@ -155,19 +155,19 @@
     "notifications.foreground": "{{colors.on_surface.default.hex}}",
     "notifications.border": "{{colors.outline.default.hex}}",
     "notificationLink.foreground": "{{colors.primary.default.hex}}",
-    
+
     "breadcrumb.foreground": "{{colors.on_surface_variant.default.hex}}",
     "breadcrumb.background": "{{colors.surface.default.hex}}",
     "breadcrumb.focusForeground": "{{colors.on_surface.default.hex}}",
     "breadcrumb.activeSelectionForeground": "{{colors.primary.default.hex}}",
     "breadcrumbPicker.background": "{{colors.surface_container_high.default.hex}}",
-    
+
     "menu.background": "{{colors.surface_container_high.default.hex}}",
     "menu.foreground": "{{colors.on_surface.default.hex}}",
     "menu.selectionBackground": "{{colors.surface_container_highest.default.hex}}",
     "menu.selectionForeground": "{{colors.on_surface.default.hex}}",
     "menu.separatorBackground": "{{colors.outline_variant.default.hex}}",
-    
+
     "focusBorder": "{{colors.primary.default.hex}}",
     "contrastBorder": "{{colors.outline_variant.default.hex}}",
     "widget.shadow": "{{colors.shadow.default.hex}}"

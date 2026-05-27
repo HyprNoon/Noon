@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Services.Mpris
 import qs.common
 import qs.common.utils
-import qs.modules.main.view
 import qs.common.functions
 import qs.common.widgets
 import qs.services
@@ -24,7 +23,7 @@ Scope {
             toggle_beam();
         }
         function toggle_bar_mode() {
-            Mem.options.bar.behavior.position = BarData.cyclePosition();
+            Mem.options.bar.behavior.position = BarData.toggleLayout();
         }
         function swap_bar_position() {
             BarData.swapPosition();

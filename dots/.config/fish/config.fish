@@ -1,32 +1,20 @@
-function fish_prompt -d "Write out the prompt"
-    # This shows up as USER@HOST /home/user/ >, with the directory colored
-    # $USER and $hostname are set by fish, so you can just use them
-    # instead of using `whoami` and `hostname`
-    printf '%s@%s %s%s%s > ' $USER $hostname \
-        (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
-end
-
 if status is-interactive
-    # Commands to run in interactive sessions can go here
     set fish_greeting
-
+    starship init fish | source
 end
 
-zoxide init fish | source
-starship init fish | source
-# pokemon-colorscripts -r --no-title
-if test -f ~/.local/state/noon/user/generated/terminal/sequences.txt
-    printf "%b" (cat ~/.local/state/noon/user/generated/terminal/sequences.txt)
+if test -f ~/.config/fish/alias.fish
+    source ~/.config/fish/alias.fish
 end
 
-alias sw="python3 ~/.config/noon/scripts/appearance_service.py"
-alias pamcan pacman
-alias pw="sh ~/.config/noon/scripts/power_service.sh"
-alias ls 'eza --icons'
-alias clear "printf '\033[2J\033[3J\033[1;1H'"
-alias noon 'qs -c ~/.config/noon'
-alias noonc 'nvim ~/.config/HyprNoon/options.json'
-# function fish_prompt
-#   set_color cyan; echo (pwd)
-#   set_color green; echo '> '
+if test -f ~/.env
+    source ~/.env
+end
+
+# if test -f ~/.local/state/noon/user/generated/terminal/sequences.txt
+#     printf "%b" (cat ~/.local/state/noon/user/generated/terminal/sequences.txt)
 # end
+
+if test "$USE_POKEMON" = true
+    pokemon-colorscripts-go --no-title
+end

@@ -4,38 +4,49 @@ import qs.services
 import QtQuick
 import QtQuick.Layouts
 
-DialogListItem {
+StyledRect {
     id: root
     required property var device
+    required property Item list
+
+    anchors.right: parent?.right
+    anchors.left: parent?.left
+    implicitHeight: contentCol.implicitHeight + Padding.massive
+    topRadius: index === 0 ? Rounding.huge : Rounding.verysmall
+    bottomRadius: index === (list.count - 1) ? Rounding.huge : Rounding.verysmall
+
+    color: Colors.colLayer3
     property bool expanded: false
-    pointingHandCursor: !expanded
 
-    onClicked: expanded = !expanded
-    altAction: () => expanded = !expanded
-
-    component ActionButton: DialogButton {
-        colBackground: Colors.colPrimary
-        colBackgroundHover: Colors.colPrimaryHover
-        colRipple: Colors.colPrimaryActive
-        colText: Colors.colOnPrimary
+    MouseArea {
+        z: 0
+        propagateComposedEvents: true
+        anchors.fill: parent
+        onClicked: root.expanded = !root.expanded
     }
 
-    contentItem: ColumnLayout {
-        anchors {
-            fill: parent
-            topMargin: root.verticalPadding
-            leftMargin: root.horizontalPadding
-            rightMargin: root.horizontalPadding
-        }
-        spacing: 0
+    ColumnLayout {
+        id: contentCol
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.leftMargin: Padding.huge
+        anchors.rightMargin: Padding.huge
+        anchors.topMargin: Padding.normal
+
+        spacing: Padding.normal
 
         RowLayout {
-            // Name
-            spacing: 10
+            Layout.alignment: Qt.AlignVCenter
+            Layout.minimumHeight: 40
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: Padding.large
 
             Symbol {
                 font.pixelSize: Fonts.sizes.verylarge
                 text: BluetoothService.getDeviceIcon(root.device?.icon || "")
+                fill: 1
                 color: Colors.colOnSurfaceVariant
             }
 
@@ -45,7 +56,8 @@ DialogListItem {
                 StyledText {
                     Layout.fillWidth: true
                     color: Colors.colOnSurfaceVariant
-                    elide: Text.ElideRight
+                    truncate: true
+                    font.pixelSize: Fonts.sizes.small
                     text: root.device?.name || qsTr("Unknown device")
                 }
                 StyledText {
@@ -53,7 +65,7 @@ DialogListItem {
                     Layout.fillWidth: true
                     font.pixelSize: Fonts.sizes.verysmall
                     color: Colors.colSubtext
-                    elide: Text.ElideRight
+                    truncate: true
                     text: {
                         if (!root.device?.paired)
                             return "";
@@ -67,48 +79,61 @@ DialogListItem {
             }
 
             Symbol {
-                icon: "keyboard_arrow_down"
+                visible: root.device?.connected ?? false
+                text: "check"
                 font.pixelSize: Fonts.sizes.verylarge
-                color: Colors.colOnLayer3
-                rotation: root.expanded ? 180 : 0
-                Behavior on rotation {
-                    Anim {}
-                }
+                color: Colors.m3.m3primary
             }
         }
 
-        RowLayout {
+        ColumnLayout {
             visible: root.expanded
-            Layout.topMargin: 8
-            Item {
-                Layout.fillWidth: true
-            }
-            ActionButton {
-                buttonText: root.device?.connected ? qsTr("Disconnect") : qsTr("Connect")
+            Layout.fillWidth: true
+            spacing: Padding.normal
 
-                onClicked: {
-                    if (root.device?.connected) {
-                        root.device.disconnect();
-                    } else {
-                        root.device.connect();
-                    }
-                }
-            }
-            ActionButton {
-                visible: root.device?.paired ?? false
-                colBackground: Colors.colError
-                colBackgroundHover: Colors.colErrorHover
-                colRipple: Colors.colErrorActive
-                colText: Colors.colOnError
-
-                buttonText: qsTr("Forget")
-                onClicked: {
-                    root.device?.forget();
-                }
+            ActionsRow {
+                model: [
+                    {
+                        name: qsTr("Forget"),
+                        visible: root.device?.paired ?? false,
+                        action: () => {
+                            root.device?.forget();
+                        }
+                    },
+                    {
+                        name: root.device?.connected ? qsTr("Disconnect") : qsTr("Connect"),
+                        action: () => {
+                            if (root.device?.connected) {
+                                root.device.disconnect();
+                            } else {
+                                root.device.connect();
+                            }
+                        }
+                    },
+                ]
             }
         }
+    }
+
+    component ActionsRow: RowLayout {
+        id: actionsRoot
+        required property var model
+        Layout.bottomMargin: -Padding.normal
+        Layout.alignment: Qt.AlignBottom
+        Layout.fillWidth: true
+        spacing: Padding.large
+
         Item {
-            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+
+        Repeater {
+            model: actionsRoot.model
+            delegate: DialogButton {
+                visible: modelData.visible !== undefined ? modelData.visible : true
+                buttonText: modelData.name
+                releaseAction: () => modelData.action()
+            }
         }
     }
 }

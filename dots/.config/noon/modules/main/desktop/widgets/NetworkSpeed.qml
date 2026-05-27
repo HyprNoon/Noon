@@ -4,7 +4,7 @@ import qs.services
 import qs.common
 import qs.common.widgets
 
-SquareComponent {
+WidgetContainer {
     GridLayout {
         columns: expanded ? 4 : 2
         rows: expanded ? 1 : 2
@@ -19,7 +19,7 @@ SquareComponent {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignLeft
             color: Colors.m3.m3onSurfaceVariant
-            text: NetworkService.uploadSpeedText
+            text: NetworkService.manager.uploadSpeedText
             font.pixelSize: Fonts.sizes.large
         }
 
@@ -33,7 +33,7 @@ SquareComponent {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignLeft
             color: Colors.m3.m3onSurfaceVariant
-            text: NetworkService.downloadSpeedText
+            text: NetworkService.manager.downloadSpeedText
             font.pixelSize: Fonts.sizes.large
         }
     }

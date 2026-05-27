@@ -9,23 +9,18 @@ BottomDialog {
     id: root
 
     collapsedHeight: 420
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.verylarge
         spacing: 0
 
-        BottomDialogHeader {
+        PageHeader {
             title: qsTr("Nightlight")
             subTitle: "Adjust HyprSunset from here"
         }
 
-        BottomDialogSeparator {}
+        PageSeparator {}
 
         ColumnLayout {
             Layout.fillWidth: true

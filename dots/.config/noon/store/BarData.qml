@@ -3,14 +3,19 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.common
-import Qt.labs.folderlistmodel
+import qs.common.utils
 
 Singleton {
+    readonly property var bars: barsModel.getArray("fileBaseName")
     readonly property QtObject settings: Mem.options.bar
     readonly property string position: settings.behavior.position
-    readonly property var bars: getLayouts()
-    readonly property var layoutProps: ["fillHeight", "fillWidth", "preferredWidth", "preferredHeight", "topMargin", "bottomMargin", "leftMargin", "rightMargin", "margins", "implicitWidth", "implicitHeight", "width", "height", "minimumWidth", "minimumHeight", "maximumWidth", "maximumHeight"]
-    readonly property int currentBarExclusiveSize: settings.currentLayout.startsWith("V") ? settings.appearance.width : settings.appearance.height
+    readonly property bool isVertical: ["left", "right"].includes(position)
+    readonly property list<string> appearanceModes: ["float", "sharp", "concave", "convex"]
+    readonly property list<string> positions: ["left", "right", "bottom", "top"]
+    readonly property list<string> layoutProps: ["fillHeight", "fillWidth", "preferredWidth", "preferredHeight", "topMargin", "bottomMargin", "leftMargin", "rightMargin", "margins", "implicitWidth", "implicitHeight", "width", "height", "minimumWidth", "minimumHeight", "maximumWidth", "maximumHeight"]
+    readonly property int currentBarExclusiveSize: isVertical ? settings.appearance.width : settings.appearance.height
+
+    // Bar Modules
     readonly property var contentTable: {
         "spacer": "Spacer",
         "power": "PowerIcon",
@@ -22,6 +27,7 @@ Singleton {
         "inlineTray": "SysTray",
         "utilButtons": "UtilButtons",
         "title": "VTitle",
+        "timers": "Timers",
         "resources": "Resources",
         "circBattery": "MinimalBattery",
         "weather": "WeatherIndicator",
@@ -29,7 +35,7 @@ Singleton {
         "clock": "VClockWidget",
         "keyboard": "KeyboardLayout",
         "logo": "Logo",
-        "battery": "BatteryIndicator",
+        "battery": "VBatteryIndicator",
         "separator": "HSeparator",
         "space": "Spacer",
         "volume": "VolumeIndicator",
@@ -37,67 +43,54 @@ Singleton {
         "brightness": "BrightnessIndicator"
     }
 
-    // Horizontal-specific component substitutions
+    // Horizontal-specific module substitutions
     readonly property var horizontalSubstitutions: {
         "workspaces": "Workspaces",
         "title": "ActiveWindow",
         "media": "Media",
+        "battery": "BatteryIndicator",
         "clock": "ClockWidget",
         "separator": "VerticalSeparator"
     }
 
+    // Helper for check and set bar pos
+    function setPosition(pos) {
+        if (positions.indexOf(pos) > -1)
+            settings.behavior.position = pos;
+    }
+
+    // Toggle Between Vertical and Horizontal
+    function toggleLayout() {
+        const pairs = {
+            "left": "top",
+            "right": "bottom",
+            "bottom": "right",
+            "top": "left"
+        };
+        setPosition(pairs[position]);
+    }
+
     function swapPosition() {
         const pairs = {
-            left: "right",
-            right: "left",
-            top: "bottom",
-            bottom: "top"
+            "left": "right",
+            "right": "left",
+            "top": "bottom",
+            "bottom": "top"
         };
-        settings.behavior.position = pairs[position];
+        setPosition(pairs[position]);
     }
 
     function cyclePosition() {
         const positions = ["top", "left", "bottom", "right"];
         const currentPosition = settings.behavior.position;
         const position = (positions.indexOf(currentPosition) + 1) % 4;
-        if (position === 0 || position === 2) {
-            settings.currentLayout = "Dynamic";
-        } else {
-            settings.currentLayout = "VDynamic";
-        }
-        settings.behavior.position = positions[position];
-    }
-
-    function getLayouts() {
-        let arr = [];
-
-        const extract = model => {
-            for (let i = 0; i < model.count; i++) {
-                let name = model.get(i, "fileBaseName").toString();
-                if (!name.includes("Content")) {
-                    arr.push(name);
-                }
-            }
-        };
-
-        extract(hModel);
-        extract(vModel);
-
-        return arr;
+        setPosition(positions[position]);
     }
 
     FolderListModel {
-        id: hModel
+        id: barsModel
         nameFilters: ["*.qml"]
-        folder: Qt.resolvedUrl(Directories.shellDir + "/modules/main/bar/layouts/horizontal")
-        showDirs: false
-        showFiles: true
-    }
-
-    FolderListModel {
-        id: vModel
-        nameFilters: ["*.qml"]
-        folder: Qt.resolvedUrl(Directories.shellDir + "/modules/main/bar/layouts/vertical")
+        folder: Qt.resolvedUrl(Directories.shellDir + "/modules/main/bar/layouts")
         showDirs: false
         showFiles: true
     }

@@ -16,6 +16,7 @@ Singleton {
     readonly property QtObject sizePresets: Sizes.sidebar
     property var enabledCategories: ({})
     property var registry: ({})
+    property list<string> appearanceModes: ["float", "sharp", "convex", "concave"]
     readonly property var shellReg: {
         "Apps": {
             icon: "rocket",
@@ -27,6 +28,12 @@ Singleton {
             expandSize: sizePresets.half,
             shape: "Ghostish",
             enabled: Mem.options.sidebar.content.apps
+        },
+        "ScreenTime": {
+            icon: "supervisor_account",
+            activeIcon: "person",
+            componentPath: "etc/ScreenTime",
+            enabled: Mem.options.sidebar.content.screenTime
         },
         "API": {
             icon: "cognition",
@@ -84,13 +91,6 @@ Singleton {
             expandSize: sizePresets.overviewExpanded,
             enabled: Mem.options.sidebar.content.overview
         },
-        "Downloads": {
-            icon: "download",
-            incubatable: true,
-            activeIcon: "view_cozy",
-            componentPath: "downloads/DownloadManager",
-            enabled: true
-        },
         "Beats": {
             icon: "music_note",
             activeIcon: "music_cast",
@@ -123,6 +123,7 @@ Singleton {
         "Emojis": {
             icon: "sentiment_calm",
             componentPath: "etc/Emojis",
+            expandable: true,
             searchable: true,
             shape: "Ghostish",
             enabled: Mem.options.sidebar.content.emojis
@@ -190,11 +191,18 @@ Singleton {
             shell: "main",
             stealth: true
         },
+        "Cast": {
+            icon: "cast",
+            shape: "Bun",
+            componentPath: "cast/Cast"
+        // stealth: true
+        },
         "Auth": {
             componentPath: "etc/Polkit",
             stealth: true
         }
     }
+
     function _get(id) {
         return registry[id];
     }

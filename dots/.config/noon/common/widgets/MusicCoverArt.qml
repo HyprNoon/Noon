@@ -17,7 +17,7 @@ StyledRect {
     property alias source: coverImage.source
     property alias tintColor: coverImage.tintColor
     property alias tintLevel: coverImage.tintLevel
-
+    property alias tint: coverImage.tint
     CroppedImage {
         id: coverImage
 

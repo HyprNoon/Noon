@@ -10,14 +10,7 @@ import "wallpapers"
 Singleton {
     id: root
 
-    readonly property QtObject secrets: QtObject {
-        property string wallhavenApiKey: Mem.store.secrets.wallhavenApiKey
-        property string unsplashApiKey: Mem.store.secrets.unsplashApiKey
-    }
-
-    property int currentApiIndex: 0
-
-    readonly property var apis: [
+    property var methods: [
         {
             name: "wallhaven",
             api: wallhavenApi
@@ -27,7 +20,9 @@ Singleton {
             api: unsplashApi
         }
     ]
-    readonly property QtObject api: apis[currentApiIndex].api
+
+    readonly property string currentMethod: Mem.options.services.wallpapers.method
+    readonly property QtObject api: methods.find(method => method.name === currentMethod)?.api ?? wallhavenMethod
 
     property var results: []
 
@@ -44,14 +39,10 @@ Singleton {
     onQueryChanged: _doFetch(1, true)
 
     Component.onCompleted: {
-        if (Mem.ready) {
-            wallhavenApi.apiKey = secrets.wallhaven;
-            unsplashApi.apiKey = secrets.unsplash;
-        }
         root._doFetch(1, true);
     }
 
-    onCurrentApiIndexChanged: {
+    onCurrentMethodChanged: {
         root.query = "";
         root.selectedCategory = 0;
         root._currentPage = 1;
@@ -136,11 +127,9 @@ Singleton {
                 WallpaperService.wallpaperModel.refresh();
         }
     }
-
     WallhavenApi {
         id: wallhavenApi
     }
-
     UnsplashApi {
         id: unsplashApi
     }

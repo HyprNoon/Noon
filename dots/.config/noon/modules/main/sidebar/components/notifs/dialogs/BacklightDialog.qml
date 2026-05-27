@@ -20,13 +20,13 @@ BottomDialog {
         anchors.fill: parent
         anchors.margins: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Kb Backlight"
             subTitle: "Select keyboard backlight device"
             target: root
         }
 
-        BottomDialogSeparator {}
+        PageSeparator {}
 
         StyledListView {
             Layout.fillWidth: true

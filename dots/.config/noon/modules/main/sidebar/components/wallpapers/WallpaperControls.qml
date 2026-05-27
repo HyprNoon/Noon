@@ -12,23 +12,11 @@ BottomDialog {
 
     property int comboWidth: 240
 
-    function findIndex(array, value, valueRole) {
-        for (let i = 0; i < array.length; i++) {
-            if (array[i][valueRole] === value)
-                return i;
-        }
-        return 0;
-    }
     z: 9999
     bottomAreaReveal: true
     hoverHeight: 230
-    color: Colors.colLayer1
     collapsedHeight: 195
     enableStagedReveal: false
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
 
     contentItem: ColumnLayout {
         anchors.fill: parent
@@ -70,7 +58,7 @@ BottomDialog {
                 model: ThemeStore.modes
                 textRole: "name"
                 valueRole: "value"
-                currentIndex: root.findIndex(ThemeStore.modes, Mem.states.desktop.appearance.scheme, "value")
+                currentIndex: ThemeStore.modes.findIndex(i => i.value === Mem.looks.scheme)
                 onActivated: index => {
                     if (index >= 0 && index < ThemeStore.modes.length)
                         WallpaperService.updateScheme(ThemeStore.modes[index].value);
@@ -95,32 +83,31 @@ BottomDialog {
         RowLayout {
             Layout.preferredHeight: 45
             Layout.fillWidth: true
+
             StyledTextField {
                 id: folderEntry
-                property string sanitizedAddress: "~" + FileUtils.trimFileProtocol(Mem.states.desktop.bg.currentFolder.slice(Directories.standard.home.length))
                 Layout.preferredHeight: 45
                 Layout.fillWidth: true
-                text: sanitizedAddress
+                text: FileUtils.collapsePath(Mem.looks.currentFolder)
                 placeholderText: "Wallpaper folder path..."
-                placeholderTextColor: Colors.colOnLayer1
+                placeholderTextColor: Colors.colOnLayer3
                 color: Colors.colOnLayer1
+                bg.color: Colors.colLayer4
                 Keys.onEscapePressed: focus = false
-                onAccepted: Mem.states.desktop.bg.currentFolder = Qt.resolvedUrl(folderEntry.text.replace("~", Directories.standard.home))
+                onAccepted: Mem.looks.currentFolder = FileUtils.expandPath(folderEntry.text)
             }
-            GroupButton {
-                clip: true
-                buttonRadius: Rounding.large
-                buttonRadiusPressed: Rounding.small
 
-                colBackground: colors.colLayer2
-                baseHeight: 45
-                baseWidth: Math.max(90, text.contentWidth + Padding.huge)
-                releaseAction: () => {
-                    OnlineWallpaperService.currentApiIndex = (OnlineWallpaperService.currentApiIndex + 1) % OnlineWallpaperService.apis.length;
-                }
-                contentItem: StyledText {
-                    id: text
-                    text: OnlineWallpaperService.apis[OnlineWallpaperService.currentApiIndex].name
+            StyledComboBox {
+                Layout.preferredWidth: 100
+                Layout.preferredHeight: 40
+                model: OnlineWallpaperService.methods.map(i => i.name)
+                currentIndex: model.indexOf(OnlineWallpaperService.currentMethod)
+                displayText: model[currentIndex] !== undefined ? model[currentIndex] : ""
+
+                onActivated: index => {
+                    if (index >= 0 && index < model.length) {
+                        Mem.options.services.wallpapers.method = model[index];
+                    }
                 }
             }
         }

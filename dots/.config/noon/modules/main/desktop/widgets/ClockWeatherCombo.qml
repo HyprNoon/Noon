@@ -5,7 +5,7 @@ import qs.services
 import qs.common
 import qs.common.widgets
 
-SquareComponent {
+WidgetContainer {
     id: root
     SwipeView {
         id: view
@@ -19,7 +19,7 @@ SquareComponent {
                 anchors.margins: Padding.massive
                 spacing: 0
                 StyledText {
-                    text: PrayerService.prayerLocation
+                    text: Mem.options.services.location
                     horizontalAlignment: Text.AlignLeft
                     color: Colors.colSubtext
                     font.pixelSize: Fonts.sizes.verylarge

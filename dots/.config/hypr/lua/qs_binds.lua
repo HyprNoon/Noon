@@ -7,6 +7,7 @@ hl.bind(mainMod .. "+SHIFT+R", hl.dsp.exec_cmd(ipc .. " global pick_random_wall"
 hl.bind(mainMod .. "+CTRL+Period", hl.dsp.exec_cmd("wl-paste -p | xargs -0 " .. ipc .. " noon translate"))
 hl.bind(mainMod .. "+CTRL+X", hl.dsp.exec_cmd(ipc .. " noon toggle_bar_mode"))
 hl.bind(mainMod .. "+ALT+X", hl.dsp.exec_cmd(ipc .. " noon swap_bar_position"))
+hl.bind(mainMod .. "+ALT+D", hl.dsp.exec_cmd(ipc .. " global toggle_dormant_state"))
 hl.bind("CTRL+ALT+P", hl.dsp.exec_cmd(ipc .. " noon toggle_dock_pin"))
 
 --##! XP
@@ -24,13 +25,21 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd(ipc .. " global toggle_playing"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd(ipc .. " global previous_track || playerctl previous"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd(ipc .. " global next_track || playerctl next"))
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd(ipc .. " global pause_all_players"))
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { repeating = true, locked = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { repeating = true, locked = true })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " global volume_up"), { locked = false })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " global volume_down"), { locked = false })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_SINK@ toggle"), { locked = true })
 
 --##! Brightness Controls
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. " global inc_brightness || brightnessctl set +5%"), { repeating = true, locked = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " global dec_brightness || brightnessctl set 5%-"), { repeating = true, locked = true })
+hl.bind(
+    "XF86MonBrightnessUp",
+    hl.dsp.exec_cmd(ipc .. " global inc_brightness || brightnessctl set +5%"),
+    { repeating = true, locked = true }
+)
+hl.bind(
+    "XF86MonBrightnessDown",
+    hl.dsp.exec_cmd(ipc .. " global dec_brightness || brightnessctl set 5%-"),
+    { repeating = true, locked = true }
+)
 
 --##! Sidebar Binds
 hl.bind("CTRL+ALT+X", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Bars'"), { locked = true })
@@ -47,12 +56,25 @@ hl.bind(mainMod .. "+A", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'API'"), { lock
 hl.bind(mainMod .. "+grave", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Sounds'"), { locked = true })
 hl.bind(mainMod .. "+Escape", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Widgets'"), { locked = true })
 hl.bind(mainMod .. "+Z", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Shelf'"), { locked = true })
+hl.bind(mainMod .. "+SHIFT+P", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Plugins'"), { locked = true })
 hl.bind(mainMod .. "+SHIFT+X", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Tweaks'"), { locked = true })
 hl.bind(mainMod .. "+N", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Notifs'"), { locked = true })
-hl.bind(mainMod .. "+Space", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Apps' || pkill fuzzel || fuzzel"), { locked = true })
-hl.bind("CTRL+ALT+delete", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Session' || pkill wlogout || wlogout -p layer-shell"), { locked = true })
+hl.bind(
+    mainMod .. "+Space",
+    hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Apps' || pkill fuzzel || fuzzel"),
+    { locked = true }
+)
+hl.bind(
+    "CTRL+ALT+delete",
+    hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Session' || pkill wlogout || wlogout -p layer-shell"),
+    { locked = true }
+)
 hl.bind(mainMod .. "+V", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'History'"), { locked = true })
-hl.bind(mainMod .. "+SHIFT+Period", hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Emojis' || pkill fuzzel || ~/.config/noon/scripts/emoji_service.sh copy"), { locked = true })
+hl.bind(
+    mainMod .. "+SHIFT+Period",
+    hl.dsp.exec_cmd(ipc .. " sidebar reveal 'Emojis' || pkill fuzzel || ~/.config/noon/scripts/emoji_service.sh copy"),
+    { locked = true }
+)
 
 --##! Global
 hl.bind("CTRL+" .. mainMod .. "+R", hl.dsp.exec_cmd(scriptsDir .. "/reload_shell.sh"))

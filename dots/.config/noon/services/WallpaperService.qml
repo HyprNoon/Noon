@@ -11,23 +11,24 @@ import qs.services
 
 Singleton {
     id: root
-
-    readonly property string currentWallpaper: Mem.states.desktop.bg.currentBg ?? "root:///assets/images/default_wallpaper.png"
-    readonly property string currentFgPath: FileUtils.trimFileProtocol(Directories.wallpapers.depthDir + Qt.md5(FileUtils.trimFileProtocol(currentWallpaper)) + ".png")
-    readonly property string shellMode: Mem.states.desktop.appearance.mode
-    readonly property string currentFolderPath: Mem.states.desktop.bg.currentFolder
+    readonly property bool fgReady: FileUtils.exists(currentFgPath)
+    readonly property string currentWallpaper: Mem.looks.currentBg ?? "root:///assets/images/default_wallpaper.png"
+    readonly property string currentFgPath: clean(Directories.wallpapers.depthDir + Qt.md5(clean(currentWallpaper)) + ".png")
+    readonly property string shellMode: Mem.looks.mode
+    readonly property string currentFolderPath: Mem.looks.currentFolder
     readonly property FolderListModel wallpaperModel: _wallpaperModel
-    readonly property bool isBright: Mem.states.desktop.bg.isBright
+    readonly property bool isBright: Mem.looks.isBright
+    readonly property var baseCmd: ["python3", Directories.wallpapers.colGenScript]
     property var _thumbnailCache: ({})
     property var wallpaperSelectorCachedModel
     property string thumbnailSize: "large"
     property alias _generatingThumbnails: thumbnailGenerator.running
     readonly property bool _loaded: {
-        if (currentWallpaper.length > 1 && Mem.options.desktop.bg.useQs) {
-            if (Mem.options.desktop.bg.deloadOnFullscreen && !Mem.states.desktop.bg.isLive) {
+        if (currentWallpaper.length > 1) {
+            if (Mem.options.desktop.bg.deloadOnFullscreen && !Mem.looks.isLive) {
                 return !GlobalStates?.topLevel?.fullscreen ?? true;
             } else {
-                return !Mem.states.desktop.bg.isLive;
+                return !Mem.looks.isLive;
             }
         }
         return true;
@@ -57,12 +58,14 @@ Singleton {
             onStreamFinished: _thumbnailCache = {}
         }
     }
-
+    function clean(fileUrl) {
+        return FileUtils.trimFileProtocol(fileUrl);
+    }
     function generateThumbnails(directory) {
         if (thumbnailGenerator.running)
             return false;
 
-        const cleanDir = FileUtils.trimFileProtocol(directory);
+        const cleanDir = clean(directory);
         // Aligned with thumbnail script: -d (dir), -s (size), -w (workers), -i (only images flag)
         const cmd = ["python3", Directories.wallpapers.thumbScript, "-d", cleanDir, "-s", thumbnailSize, "-i"];
         thumbnailGenerator.command = cmd;
@@ -78,7 +81,7 @@ Singleton {
         if (_thumbnailCache[cacheKey])
             return _thumbnailCache[cacheKey];
 
-        let cleanPath = FileUtils.trimFileProtocol(fileUrl);
+        let cleanPath = clean(fileUrl);
         if (!cleanPath.startsWith("/"))
             cleanPath = "/" + cleanPath;
 
@@ -92,10 +95,14 @@ Singleton {
             "xx-large": "xx-large"
         };
         const sizeDir = sizeDirMap[thumbnailSize];
-        const thumbnailPath = `${FileUtils.trimFileProtocol(Directories.standard.home)}/.cache/thumbnails/${sizeDir}/${hash}.png`;
+        const thumbnailPath = `${clean(Directories.standard.home)}/.cache/thumbnails/${sizeDir}/${hash}.png`;
 
         _thumbnailCache[cacheKey] = `file://${thumbnailPath}`;
         return _thumbnailCache[cacheKey];
+    }
+
+    function refreshFolderDelayed() {
+        _wallpaperModel.refreshFolder();
     }
 
     function generateThumbnailsForCurrentFolder() {
@@ -107,50 +114,59 @@ Singleton {
     }
 
     function updateShellMode(mode) {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --noswitch -f --mode '${mode}'`);
+        _cmd("mode", `${mode}`);
     }
 
     function toggleShellMode() {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --noswitch -f --mode toggle`);
+        _cmd("mode", "toggle");
     }
 
     function updateScheme(selectedMode) {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --noswitch -f --scheme '${selectedMode}'`);
-    }
-
-    function refreshFolderDelayed() {
-        _wallpaperModel.refreshFolder();
+        _cmd("set", `${clean(root.currentWallpaper)}`, "--scheme", `${selectedMode}`);
     }
 
     function resetWallpaper() {
-        applyWallpaper("root:///assets/images/default_wallpaper.png");
+        applyWallpaper(Directories.shellDir + "/assets/images/default_wallpaper.png");
+    }
+
+    function _cmd(...args) {
+        if (mainProc.running)
+            mainProc.running = false
+        mainProc.command = [...baseCmd, ...args];
+        mainProc.running = true;
     }
 
     function pickAccentColor() {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --pick`);
+        _cmd("pick");
     }
 
-    function changeAccentColor(color: string) {
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --color '${color}'`);
+    function changeAccentColor(color) {
+        _cmd("color", `${color}`);
+    }
+
+    function changeAccentFromSource(file) {
+        _cmd("set", `${clean(file)}`);
+    }
+
+    function setSystemWallpaper(file) {
+        Mem.looks.currentBg = `${file}`;
     }
 
     function applyWallpaper(fileUrl) {
-        const cleanPath = FileUtils.trimFileProtocol(fileUrl);
         const thumbUrl = getThumbnailPath(fileUrl);
-        const cleanThumb = FileUtils.trimFileProtocol(thumbUrl);
-
-        let cmd = `python3 ${Directories.wallpapers.switchScript} --image '${cleanPath}'`;
-
-        if (cleanThumb && cleanThumb !== cleanPath)
-            cmd += ` --extract-col-from '${cleanThumb}'`;
-
-        NoonUtils.execDetached(cmd);
+        const cleanThumb = clean(thumbUrl);
+        setSystemWallpaper(fileUrl);
+        if (!ColorsService.isDynamic)
+            changeAccentColor(ColorsService.colors.m3primary);
+        else if (cleanThumb && cleanThumb !== fileUrl)
+            changeAccentFromSource(cleanThumb);
+        else if (ColorsService.isDynamic)
+            changeAccentFromSource();
     }
 
     function applyRandomWallpaper() {
-        if (_wallpaperModel.count <= 0)
-            return;
-        NoonUtils.execDetached(`python3 ${Directories.wallpapers.switchScript} --random-no-recursive -R '${FileUtils.trimFileProtocol(currentFolderPath)}'`);
+        if (_wallpaperModel.count > 0)
+            applyWallpaper(_wallpaperModel.get(Math.floor(Math.random() * _wallpaperModel.count),"fileUrl"));
     }
 
     function shuffleWallpapers() {
@@ -173,10 +189,10 @@ Singleton {
     }
 
     function goBack() {
-        const currentDir = Mem.states.desktop.bg.currentFolder;
+        const currentDir = Mem.looks.currentFolder;
         const parentDir = FileUtils.parentDirectory(currentDir);
         if (parentDir && parentDir !== currentDir)
-            Mem.states.desktop.bg.currentFolder = parentDir;
+            Mem.looks.currentFolder = parentDir;
     }
 
     FolderListModel {
@@ -189,7 +205,7 @@ Singleton {
         signal modelUpdated
 
         folder: currentFolderPath
-        nameFilters: NameFilters.picture
+        nameFilters: [...NameFilters.picture,...NameFilters.video]
         showDirs: false
         showFiles: true
         sortField: FolderListModel.Name
@@ -269,5 +285,8 @@ Singleton {
             isFiltering = false;
             modelUpdated();
         }
+    }
+    Process {
+        id: mainProc
     }
 }

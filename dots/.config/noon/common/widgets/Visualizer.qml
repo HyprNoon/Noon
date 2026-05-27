@@ -13,7 +13,7 @@ StyledRect {
     anchors.fill: parent
 
     property bool active: false
-    property string mode: "filled"
+    property alias mode: waves.visualizerType
     property color visualizerColor: ColorUtils.transparentize(Colors.colPrimary, 0.35)
     property real maxVisualizerValue: 5000
     clip: radius > 0
@@ -26,6 +26,7 @@ StyledRect {
     }
 
     WaveVisualizer {
+        id: waves
         anchors.fill: parent
         visualizerType: root.mode
         points: cavaWatcher.data

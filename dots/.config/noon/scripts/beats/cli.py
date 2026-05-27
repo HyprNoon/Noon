@@ -7,10 +7,10 @@ import time
 
 import mpd
 
+from .config import load_conf
 from .library import LibraryManager
 from .player import Player
 
-MPD_CONF = os.path.expanduser("~/.config/mpd/mpd.conf")
 MPD_SOCKET = os.path.expanduser("~/.cache/noon/beats/mpd/socket")
 
 
@@ -34,111 +34,95 @@ def _wait_for_mpd(sock: str, max_sec: int = 15) -> bool:
     return False
 
 
-def _ensure_mpd():
-    if _mpd_ping(MPD_SOCKET):
-        print("MPD already running.", flush=True)
+def _mpd_conf(name: str, host: str, music_dir: str) -> str:
+    sock_dir = os.path.dirname(host)
+    os.makedirs(sock_dir, exist_ok=True)
+    return (
+        f'music_directory "{music_dir}"\n'
+        f'db_file "{os.path.join(sock_dir, name)}.db"\n'
+        f'pid_file "{os.path.join(sock_dir, name)}.pid"\n'
+        f'log_file "{os.path.join(sock_dir, name)}.log"\n'
+        f'bind_to_address "{host}"\n'
+        'restore_paused "yes"\n'
+        'auto_update "yes"\n'
+        'audio_output {\n'
+        '  type "pipewire"\n'
+        f'  name "{name}"\n'
+        '}\n'
+    )
+
+
+def _ensure_mpd(name: str, host: str, music_dir: str):
+    if _mpd_ping(host):
         return
 
-    if os.path.exists(MPD_SOCKET):
-        print("Removing stale MPD socket...", flush=True)
-        os.remove(MPD_SOCKET)
+    if os.path.exists(host):
+        os.remove(host)
 
-    print("Starting MPD...", flush=True)
-    try:
-        subprocess.run(
-            ["systemctl", "--user", "start", "mpd"],
-            capture_output=True, timeout=10,
-        )
-    except Exception:
-        subprocess.Popen(
-            ["mpd", MPD_CONF],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+    print(f"Starting MPD ({name}) on {host}...", file=sys.stderr, flush=True)
+    conf = _mpd_conf(name, host, music_dir)
+    conf_file = os.path.join(os.path.dirname(host), f"{name}.conf")
+    with open(conf_file, "w") as f:
+        f.write(conf)
+    subprocess.Popen(
+        ["mpd", conf_file],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
-    if _wait_for_mpd(MPD_SOCKET):
-        print("  MPD started.", flush=True)
+    if _wait_for_mpd(host):
+        print(f"  {name} ready.", file=sys.stderr, flush=True)
     else:
-        print("  Failed to start MPD.", file=sys.stderr, flush=True)
+        print(f"  Failed to start MPD ({name}).", file=sys.stderr, flush=True)
         sys.exit(1)
 
 
-def _ensure_mpd_mpris():
-    if _pgrep_alive(r"[m]pd-mpris.*unix.*" + MPD_SOCKET.replace("/", r"\/")) and _mpd_ping(MPD_SOCKET):
-        print("mpd-mpris already running.", flush=True)
-        return
+BRIDGE_BIN = "mpd-mpris"
 
-    print("Starting mpd-mpris...", flush=True)
+
+def _kill_bridge():
+    subprocess.run(["killall", "-9", "mpd-mpris"], capture_output=True, timeout=5)
+    subprocess.run(["killall", "mpd-mpris"], capture_output=True, timeout=5)
+    time.sleep(0.5)
+
+
+def _ensure_mpd_mpris():
+    _kill_bridge()
+
+    print("Starting MPRIS bridge...", file=sys.stderr, flush=True)
     subprocess.Popen(
-        ["mpd-mpris", "-network", "unix", "-host", MPD_SOCKET],
+        [BRIDGE_BIN, "-network", "unix", "-host", MPD_SOCKET, "-no-instance"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     time.sleep(1)
 
-    if _pgrep_alive("[m]pd-mpris"):
-        print("  mpd-mpris started.", flush=True)
-    else:
-        print("  Warning: mpd-mpris may not have started.", file=sys.stderr, flush=True)
-
 
 def init(player: str, port: int):
-    _ensure_mpd()
+    conf = load_conf()
+    players = conf.get("players", {})
+    for name, pconf in players.items():
+        if "host" not in pconf:
+            continue
+        music_dir = os.path.expanduser(pconf.get("musicDirectory", "~/Music"))
+        host = os.path.expanduser(pconf["host"])
+        _ensure_mpd(name, host, music_dir)
+
     _ensure_mpd_mpris()
-
-    import asyncio
-    from .web_client import BeatsWebServer
-    print(f"Starting beats web server on port {port}...", flush=True)
-    asyncio.run(BeatsWebServer(player, port).start())
-
-
-def _pgrep_alive(pattern: str) -> bool:
-    try:
-        r = subprocess.run(
-            ["ps", "-eo", "pid,stat,args"],
-            capture_output=True, text=True, timeout=5,
-        )
-        for line in r.stdout.splitlines():
-            if pattern in line:
-                parts = line.split(None, 2)
-                if len(parts) >= 2 and not parts[1].startswith("Z"):
-                    return True
-        return False
-    except Exception:
-        return True
+    print("Init complete. Run 'beats serve' to start the web UI.", file=sys.stderr, flush=True)
 
 
 def kill():
-    print("Stopping mpd-mpris...", flush=True)
-    subprocess.run(["pkill", "-f", r"[m]pd-mpris"], capture_output=True, timeout=5)
+    _kill_bridge()
+    subprocess.run(["killall", "-9", "mpd"], capture_output=True, timeout=5)
     time.sleep(1)
 
-    if _pgrep_alive("[m]pd-mpris"):
-        print("  Force killing mpd-mpris...", flush=True)
-        subprocess.run(["pkill", "-9", "-f", r"[m]pd-mpris"], capture_output=True, timeout=5)
-        time.sleep(0.5)
+    for sock in os.listdir(os.path.dirname(MPD_SOCKET)):
+        path = os.path.join(os.path.dirname(MPD_SOCKET), sock)
+        if os.path.exists(path) and (sock.endswith("_socket") or sock == "socket"):
+            os.remove(path)
 
-    print(f"  mpd-mpris {'still running' if _pgrep_alive('[m]pd-mpris') else 'stopped'}.", flush=True)
-
-    if _mpd_ping(MPD_SOCKET):
-        print("Stopping MPD...", flush=True)
-        r = subprocess.run(
-            ["systemctl", "stop", "mpd"],
-            capture_output=True, timeout=10,
-        )
-        if r.returncode != 0:
-            subprocess.run(["pkill", "mpd"], capture_output=True, timeout=5)
-        time.sleep(1.5)
-
-        if _mpd_ping(MPD_SOCKET):
-            print("  Force killing MPD...", flush=True)
-            subprocess.run(["pkill", "-9", "mpd"], capture_output=True, timeout=5)
-
-    if os.path.exists(MPD_SOCKET):
-        os.remove(MPD_SOCKET)
-        print("  Socket cleaned.", flush=True)
-
-    print("MPD stopped.", flush=True)
+    print("All stopped.", file=sys.stderr, flush=True)
 
 
 def main():
@@ -158,8 +142,6 @@ def main():
             "seek",
             "volume",
             "status",
-            "refresh-config",
-            "resume-main",
             "queue",
             "queue-add",
             "queue-remove",
@@ -170,8 +152,7 @@ def main():
             "list-artists",
             "list-albums",
             "list-genres",
-            "build-covers",
-            "update-db",
+            "fetch",
             "serve",
             "init",
             "kill",
@@ -201,6 +182,16 @@ def main():
         asyncio.run(BeatsWebServer(args.player, args.port).start())
         return
 
+    conf = load_conf()
+    pconf = conf.get("players", {}).get(args.player)
+    if pconf:
+        host = os.path.expanduser(pconf["host"])
+        if not _mpd_ping(host):
+            print(f"MPD ({args.player}) not running. Initializing...", file=sys.stderr, flush=True)
+            init(args.player, args.port)
+        else:
+            _ensure_mpd_mpris()
+
     p = Player(args.player)
     lib = LibraryManager(args.player)
 
@@ -215,8 +206,6 @@ def main():
         "seek": lambda: p.seek(args.seconds),
         "volume": lambda: p.set_volume(args.volume),
         "status": lambda: print(json.dumps(p.status())),
-        "refresh-config": p.refresh_config,
-        "resume-main": p.resume_main,
         "queue": lambda: print(json.dumps(p.get_queue())),
         "queue-add": lambda: p.queue_add(args.url or args.file),
         "queue-remove": lambda: p.queue_remove(args.index),
@@ -227,8 +216,7 @@ def main():
         "list-artists": lambda: print(json.dumps(lib.list_artists())),
         "list-albums": lambda: print(json.dumps(lib.list_albums())),
         "list-genres": lambda: print(json.dumps(lib.list_genres())),
-        "build-covers": lib.build_covers,
-        "update-db": lambda: (p.update_db(), print("Database update triggered.")),
+        "fetch": lambda: (p.refresh_config(), lib.build_covers(), p.update_db(), print("Fetch complete.", file=sys.stderr)),
     }
     dispatch[args.command]()
 

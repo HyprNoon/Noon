@@ -4,6 +4,7 @@ import qs.common
 import qs.common.widgets
 
 GroupButton {
+    property alias iconSize: symb.font.pixelSize
     property alias materialIconFill: symb.fill
     property alias materialIcon: symb.text
     property alias animateIcon: symb.animateChange

@@ -114,10 +114,10 @@ Singleton {
     readonly property color colErrorContainerHover: m(colErrorContainer, colOnErrorContainer, 0.92)
     readonly property color colErrorContainerActive: m(colErrorContainer, colOnErrorContainer, 0.88)
 
-    readonly property color colOutline: t(m3.m3outline, 0.8)
+    readonly property color colOutline: m(m3.m3surfaceContainerHigh, m3.m3onSurface, 0.96)  // <-- I like this More ;  m3.m3outline
     readonly property color colOutlineVariant: m3.m3outlineVariant
     readonly property color colTooltip: m3.darkmode ? m(m3.m3background, "#3C4043", 0.5) : "#3C4043"
     readonly property color colOnTooltip: m3.m3onBackground
     readonly property color colScrim: t(m3.m3scrim, 0.4)
-    readonly property color colShadow: t(m3.m3shadow, 0.4)
+    readonly property color colShadow: m3.m3shadow
 }

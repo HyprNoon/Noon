@@ -20,18 +20,24 @@ Item {
 
     readonly property var allCommands: [
         {
+            name: "new",
+            description: qsTr("Start New Session"),
+            execute: args => Ai.newSession()
+        },
+        {
+            name: "sessions",
+            description: qsTr("Select Session"),
+            execute: args => Ai.loadChat(args.join(" ").trim())
+        },
+        {
             name: "scale",
             description: qsTr("Change response's font scale by decimal."),
-            execute: args => {
-                Mem.states.sidebar.apis.fontScale = args.join(" ").trim();
-            }
+            execute: args => Mem.states.sidebar.apis.fontScale = args.join(" ").trim()
         },
         {
             name: "attach",
             description: qsTr("Attach a file. Only works with Gemini."),
-            execute: args => {
-                Ai.attachFile(args.join(" ").trim());
-            }
+            execute: args => Ai.attachFile(args.join(" ").trim())
         },
         {
             name: "model",
@@ -41,21 +47,36 @@ Item {
         {
             name: "skill",
             description: qsTr("Choose Skill"),
-            execute: args => {
-                Ai.setSkill(args[0]);
-            }
-        },
-        {
-            name: "load",
-            description: qsTr("Load chat"),
-            execute: args => {
-                Ai.loadChat(args.join(" ").trim());
-            }
+            execute: args => Ai.setSkill(args[0])
         },
         {
             name: "clear",
             description: qsTr("Clear chat history"),
             execute: () => Ai.clearMessages()
+        },
+        {
+            name: "test",
+            description: qsTr("Send LaTeX test messages"),
+            execute: () => {
+                Ai.clearMessages();
+                const tests = [
+                    "Inline: $$E = mc^2$$",
+                    "Quadratic: $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$",
+                    "Integral: $$\\int_{a}^{b} f(x)\\,dx = F(b) - F(a)$$",
+                    "Matrix: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$",
+                    "Summation: $$\\sum_{k=1}^{n} \\frac{1}{k} \\approx \\ln(n) + \\gamma$$",
+                    "Greek: $$\\alpha \\beta \\gamma \\delta \\epsilon \\theta \\pi \\sigma \\omega \\phi \\psi \\mu$$",
+                    "Limit: $$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$",
+                    "Trig: $$\\sin^2 \\theta + \\cos^2 \\theta = 1$$",
+                    "Nested fraction: $$\\frac{1 + \\frac{1}{x}}{1 - \\frac{1}{x}}$$",
+                    "Piecewise: $$f(x) = \\begin{cases} x^2 & x \\ge 0 \\\\ -x & x < 0 \\end{cases}$$",
+                    "Decorations: $$\\hat{a} \\; \\bar{b} \\; \\vec{c} \\; \\dot{d} \\; \\ddot{e}$$",
+                    "Binomial: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$",
+                    "Text in math: $$\\text{area} = \\pi r^2 \\quad \\text{for } r \\ge 0$$",
+                    "Set builder: $$\\{ x \\in \\mathbb{R} \\mid |x| < 1 \\}$$",
+                ];
+                tests.forEach(t => Ai.addMessage(t, "ai"));
+            }
         }
     ]
 
@@ -65,7 +86,7 @@ Item {
         const parts = text.trim().split(" ");
         const cmd = root.allCommands.find(c => c.name === parts[0].substring(1));
         text.startsWith(root.commandPrefix) && cmd ? cmd.execute(parts.slice(1)) : Ai.sendUserMessage(text);
-        // chatView.listView.positionViewAtEnd();
+        chatView.listView.positionViewAtEnd();
     }
 
     function decodeImageAndAttach(entry) {
@@ -132,7 +153,7 @@ Item {
                 }));
     }
 
-    function handleLoadSuggestions() {
+    function handleSessionsSuggestions() {
         const query = messageInputField.text.split(" ")[1] ?? "";
         const source = Ai.sessions.map(s => ({
                     name: s.title,
@@ -150,16 +171,16 @@ Item {
         const isFirst = messageInputField.text.trim().split(" ").length === 1;
         root.suggestionQuery = query;
         root.suggestionList = results.map(r => ({
-                    name: (isFirst ? root.commandPrefix + "load " : "") + r.target.id,
+                    name: (isFirst ? root.commandPrefix + "sessions " : "") + r.target.id,
                     displayName: r.target.title,
-                    description: qsTr("Load chat from %1").arg(new Date(r.target.updated).toLocaleString())
+                    description: qsTr("Session from %1").arg(new Date(r.target.updated).toLocaleString())
                 }));
     }
 
     readonly property var argHandlers: ({
             "model": handleModelSuggestions,
             "skill": handleSkillsSuggestions,
-            "load": handleLoadSuggestions
+            "sessions": handleSessionsSuggestions
         })
 
     function updateSuggestions() {
@@ -269,7 +290,8 @@ Item {
         anchors.fill: parent
         spacing: root.padding
 
-        InteractionArea {
+        ChatView {
+            id: chatView
             Layout.fillWidth: true
             Layout.fillHeight: true
         }

@@ -16,6 +16,7 @@ Item {
     property var messageInputField
     property bool enableMouseSelection: false
     property bool renderMarkdown: true
+    property bool editing: false
 
     readonly property list<var> messageBlocks: StringUtils.splitMarkdownBlocks(root.messageData?.content)
 

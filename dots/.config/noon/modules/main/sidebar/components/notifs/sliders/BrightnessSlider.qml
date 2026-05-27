@@ -37,7 +37,7 @@ Item {
     }
 
     Symbol {
-        text: "light_mode"
+        text: "routine"
         z: 0
         color: Colors.colOnPrimary
         fill: 1

@@ -12,7 +12,7 @@ Item {
     Layout.preferredHeight: 45
 
     property var sink: AudioService.sink
-    property real maxValue: 1
+    property real maxValue: 1.5
 
     Symbol {
         z: 2

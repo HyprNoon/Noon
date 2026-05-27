@@ -8,6 +8,8 @@ import Quickshell
 
 BarGroup {
     id: root
+    property var sink: AudioService.sink
+    property real maxValue: 1.5
 
     Layout.fillWidth: true
     Layout.preferredHeight: width
@@ -34,6 +36,15 @@ BarGroup {
         anchors.fill: parent
         acceptedButtons: Qt.MiddleButton | Qt.BackButton | Qt.ForwardButton | Qt.RightButton | Qt.LeftButton
         hoverEnabled: true
+        scrollGestureEnabled: true
+        onWheel: wheel => {
+            if (!root.sink || !root.sink.audio)
+                return;
+            var delta = wheel.angleDelta.y / 120;
+            var newValue = root.sink.audio.volume + (delta * 0.05);
+            root.sink.audio.volume = Math.max(0, Math.min(newValue, root.maxValue));
+            wheel.accepted = true;
+        }
 
         onPressed: event => {
             const activePlayer = BeatsService.player;

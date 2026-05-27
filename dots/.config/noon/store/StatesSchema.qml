@@ -4,24 +4,23 @@ JsonAdapter {
     property JO applications: JO {
         property JO settings: JO {
             property string cat: ""
-            property bool sidebar_expanded: false
+            property bool sidebar_expanded: true
             property bool sidebar_pinned: true
-            property int appearance_mode: 2
+            property int appearance_mode: 1
         }
         property JO reader: JO {
             property string currentFile: ""
-            property bool sidebar_expanded: false
+            property bool sidebar_expanded: true
             property bool sidebar_pinned: true
-            property int appearance_mode: 2
+            property int appearance_mode: 1
         }
     }
     property JO desktop: JO {
         property JO icons
-        property JO bg
-        property JO appearance
         property JO clock
         property JO shell
         property JO dialogs
+        property bool firstRun: true
 
         dialogs: JO {
             property string lastIncubatedCategory
@@ -34,27 +33,6 @@ JsonAdapter {
             property int sortMode: 1
             property bool snapToGrid: true
             property var positions: []
-            property string currentIconTheme: ""
-        }
-        bg: JO {
-            property bool isBright: false
-            property bool isLive: false
-            property string currentVideo: ""
-            property string currentBg: ""
-            property string currentFolder: "~/Pictures/Wallpapers"
-        }
-        appearance: JO {
-            property JO colors
-
-            property bool autoSchemeSelection: false
-            property bool autoShellMode: false
-            property string mode: "dark"
-            property string scheme: ""
-
-            colors: JO {
-                property real chroma: 1
-                property real tone: 1
-            }
         }
         clock: JO {
             property real x: 0
@@ -68,19 +46,15 @@ JsonAdapter {
 
     property JO services: JO {
         property JO kdeconnect
-        property JO islam
         property JO bookmarks
-        property JO ai
-        property JO radio
+        property JO notes
         property JO record
         property JO emojis
         property JO nightLight
         property JO power
         property JO games
-        property JO todo
         property JO timers
         property JO beats
-        property JO calendar
 
         beats: JO {
             property int pageIndex: 0
@@ -92,16 +66,8 @@ JsonAdapter {
             property list<var> hits: []
         }
         timers: JO {
-            property list<var> alarms: []
-            property int nextAlarmId: 1
             property list<var> timers: []
             property int nextTimerId: 1
-        }
-        calendar: JO {
-            property list<var> events: []
-        }
-        todo: JO {
-            property list<var> tasks: []
         }
         record: JO {
             property bool fullscreen: true
@@ -112,37 +78,25 @@ JsonAdapter {
             property list<var> list: []
             property string gameModeCommand
         }
-        islam: JO {
-            property list<var> donePrayers: []
-            property string currentSurah: ""
-        }
-
-        ai: JO {
-            property list<var> skills: []
-            property list<var> models: []
-            property string model: ""
-            property string currentSessionId: ""
-            property JO tokenCount: JO {
-                property int input
-                property int output
-                property int total
-            }
-        }
-        radio: JO {
-            property string url: ""
+        notes: JO {
+            property string currentFile: "noon_notes.md"
         }
         power: JO {
             property string controller: ""
             property string mode: ""
             property list<var> modes
         }
+
         kdeconnect: JO {
-            property string selectedDeviceId: ""
+            property int selectedDeviceIndex: 0
+            property var connectedDevices: []
         }
+
         nightLight: JO {
             property bool enabled: false
             property int temperature: 3600
         }
+
         bookmarks: JO {
             property list<var> firefoxBookmarks
         }
@@ -171,30 +125,31 @@ JsonAdapter {
     property JO dock: JO {
         property bool pinned: false
     }
+
     property JO sidebar: JO {
         property JO apis
-        property JO web
         property JO widgets
         property JO shelf
-        web: JO {
-            property string currentUrl: ""
-        }
+
         shelf: JO {
             property list<string> filePaths: []
         }
+
         widgets: JO {
             property list<string> order: []
             property list<string> enabled: []
-            property list<string> desktop: []
-            property list<string> pilled: []
+            property list<string> desktop: ["cal", "resources", "dino"]
+            property list<string> pilled: ["dino"]
             property list<string> pinned: []
             property list<string> expanded: []
         }
+
         apis: JO {
             property int selectedTab: 0
             property real fontScale: 1
         }
     }
+
     property JO favorites: JO {
         property var apps: [
             {

@@ -16,7 +16,7 @@ Singleton {
         property int veryhuge: 700 * scale
         property int gigantic: 1000 * scale
         property int massive: 1500 * scale
-        property int expressiveFastSpatial: 350 * scale
+        property int expressiveFastSpatial: 300 * scale
         property int expressiveDefaultSpatial: 500 * scale
         property int expressiveEffects: 200 * scale
     }

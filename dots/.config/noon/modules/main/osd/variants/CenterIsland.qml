@@ -10,7 +10,7 @@ import qs.services
 
 StyledPanel {
     id: panelRoot
-    name: "fade_layer"
+    name: "blurred_fade_layer"
 
     property real value
     property string icon
@@ -21,11 +21,11 @@ StyledPanel {
     signal interactionEnded
 
     mask: Region {
-        item: bottomPill
+        item: bg
     }
 
-    implicitWidth: bottomPill.implicitWidth
-    implicitHeight: bottomPill.implicitHeight + Sizes.elevationMargin * 2
+    exclusiveZone: -1
+    fill: true
 
     Connections {
         target: panelRoot
@@ -34,28 +34,32 @@ StyledPanel {
         }
     }
 
+    StyledRectangularShadow {
+        target: bg
+    }
+
     StyledRect {
-        id: bottomPill
+        id: bg
         anchors.centerIn: parent
 
-        implicitWidth: Sizes.osd.centerIsland.width
-        implicitHeight: Sizes.osd.centerIsland.height
+        implicitSize: Sizes.osd.centerIsland.width
+
         enableBorders: true
         color: Colors.colLayer0
-        radius: Rounding.massive
+        radius: Rounding.silly
 
         CircularProgress {
             id: circularProgress
             anchors.centerIn: parent
             value: panelRoot.value
-            size: bottomPill.implicitWidth / 1.25
+            size: bg.implicitWidth / 1.25
             lineWidth: 10
 
             property bool valueChanging: true
 
             Timer {
                 id: valueChangeTimer
-                interval: 1000
+                interval: 500
                 onTriggered: circularProgress.valueChanging = false
             }
 
@@ -68,14 +72,13 @@ StyledPanel {
             }
 
             Symbol {
-                fill: 1
                 animateChange: !circularProgress.valueChanging
-                font {
-                    family: circularProgress.valueChanging ? Fonts.family.numbers : Fonts.family.iconMaterial
-                    variableAxes: circularProgress.valueChanging ? Fonts.variableAxes.numbers : variableAxes
-                    pixelSize: bottomPill.implicitWidth / 3.85
-                }
+
                 text: circularProgress.valueChanging ? Math.round(panelRoot.value * 100) : panelRoot.icon
+                font.family: circularProgress.valueChanging ? Fonts.family.numbers : Fonts.family.iconMaterial
+                font.variableAxes: circularProgress.valueChanging ? Fonts.variableAxes.numbers : variableAxes
+                font.pixelSize: bg.implicitWidth / 3.85
+
                 color: Colors.colOnLayer0
                 anchors.centerIn: parent
             }

@@ -22,11 +22,11 @@ StyledRect {
     property int maxValue: 100
     property real sliderMinValue: 0
     property real sliderMaxValue: 1
+    property bool canRefresh: false
+    property var refreshAction
     property var comboBoxValues: []
     property bool fillHeight: false
     property string textPlaceholder: "text"
-
-    signal clicked
 
     readonly property var configValue: getConfigValue()
 
@@ -92,34 +92,38 @@ StyledRect {
     readonly property var currentType: typeMap[type] || typeMap["switch"]
     readonly property bool isActive: currentType.isActive ? currentType.isActive() : !!root.configValue
     readonly property bool hideTitle: type === "field"
-
+    readonly property var base: Mem[(store || "options")] ?? Mem.options
     Layout.fillWidth: true
     Layout.fillHeight: fillHeight
-    Layout.preferredHeight: (fillHeight && component) ? component.implicitHeight + 2 * Padding.normal : 65
+    Layout.preferredHeight: (fillHeight && component) ? component.implicitHeight + 2 * Padding.normal : 72
 
     color: !enabled ? colors.colLayer2Disabled : mouseArea.pressed ? colors.colLayer2Active : mouseArea.containsMouse ? colors.colLayer2Hover : colors.colLayer2
 
     function getConfigValue() {
         if (key === "" || !Mem)
             return undefined;
-        const base = store === "hypr" ? Mem.hypr : (store === "state" ? Mem.states : Mem.options);
         return key.split('.').reduce((cur, k) => cur?.[k], base);
+    }
+
+    function startReloadDialog() {
+        NoonUtils.requestDialog("assure", {
+            title: "Restart",
+            description: "For changes to take Effect",
+            acceptText: "Accept",
+            onAccepted: () => NoonUtils.execDetached(Directories.scriptsDir + "/reload_shell.sh")
+        });
     }
 
     function setConfigValue(value) {
         if (key === "" || !Mem)
             return;
         const parts = key.split('.');
-        const base = store === "hypr" ? Mem.hypr : (store === "state" ? Mem.states : Mem.options);
         const target = parts.slice(0, -1).reduce((cur, k) => cur[k] || (cur[k] = {}), base);
+
         target[parts[parts.length - 1]] = value;
+
         if (reloadOnChange)
-            NoonUtils.requestDialog("assure", {
-                title: "Restart",
-                description: "For changes to take Effect",
-                acceptText: "Accept",
-                onAccepted: () => NoonUtils.execDetached(Directories.scriptsDir + "/reload_shell.sh")
-            });
+            startReloadDialog();
     }
 
     Connections {
@@ -127,6 +131,9 @@ StyledRect {
         ignoreUnknownSignals: true
 
         function onClicked() {
+            feedbackAnimation.start();
+            iconAnimation.start();
+            root.getConfigValue();
             root.setConfigValue(root.component.checked);
         }
 
@@ -153,32 +160,27 @@ StyledRect {
         anchors.fill: parent
         hoverEnabled: true
         enabled: root.enabled && type === "switch"
-        onClicked: {
-            setConfigValue(!root.configValue);
-            root.clicked();
-            iconAnimation.start();
-        }
-        onPressed: feedbackAnimation.start()
+        onClicked: root.component?.click()
     }
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Padding.small
-        anchors.leftMargin: Padding.large
-        anchors.rightMargin: Padding.large
-        spacing: Padding.huge
+        // anchors.margins: Padding.large
+        anchors.leftMargin: Padding.veryhuge
+        anchors.rightMargin: Padding.veryhuge
+        spacing: Padding.massive
 
         StyledRect {
             visible: !root.hideTitle
-            Layout.preferredHeight: 40
-            Layout.preferredWidth: 40
+            Layout.preferredHeight: 45
+            Layout.preferredWidth: 45
             radius: Rounding.full
             color: root.isActive ? colors.colPrimary : colors.colLayer3
 
             Symbol {
                 id: iconSymbol
                 fill: 1
-                font.pixelSize: 18
+                font.pixelSize: 20
                 text: root.icon
                 color: root.isActive ? colors.colOnPrimary : colors.colOnLayer3
                 anchors.centerIn: parent
@@ -223,6 +225,18 @@ StyledRect {
                     if (prop in item)
                         item[prop] = Qt.binding(() => props[prop]);
                 });
+            }
+        }
+
+        StyledLoader {
+            id: refreshLoader
+            Layout.leftMargin: -Padding.verylarge
+            shown: root.canRefresh
+            sourceComponent: RippleButtonWithIcon {
+                materialIcon: "refresh"
+                // colBackground: "transparent"
+                implicitSize: 45
+                releaseAction: () => root.refreshAction()
             }
         }
     }

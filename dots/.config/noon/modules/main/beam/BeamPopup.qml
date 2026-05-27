@@ -78,7 +78,7 @@ ShaderRect {
         spacing: Padding.massive
 
         StyledLoader {
-            active: root.currentConf && root.currentConf.active && root.height <= 260
+            active: (root?.currentConf && root.currentConf.active && root.height <= 260) || false
             asynchronous: true
             visible: active
             sourceComponent: root.currentConf ? root.currentConf.comp : null

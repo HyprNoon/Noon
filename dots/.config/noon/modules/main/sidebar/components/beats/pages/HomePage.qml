@@ -17,7 +17,7 @@ StyledRect {
     property bool expanded: false
     readonly property bool playing: BeatsService.player?.playbackState === MprisPlaybackState.Playing
     readonly property bool displayingLyrics: activeLyrics.showContent
-    property QtObject colors: Colors
+    property QtObject colors: BeatsService.colors
 
     Behavior on width {
         enabled: false
@@ -38,9 +38,6 @@ StyledRect {
                 break;
             case Qt.Key_Left:
                 player?.canControl && player.previous();
-                break;
-            case Qt.Key_D:
-                BeatsService.downloadCurrentSong();
                 break;
             case Qt.Key_S:
                 player && (player.shuffle = !player.shuffle);
@@ -95,7 +92,6 @@ StyledRect {
         anchors {
             fill: parent
             margins: detached ? Padding.massive : Padding.large
-            rightMargin: 0
         }
 
         Item {
@@ -107,9 +103,7 @@ StyledRect {
             }
             StyledRectangularShadow {
                 target: bigCover
-                radius: 50
-                intensity: 0.6
-                show: true
+                show: LyricsService.syncedLyrics.length === 0
             }
             StyledLoader {
                 id: bigCover
@@ -134,7 +128,7 @@ StyledRect {
 
             Visualizer {
                 active: Mem.options.mediaPlayer.showVisualizer && root.playing
-                mode: Mem.options.mediaPlayer.visualizerMode
+                mode: WaveVisualizer[Mem.options.mediaPlayer.visualizerMode]
                 visualizerColor: root.colors.colPrimary
                 radius: Rounding.massive
             }
@@ -168,7 +162,6 @@ StyledRect {
 
             StyledRectangularShadow {
                 target: queue
-                intensity: 0.45
             }
         }
     }

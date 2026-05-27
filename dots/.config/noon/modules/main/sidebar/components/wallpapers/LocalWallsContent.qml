@@ -119,10 +119,9 @@ LayerRect {
         animateAppearance: true
         animateMovement: true
         popin: true
-
+        Component.onCompleted: Qt.callLater(() => listView.currentIndex = listView.model?.findIndex(t => t.title === title))
         spacing: Padding.small
         model: filteredModel
-        currentIndex: filteredModel.values.indexOf(WallpaperService.currentWallpaper)
         highlightFollowsCurrentItem: true
         highlightMoveDuration: 300
 

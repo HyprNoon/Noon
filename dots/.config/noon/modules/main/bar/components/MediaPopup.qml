@@ -24,8 +24,9 @@ StyledPopup {
         Visualizer {
             z: 1
             active: true
-            visualizerColor: BeatsService.colors.colPrimary
-            maxVisualizerValue: 5000
+            mode: WaveVisualizer[Mem.options.mediaPlayer.visualizerMode]
+            visualizerColor: Colors.t(BeatsService.colors.colOnSurface, 0.5)
+            maxVisualizerValue: 3000
         }
 
         BlurImage {
@@ -34,7 +35,7 @@ StyledPopup {
             source: BeatsService.artUrl
             asynchronous: true
             blur: true
-            tint: true
+            tint: Mem.options.mediaPlayer.adaptiveTheme
             tintColor: BeatsService.colors.colPrimaryContainer
             tintLevel: 0.4
         }
@@ -49,6 +50,7 @@ StyledPopup {
 
             // Cover Art
             MusicCoverArt {
+                tint: Mem.options.mediaPlayer.adaptiveTheme
                 radius: Rounding.verylarge - Padding.normal
                 Layout.preferredWidth: parent.height * 0.86
                 Layout.preferredHeight: parent.height * 0.86

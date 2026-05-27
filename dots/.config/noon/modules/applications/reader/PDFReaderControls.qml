@@ -45,7 +45,6 @@ Item {
 
     StyledRectangularShadow {
         target: bg
-        intensity: 0.5
     }
     Component {
         id: controls_component

@@ -42,7 +42,7 @@ ShapeCanvas {
         Heart
     }
 
-    required property var shape
+    property var shape
     property double implicitSize
 
     implicitHeight: implicitSize
@@ -121,7 +121,7 @@ ShapeCanvas {
         case MaterialShape.Shape.Heart:
             return MaterialShapes.getHeart();
         default:
-            return MaterialShapes.getCircle();
+            return MaterialShapes.getClover4Leaf();
         }
     }
 }

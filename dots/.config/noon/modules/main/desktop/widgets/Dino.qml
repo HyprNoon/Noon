@@ -3,7 +3,7 @@ import Qt5Compat.GraphicalEffects
 import qs.common
 import qs.common.widgets
 
-SquareComponent {
+WidgetContainer {
     Item {
         id: dino
         anchors.fill: parent
@@ -28,11 +28,11 @@ SquareComponent {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        property string fgColor: Colors.colOnLayer0.toString().substring(1)
-        property string bgColor: Colors.colLayer0.toString().substring(1)
+        property string bgColor: Colors.colOnLayer0.substring(1)
+        property string fgColor: Colors.colLayer0.substring(1)
         property string dinoUrl: "file://" + Directories.assets + `/etc/t-rex-runner/index.html?bg=${bgColor}&fg=${fgColor}`
 
-        onPressed: NoonUtils.execDetached(Mem.options.apps.browser + " '" + dinoUrl + "'")
+        onPressed: NoonUtils.execDetached(["gio", "open", `${dinoUrl}`])
     }
     StyledText {
         anchors {

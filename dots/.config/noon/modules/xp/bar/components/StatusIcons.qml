@@ -59,16 +59,16 @@ RowLayout {
         height: commonIconSize
 
         readonly property string networkIcon: {
-            if (NetworkService.ethernet) {
+            if (NetworkService.manager.ethernet) {
                 return "network-connected";
             }
 
-            if (!NetworkService.wifiEnabled) {
+            if (!NetworkService.manager.wifiEnabled) {
                 return "network-wireless-offline";
             }
 
-            if (NetworkService.wifi && (NetworkService.networkName ?? "") !== "") {
-                const strength = NetworkService.networkStrength ?? 0;
+            if (NetworkService.manager.wifi && (NetworkService.manager.networkName ?? "") !== "") {
+                const strength = NetworkService.manager.networkStrength ?? 0;
                 if (strength > 80)
                     return "network-wireless-signal-excellent";
                 if (strength > 60)

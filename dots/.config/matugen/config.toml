@@ -12,9 +12,9 @@ output_path = "~/.config/opencode/themes/noon.json"
 input_path = "~/.config/matugen/templates/applications/obsidian.css"
 output_path = "~/Documents/Notes/.obsidian/snippets/noon.css"
 
-[templates.sequences]
-input_path = "~/.config/matugen/templates/terminal/sequences.txt"
-output_path = '~/.local/state/noon/user/generated/terminal/sequences.txt'
+# [templates.sequences]
+# input_path = "~/.config/matugen/templates/terminal/sequences.txt"
+# output_path = '~/.local/state/noon/user/generated/terminal/sequences.txt'
 
 [templates.temp_qt]
 input_path = '~/.config/matugen/templates/qt/qt2.colors'
@@ -27,7 +27,7 @@ post_hook = '~/.config/matugen/templates/qt/hot_reload.sh'
 
 [templates.noon]
 input_path = '~/.config/matugen/templates/colors.json'
-output_path = '~/.local/state/noon/colors.json'
+output_path = '~/.local/state/noon/user/generated/colors.json'
 
 [templates.starship]
 input_path = '~/.config/matugen/templates/starship.toml'
@@ -42,13 +42,19 @@ post_hook = 'pkill -SIGUSR1 nvim'
 input_path = '~/.config/matugen/templates/hyprland/colors.lua'
 output_path = '~/.config/hypr/colors.lua'
 
+[templates.hyprtoolkit]
+input_path = '~/.config/matugen/templates/hyprland/hyprtoolkit.conf'
+output_path = '~/.config/hypr/hyprtoolkit.conf'
+
 [templates.gtk3]
 input_path = '~/.config/matugen/templates/gtk/colors.css'
 output_path = '~/.config/gtk-3.0/gtk.css'
+pre_hook = "rm ~/.config/gtk-3.0/gtk.css"
 
 [templates.gtk4]
 input_path = '~/.config/matugen/templates/gtk/colors.css'
 output_path = '~/.config/gtk-4.0/gtk.css'
+pre_hook = "rm ~/.config/gtk-4.0/gtk.css"
 
 [templates.firefox]
 input_path = '~/.config/matugen/templates/applications/firefox.json'
@@ -94,6 +100,25 @@ output_path = '~/.config/zathura/zathurarc'
 [templates.heroic]
 input_path = '~/.config/matugen/templates/applications/heroic.css'
 output_path = '~/.cache/noon/user/generated/heroic.css'
+
+[templates.yazi]
+input_path = '~/.config/matugen/templates/applications/yazi.toml'
+output_path = '~/.config/yazi/theme.toml'
+
+[templates.kitty]
+input_path = '~/.config/matugen/templates/applications/kitty.conf'
+output_path = '~/.config/kitty/themes/Noon.conf'
+post_hook = "kitty +kitten themes --reload-in=all Noon"
+
+[templates.foot]
+input_path = '~/.config/matugen/templates/applications/foot.ini'
+output_path = '~/.config/foot/colors.ini'
+post_hook = 'pkill -SIGUSR2 foot'
+
+[templates.ghostty]
+input_path = '~/.config/matugen/templates/applications/ghostty'
+output_path = '~/.config/ghostty/themes/Noon'
+post_hook = 'pkill -SIGUSR2 ghostty'
 
 [templates.sddm]
 input_path = '~/.config/matugen/templates/sddm.conf'

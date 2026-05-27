@@ -37,7 +37,7 @@ BarGroup {
     readonly property real previewIconScale: 0.15
     vertical: true
     Layout.preferredHeight: columnLayout.implicitHeight
-
+    color: Colors.colLayer1
     function updateWorkspaceOccupied() {
         workspaceOccupied = Array.from({
             length: shownWs
@@ -247,6 +247,7 @@ BarGroup {
 
                 CurrentAppPopUp {
                     hoverTarget: iconHoverArea
+                    workspaceId: button.workspaceValue
                 }
             }
         }

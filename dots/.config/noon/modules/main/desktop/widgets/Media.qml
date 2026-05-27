@@ -22,7 +22,7 @@ ListView {
     model: BeatsService.meaningfulPlayers
     snapMode: ListView.SnapToItem
     spacing: Padding.massive
-    delegate: SquareComponent {
+    delegate: WidgetContainer {
         id: bg
         clip: true
         required property var modelData

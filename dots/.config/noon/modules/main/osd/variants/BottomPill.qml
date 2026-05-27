@@ -10,7 +10,7 @@ import qs.services
 
 StyledPanel {
     id: panelRoot
-    name: "osd"
+    name: "blurred_layer"
 
     property real value
     property string icon
@@ -20,7 +20,9 @@ StyledPanel {
     signal interactionStarted
     signal interactionEnded
     visible: true
-    anchors.bottom: true
+    exclusiveZone: -1
+    _layer: "Overlay"
+    fill: true
 
     mask: Region {
         item: bottomPill
@@ -35,70 +37,61 @@ StyledPanel {
             panelRoot.screen = panelRoot.targetScreen;
         }
     }
-
+    StyledRectangularShadow {
+        target: bottomPill
+    }
     StyledRect {
         id: bottomPill
-        anchors.centerIn: parent
+
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.margins: Sizes.elevationMargin
 
         implicitWidth: Sizes.osd.bottomPill.width
         implicitHeight: Sizes.osd.bottomPill.height
-        color: Colors.colLayer0
-        radius: Rounding.normal
+
+        color: Colors.colLayer1
+        radius: Rounding.full
+
         clip: true
 
-        Rectangle {
-            id: sideRect
-            implicitWidth: 40
-            color: Colors.colPrimary
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                left: parent.left
-            }
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: Padding.verylarge
+            spacing: Padding.veryhuge
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                anchors.horizontalCenterOffset: 2
-                spacing: -2
+            StyledRect {
+                id: sideRect
+                Layout.fillHeight: true
+                implicitSize: height
+                color: panelRoot.value > 0 ? Colors.colPrimary : Colors.colLayer2
+                radius: Rounding.full
 
                 Symbol {
                     fill: 1
-                    animateChange: true
-                    color: Colors.colOnPrimary
-                    text: panelRoot.icon
-                    font.pixelSize: Fonts.sizes.huge
+                    anchors.centerIn: parent
+                    color: panelRoot.value === 0 ? Colors.colOnSurface : Colors.colOnPrimary
+                    icon: panelRoot.icon
+                    iconSize: 24
                 }
-
-                StyledText {
-                    Layout.fillWidth: true
-                    horizontalAlignment: Text.AlignHCenter
-                    color: Colors.colOnPrimary
-                    text: Math.round(panelRoot.value * 100)
-                    font.variableAxes: Fonts.variableAxes.numbers
-                    font.pixelSize: Fonts.sizes.small
-                }
-            }
-        }
-
-        RowLayout {
-            id: mainContent
-            spacing: Padding.normal
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                left: sideRect.right
-                right: parent.right
-                rightMargin: Padding.large
-                leftMargin: Padding.large
             }
 
             StyledProgressBar {
                 id: valueProgressBar
                 Layout.alignment: Qt.AlignCenter
                 Layout.fillWidth: true
-                Layout.preferredHeight: parent.height / 2
+                valueBarHeight: 15
+                showProgressIndicator: false
+                valueBarGap: 7
                 value: panelRoot.value
-                valueBarGap: parent.height / 3
+            }
+
+            StyledText {
+                rightPadding: Padding.large
+                color: Colors.colSecondary
+                horizontalAlignment: Text.AlignHCenter
+                text: Math.round(panelRoot.value * 100)
+                font.pixelSize: Fonts.sizes.normal
             }
         }
     }

@@ -1,73 +1,85 @@
-import qs.store
-import qs.services
-import qs.common
-import qs.common.widgets
-import qs.common.functions
-
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import QtQuick.Layouts
+import Quickshell.Widgets
+import qs.common
+import qs.common.widgets
+import qs.services
 
 StyledPopup {
-    name: `workspace-${button.workspaceValue}-preview`
-    focus: false
+    id: popup
 
-    StyledRect {
-        readonly property size targetSize: {
-            if (button.windowToplevel && button.biggestWindow?.size) {
-                const winWidth = button.biggestWindow.size[0];
-                const winHeight = button.biggestWindow.size[1];
+    active: hoverTarget && hoverTarget.containsMouse
+    property alias workspaceId: root.targetWorkspaceId
+    contentMargins: Padding.normal
+    Item {
+        id: root
 
-                if (winWidth <= 0 || winHeight <= 0)
-                    return root.previewMaxSize;
+        property int targetWorkspaceId: 1
+        readonly property var monitor: MonitorsInfo.focused
+        readonly property var monitorData: HyprlandService.monitors.find(m => m.name === monitor?.name) ?? null
 
-                const aspectRatio = winWidth / winHeight;
-                let width = winWidth * root.previewScale;
-                let height = winHeight * root.previewScale;
+        readonly property real monitorWidth: monitorData ? (monitorData.transform % 2 === 1 ? monitorData.height : monitorData.width) : 1920
+        readonly property real monitorHeight: monitorData ? (monitorData.transform % 2 === 1 ? monitorData.width : monitorData.height) : 1080
 
-                if (width > root.previewMaxSize.width) {
-                    width = root.previewMaxSize.width;
-                    height = width / aspectRatio;
-                }
+        readonly property real scaleX: implicitWidth / monitorWidth
+        readonly property real scaleY: implicitHeight / monitorHeight
 
-                if (height > root.previewMaxSize.height) {
-                    height = root.previewMaxSize.height;
-                    width = height * aspectRatio;
-                }
+        implicitWidth: 470
+        implicitHeight: 264
 
-                return Qt.size(width, height);
-            }
-            return root.previewMaxSize;
-        }
-
-        clip: true
-        color: "transparent"
-        radius: Rounding.verylarge - Padding.normal
-        anchors.fill: parent
-        anchors.margins: Padding.normal
-        implicitWidth: targetSize.width - Padding.normal
-        implicitHeight: targetSize.height - Padding.normal
-
-        StyledScreencopyView {
-            id: preview
-            z: 0
+        StyledRect {
             anchors.fill: parent
-            constraintSize: Qt.size(parent.implicitWidth, parent.implicitHeight)
-            captureSource: button.windowToplevel || root.bar.screen
-            live: true
-            smooth: true
-        }
+            color: Colors.colLayer1
+            radius: Rounding.verylarge
+            clip: true
 
-        StyledIconImage {
-            z: 1
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            anchors.margins: Padding.huge
-            width: Math.min(parent.implicitWidth, parent.implicitHeight) * root.previewIconScale
-            height: width
-            source: button.appIconSource
-            mipmap: true
+            Repeater {
+                model: ScriptModel {
+                    id: clientModel
+                    readonly property var filteredWindows: ToplevelManager?.toplevels ? ToplevelManager.toplevels.values.filter(t => {
+                        const win = HyprlandService.windowByAddress[`0x${t.HyprlandToplevel.address}`];
+                        return win && win.workspace && win.workspace.id === root.targetWorkspaceId;
+                    }) : []
+                    values: clientModel.filteredWindows
+                }
+
+                delegate: StyledRect {
+                    id: winRect
+                    required property var modelData
+
+                    readonly property string address: `0x${modelData.HyprlandToplevel.address}`
+                    readonly property var winData: HyprlandService.windowByAddress[address]
+
+                    x: ((winData?.at[0] ?? 0) - (root.monitorData?.x ?? 0)) * root.scaleX
+                    y: ((winData?.at[1] ?? 0) - (root.monitorData?.y ?? 0)) * root.scaleY
+                    width: Math.max(1, (winData?.size[0] ?? 0) * root.scaleX)
+                    height: Math.max(1, (winData?.size[1] ?? 0) * root.scaleY)
+
+                    color: Colors.colLayer2
+                    radius: Rounding.normal
+                    enableBorders: true
+                    clip: true
+
+                    StyledScreencopyView {
+                        anchors.fill: parent
+                        paintCursor: false
+                        constraintSize: Qt.size(winRect.width, winRect.height)
+                        captureSource: winRect.modelData
+                        live: true
+                    }
+
+                    StyledIconImage {
+                        mipmap: true
+                        _source: AppSearch.guessIcon(winRect.winData?.class)
+                        implicitSize: Math.min(winRect.width, winRect.height) * 0.25
+                        anchors.centerIn: parent
+                    }
+                }
+            }
         }
     }
 }

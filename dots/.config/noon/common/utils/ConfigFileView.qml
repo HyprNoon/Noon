@@ -8,7 +8,7 @@ FileView {
 
     property string fileName
     property bool state: true
-
+    property string parentDir: ""
     readonly property alias data: root.adapter
     readonly property Timer reloadTimer: Timer {
         interval: 20
@@ -23,7 +23,7 @@ FileView {
 
     path: {
         const parent = state ? Directories.standard.state : Directories.shellConfigs;
-        return parent + "/" + fileName + ".json";
+        return parent + "/" + parentDir + fileName + ".json";
     }
 
     onFileChanged: {

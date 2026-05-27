@@ -8,12 +8,11 @@ from pathlib import Path
 
 from oauth_service import NoonAuthenticator
 
-STATES_FILE = Path("~/.local/state/noon/states.json").expanduser()
-GID_MAP_FILE = Path("~/.local/state/noon/gid_map.json").expanduser()
+STORE_FILE = Path("~/.local/state/noon/user/generated/todo.json").expanduser()
+GID_MAP_FILE = Path("~/.local/state/noon/user/generated/gid_map.json").expanduser()
 TASKLIST_NAME = "Noon"
 SCOPES = "https://www.googleapis.com/auth/tasks"
 STATUS_TAGS = ["[todo]", "[wip]", "[final]", "[done]"]
-STATES_KEY = ["services", "todo", "tasks"]
 
 
 def get_auth():
@@ -68,20 +67,14 @@ def fetch_remote(tasklist):
     return [i for i in items if i.get("status") != "completed"]
 
 
-def load_states():
-    data = json.loads(STATES_FILE.read_text())
-    tasks = data
-    for k in STATES_KEY:
-        tasks = tasks[k]
-    return data, tasks
+def load_tasks():
+    data = json.loads(STORE_FILE.read_text())
+    return data, data["tasks"]
 
 
-def write_states(data, tasks):
-    d = data
-    for k in STATES_KEY[:-1]:
-        d = d[k]
-    d[STATES_KEY[-1]] = tasks
-    STATES_FILE.write_text(json.dumps(data, indent=2))
+def write_tasks(data, tasks):
+    data["tasks"] = tasks
+    STORE_FILE.write_text(json.dumps(data, indent=4))
 
 
 def load_gid_map():
@@ -125,7 +118,7 @@ def format_due(due):
 
 
 def pull(tasklist):
-    data, _ = load_states()
+    data, _ = load_tasks()
     gid_map = {}
     tasks = []
     for item in fetch_remote(tasklist):
@@ -136,12 +129,12 @@ def pull(tasklist):
         }
         tasks.append(task)
         gid_map[task_key(task)] = item["id"]
-    write_states(data, tasks)
+    write_tasks(data, tasks)
     save_gid_map(gid_map)
 
 
 def push(tasklist):
-    _, tasks = load_states()
+    _, tasks = load_tasks()
     gid_map = load_gid_map()
     local_keys = {task_key(t) for t in tasks}
 

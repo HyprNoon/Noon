@@ -63,8 +63,8 @@ ColumnLayout {
         }
 
         BottomInfo {
-            visible: AlarmService.alarms.length > 0
-            text: AlarmService.alarms.length
+            visible: TimerService.timers.length > 0
+            text: TimerService.timers.length
             icon: "alarm"
         }
 

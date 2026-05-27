@@ -22,8 +22,8 @@ Singleton {
     readonly property var statusNames: ["Not Installed", "Installed", "Playing", "Completed"]
 
     property int selectedIndex: 0
-    property var selectedInfo: store.list[selectedIndex]
-    property QtObject colors: selectedInfo.coverImage.length > 0 ? colorsgen?.colors ?? Colors : Colors
+    property var selectedInfo: store?.list[selectedIndex] ?? null
+    property QtObject colors: selectedInfo?.coverImage && selectedInfo?.coverImage.length > 0 ? colorsgen?.colors ?? Colors : Colors
     property string pendingSelectedGame: ""
     property string pendingSelectedCover: ""
     property alias addDialog: addGamePicker
@@ -160,7 +160,7 @@ Singleton {
             id: 6,
             content: "Game Launched",
             icon: "stadia_controller"
-        });
+        })
         onExited: {
             NoonUtils.callIpc("global load");
             NoonUtils.execDetached("hyprctl reload");

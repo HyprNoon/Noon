@@ -9,115 +9,130 @@ import qs.common.widgets
 import qs.services
 import qs.store
 
-StyledPanel {
-    id: root
+Variants {
+    model: MonitorsInfo.main
 
-    property bool hoverMode: true
-    property bool pinned: false
-    property bool expanded: false
-    property bool reveal: revealCondition
-    property int selectedTabIndex: 0
-    property bool rightMode: barPosition !== "right" // Default to right in horizontal Bars
-    property alias selectedCategory: sidebarContent.selectedCategory
-    readonly property bool show: !hoverMode
-    readonly property bool revealCondition: (mouseArea.containsMouse && hoverMode) || PolkitService.flow !== null
-    readonly property int rounding: Rounding.verylarge
-    readonly property int appearanceMode: Mem.options.sidebar.appearance.mode
-    readonly property string barPosition: Mem.options.bar.behavior.position
-    readonly property int sidebarWidth: SidebarData.currentSize(hoverMode, root.expanded, selectedCategory) + auxWidth
-    readonly property int auxWidth: sidebarContent.auxVisible && !hoverMode ? SidebarData.currentSize(false, false, sidebarContent.auxCategory) : 0
-    readonly property int hoverArea: 2
-    readonly property Component detachedWindow: DetachedSidebarWindow {}
+    StyledPanel {
+        id: root
 
-    function hide() {
-        if (pinned)
-            return;
-        reveal = false;
-        hoverMode = true;
-        selectedTabIndex = 0;
-        sidebarContent.selectedCategory = "";
-        if (!pinned)
-            reset_reveal_conditions();
-    }
+        fill: true
+        screen: modelData
+        shell: "noon"
+        name: "blurred_layer"
+        _layer: "Top"
+        implicitWidth: !pinned ? Screen.width : bg.width + bubble.width + Sizes.hyprland.gapsOut + rounding
+        aboveWindows: true
+        keyboardFocus: true
+        anchors.left: !root.rightMode || !pinned
+        anchors.right: root.rightMode || !pinned
+        exclusiveZone: pinned ? sidebarWidth : 0
 
-    function incubate(cat = selectedCategory) {
-        if (SidebarData.isIncubatable(cat)) {
-            GlobalStates.main.sysDialogs.mode = "incubate";
-            GlobalStates.main.sysDialogs.pendingData = cat;
-            Mem.states.desktop.dialogs.lastIncubatedCategory = cat;
+        mask: Region {
+            Region {
+                item: hoverArea
+            }
+            Region {
+                item: bg
+            }
+            Region {
+                item: bubble
+            }
         }
-    }
-    function detach(cat = selectedCategory) {
-        if (SidebarData.isDetachable(cat) || !isDetached()) {
-            detachedWindow.createObject(root, {
-                category: cat
+
+        property bool hoverMode: true
+        property bool pinned: false
+        property bool expanded: false
+        property bool reveal: revealCondition
+        property int selectedTabIndex: 0
+        property alias selectedCategory: content.selectedCategory
+
+        required property var modelData
+        readonly property bool opposeBar: true
+        readonly property bool rightMode: opposeBar ? barPosition !== "right" : barPosition !== "left"
+        readonly property bool show: !hoverMode
+        readonly property bool revealCondition: (!hoverMode || hoverArea.containsMouse || content.hovered) || PolkitService.flow !== null
+        readonly property int rounding: Rounding.verylarge
+        readonly property string barPosition: Mem.options.bar.behavior.position
+        readonly property int sidebarWidth: SidebarData.currentSize(hoverMode, root.expanded, selectedCategory) + auxWidth
+        readonly property int auxWidth: content.auxVisible && !hoverMode ? SidebarData.currentSize(false, false, content.auxCategory) : 0
+        readonly property int hoverArea: 2
+        readonly property Component detachedWindow: DetachedSidebarWindow {}
+
+        function hide() {
+            if (pinned)
+                return;
+            reveal = false;
+            hoverMode = true;
+            selectedTabIndex = 0;
+            content.selectedCategory = "";
+            if (!pinned)
+                reset_reveal_conditions();
+        }
+
+        function incubate(cat = selectedCategory) {
+            if (SidebarData.isIncubatable(cat)) {
+                GlobalStates.main.sysDialogs.mode = "incubate";
+                GlobalStates.main.sysDialogs.pendingData = cat;
+                Mem.states.desktop.dialogs.lastIncubatedCategory = cat;
+            }
+        }
+        function detach(cat = selectedCategory) {
+            if (SidebarData.isDetachable(cat) || !isDetached()) {
+                detachedWindow.createObject(root, {
+                    category: cat
+                });
+            }
+            hide();
+        }
+        function isDetached() {
+            return SidebarData.detachedContent.includes(root.selectedCategory);
+        }
+        function setTab(tab) {
+            if (tab)
+                root.selectedTabIndex = tab;
+        }
+        function reveal_content(selectedTab = 0) {
+            hoverMode = false;
+            content.forceActiveFocus();
+        }
+
+        function close_aux() {
+            content.closeAux();
+        }
+
+        function reset_reveal_conditions() {
+            root.reveal = Qt.binding(() => {
+                return root.revealCondition;
             });
         }
-        hide();
-    }
-    function isDetached() {
-        return SidebarData.detachedContent.includes(root.selectedCategory);
-    }
-    function setTab(tab) {
-        if (tab)
-            root.selectedTabIndex = tab;
-    }
-    function reveal_content(selectedTab = 0) {
-        hoverMode = false;
-        sidebarContent.forceActiveFocus();
-    }
 
-    function close_aux() {
-        sidebarContent.closeAux();
-    }
-
-    function reset_reveal_conditions() {
-        root.reveal = Qt.binding(() => {
-            return root.revealCondition;
-        });
-    }
-
-    name: "blurred_layer"
-    visible: true
-    implicitWidth: !pinned ? Screen.width : visualContainer.width + bubble.width + Sizes.hyprland.gapsOut + rounding
-    exclusiveZone: !hoverMode && pinned ? implicitWidth - rounding : appearanceMode === 3 ? 0 : -1
-    aboveWindows: true
-    WlrLayershell.layer: WlrLayer.Overlay
-
-    anchors {
-        top: true
-        bottom: true
-        left: !root.rightMode || !pinned
-        right: root.rightMode || !pinned
-    }
-
-    margins {
-        top: !pinned && Mem.options.desktop.shell.mode === "nobuntu" ? 40 : 0
-    }
-
-    ScreenActionHint {
-        z: -1
-        icon: "keyboard_double_arrow_right"
-        text: "Drop it Inside Your Shelf !"
-        target: dropArea
-    }
-
-    Item {
-        id: wrapperItem
-
-        opacity: width > root.hoverArea ? 1 : 0
-        width: {
-            if (!hoverMode)
-                return visualContainer.width + bubble.width + Padding.massive;
-            else
-                return reveal ? visualContainer.width : root.hoverArea;
+        FocusHandler {
+            windows: [root]
+            active: show
+            onCleared: !pinned ? hide() : null
         }
 
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-            left: !root.rightMode ? parent.left : undefined
-            right: root.rightMode ? parent.right : undefined
+        Binding {
+            target: GlobalStates.main
+            property: "sidebar"
+            value: root
+        }
+
+        HoverHandler {
+            id: hoverArea
+            implicitWidth: root.hoverArea
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: !root.rightMode ? parent.left : undefined
+            anchors.right: root.rightMode ? parent.right : undefined
+        }
+
+        ScreenActionHintPanel {
+            target: dropArea
+            hint: {
+                "icon": "keyboard_double_arrow_right",
+                "text": "Drop it Inside Your Shelf !"
+            }
         }
 
         // Files Drop Area
@@ -128,38 +143,28 @@ StyledPanel {
             onEntered: NoonUtils.callIpc("sidebar reveal Shelf")
         }
 
-        // Main hover Area
-        MouseArea {
-            id: mouseArea
-            enabled: root.hoverMode
-            z: 1000
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-            anchors.fill: parent
-        }
-
         StyledRectangularShadow {
-            target: visualContainer
+            target: bg
+            show: root.reveal
         }
 
         ShaderRect {
-            id: visualContainer
+            id: bg
 
             width: root.sidebarWidth
             readonly property int hideMargin: state === "float" ? Sizes.elevationMargin : 0
+            animationDuration: Animations.durations.normal
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
 
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-
-                left: !rightMode ? parent.left : undefined
-                right: rightMode ? parent.right : undefined
-                leftMargin: !rightMode ? ((!hoverMode || reveal) ? hideMargin : -root.sidebarWidth) : 0
-                rightMargin: rightMode ? ((!hoverMode || reveal) ? hideMargin : -root.sidebarWidth) : 0
-            }
+            anchors.left: !rightMode ? parent.left : undefined
+            anchors.right: rightMode ? parent.right : undefined
+            anchors.leftMargin: !rightMode ? ((!hoverMode || reveal) ? hideMargin : -root.sidebarWidth) : 0
+            anchors.rightMargin: rightMode ? ((!hoverMode || reveal) ? hideMargin : -root.sidebarWidth) : 0
+            state: Mem.options.sidebar.appearance?.style ?? "float"
 
             Content {
-                id: sidebarContent
+                id: content
                 panelWindow: root
                 selectedTabIndex: root.selectedTabIndex
             }
@@ -167,94 +172,44 @@ StyledPanel {
             states: [
                 State {
                     name: "float"
-                    when: root.appearanceMode === 0
                     PropertyChanges {
-                        target: visualContainer
-
-                        topRightRadius: root.rounding
-                        bottomRightRadius: root.rounding
-                        topLeftRadius: root.rounding
-                        bottomLeftRadius: root.rounding
-
+                        target: bg
+                        radius: root.rounding
+                        enableBorders: true
+                        border.color: content.rail.color
                         anchors.topMargin: Sizes.elevationMargin
                         anchors.bottomMargin: Sizes.elevationMargin
                     }
                 },
                 State {
                     name: "convex"
-                    when: root.appearanceMode === 1
 
                     PropertyChanges {
-                        target: visualContainer
+                        target: bg
 
-                        topRightRadius: !root.rightMode ? root.rounding : 0
-                        bottomRightRadius: !root.rightMode ? root.rounding : 0
-                        topLeftRadius: root.rightMode ? root.rounding : 0
-                        bottomLeftRadius: root.rightMode ? root.rounding : 0
-
-                        anchors.topMargin: root.barPosition !== "top" ? Sizes.frameThickness : 0
-                        anchors.bottomMargin: root.barPosition !== "bottom" ? Sizes.frameThickness : 0
+                        rightRadius: root.rightMode ? 0 : root.rounding
+                        leftRadius: !root.rightMode ? 0 : root.rounding
                     }
                 },
                 State {
                     name: "sharp"
-                    when: root.appearanceMode === 2
-
-                    PropertyChanges {
-                        target: visualContainer
-
-                        topRightRadius: 0
-                        bottomRightRadius: 0
-                        topLeftRadius: 0
-                        bottomLeftRadius: 0
-                        anchors.topMargin: 0
-                        anchors.bottomMargin: 0
-                    }
                 },
                 State {
                     name: "concave"
-                    when: root.appearanceMode === 3
-                    PropertyChanges {
-                        target: visualContainer
-
-                        topRightRadius: 0
-                        bottomRightRadius: 0
-                        topLeftRadius: 0
-                        bottomLeftRadius: 0
-                        anchors.topMargin: 0
-                        anchors.bottomMargin: 0
-                    }
                 }
             ]
-            transitions: Transition {
-                Anim {
-                    properties: "topRightRadius,bottomRightRadius,topLeftRadius,bottomLeftRadius,anchors.topMargin,anchors.bottomMargin,radius"
-                }
-            }
+
             Behavior on anchors.leftMargin {
                 Anim {
-                    duration: Animations.durations.normal
+                    duration: bg.animationDuration
                     easing.bezierCurve: Animations.curves.emphasized
                 }
             }
 
             Behavior on anchors.rightMargin {
                 Anim {
-                    duration: Animations.durations.normal
+                    duration: bg.animationDuration
                     easing.bezierCurve: Animations.curves.emphasized
-                }
-            }
-
-            Behavior on width {
-                Anim {
-                    duration: Animations.durations.large
-                    easing.type: Easing.OutExpo
-                }
-            }
-
-            Behavior on color {
-                CAnim {
-                    duration: Animations.durations.verylarge
                 }
             }
         }
@@ -264,90 +219,61 @@ StyledPanel {
 
             show: !hoverMode
             rightMode: root.rightMode
-            selectedCategory: sidebarContent.selectedCategory
-            colors: sidebarContent.colors
-
-            anchors {
-                right: !root.rightMode ? undefined : visualContainer.left
-                left: root.rightMode ? undefined : visualContainer.right
-                bottom: visualContainer.bottom
-                margins: Padding.verylarge
-            }
+            selectedCategory: content.selectedCategory
+            colors: content.colors
+            sidebarBg: bg
         }
 
         RoundCorner {
             id: c1
 
-            visible: root.appearanceMode === 2
+            visible: bg.state === "concave"
             corner: root.rightMode ? RoundCorner.BottomRight : RoundCorner.BottomLeft
-            color: visualContainer.color
+            color: root.hoverMode ? content.rail.color : content.colors.colLayer0
             size: root.rounding
 
-            anchors {
-                left: root.rightMode ? undefined : visualContainer.right
-                right: root.rightMode ? visualContainer.left : undefined
-                bottom: visualContainer.bottom
-                bottomMargin: root.barPosition === "bottom" ? 0 : Sizes.frameThickness
-            }
+            anchors.left: root.rightMode ? undefined : bg.right
+            anchors.right: root.rightMode ? bg.left : undefined
+            anchors.bottom: bg.bottom
+            anchors.bottomMargin: root.barPosition === "bottom" ? 0 : Sizes.frameThickness
         }
 
         RoundCorner {
-            visible: c1.visible
             corner: root.rightMode ? RoundCorner.TopRight : RoundCorner.TopLeft
-            color: visualContainer.color
-            size: c1.size
 
-            anchors {
-                top: visualContainer.top
-                left: root.rightMode ? undefined : visualContainer.right
-                right: root.rightMode ? visualContainer.left : undefined
-                topMargin: root.barPosition === "top" ? 0 : Sizes.frameThickness
+            visible: c1.visible
+            color: c1.color
+            size: c1.size
+            anchors.left: c1.anchors.left
+            anchors.right: c1.anchors.right
+
+            anchors.top: bg.top
+            anchors.topMargin: root.barPosition === "top" ? 0 : Sizes.frameThickness
+        }
+
+        IpcHandler {
+            target: "sidebar"
+            function reveal_aux(cat: string) {
+                content.toggleAux(cat);
+                GlobalStates.main.holdNotif(cat);
+            }
+
+            function reveal(cat: string) {
+                content.changeContent(cat);
+            }
+            function pin() {
+                root.pinned = true;
+            }
+            function unpin() {
+                root.pinned = false;
+            }
+            function toggle_pin() {
+                root.pinned = !root.pinned;
+            }
+
+            function hide() {
+                root.hide();
             }
         }
-
-        Behavior on width {
-            Anim {}
-        }
-    }
-
-    FocusHandler {
-        windows: [root]
-        active: show
-        onCleared: !pinned ? hide() : null
-    }
-
-    Binding {
-        target: GlobalStates.main
-        property: "sidebar"
-        value: root
-    }
-
-    IpcHandler {
-        target: "sidebar"
-        function reveal_aux(cat: string) {
-            sidebarContent.toggleAux(cat);
-            GlobalStates.main.holdNotif(cat);
-        }
-
-        function reveal(cat: string) {
-            sidebarContent.changeContent(cat);
-        }
-        function pin() {
-            root.pinned = true;
-        }
-        function unpin() {
-            root.pinned = false;
-        }
-        function toggle_pin() {
-            root.pinned = !root.pinned;
-        }
-
-        function hide() {
-            root.hide();
-        }
-    }
-
-    mask: Region {
-        item: wrapperItem
     }
 }

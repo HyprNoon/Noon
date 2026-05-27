@@ -37,7 +37,7 @@ LazyLoader {
             target: popupBackground
         }
 
-        Rectangle {
+        ShaderRect {
             id: popupBackground
             anchors {
                 fill: parent
@@ -45,9 +45,7 @@ LazyLoader {
             }
             implicitWidth: root.contentItem.implicitWidth + Padding.massive
             implicitHeight: root.contentItem.implicitHeight + Padding.massive
-            border.width: 1
-            border.color: Colors.colOutline
-            color: ColorUtils.applyAlpha(Colors.colLayer0, 1 - Colors.transparency)
+            enableBorders: true
             radius: Rounding.verylarge
             children: [root.contentItem]
         }

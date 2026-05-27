@@ -5,43 +5,27 @@ import qs.common.utils
 
 import "bar"
 import "beam"
-import "desktop/bg"
 import "dock"
 import "lock"
 import "notificationPopup"
 import "osd"
 import "sidebar"
-import "view"
 import "screenshot"
 import "toolbar"
-import "desktop/dialogs"
-import "desktop/toasts"
+import "desktop"
 
 Scope {
-    WidgetLoader {
-        Bg {}
-    }
-    WidgetLoader {
-        enabled: Mem.options.desktop.widgets.enabled
-        DesktopWidgets {}
-    }
-    WidgetLoader {
-        enabled: Mem.options.desktop.bg.borderMultiplier > 0
-        Border {}
-    }
+    Desktop {}
+    NIPC {}
 
     WidgetLoader {
-        enabled: true
-        reloadOn: Mem.options.bar.behavior.position
-        Sidebar {}
-    }
-
-    WidgetLoader {
+        enabled: Notifications.popupAppNameList.length > 0
         NotificationPopup {}
     }
 
     WidgetLoader {
-        DialogPanel {}
+        reloadOn: Mem.options.bar.behavior.position
+        Sidebar {}
     }
 
     WidgetLoader {
@@ -50,24 +34,13 @@ Scope {
     }
 
     WidgetLoader {
-        enabled: Mem.options.desktop.lock.enabled
+        enabled: GlobalStates.main.locked
         Lock {}
     }
 
     WidgetLoader {
-        enabled: false
-        NotifPanel {}
-    }
-
-    WidgetLoader {
-        enabled: Mem.options.bar.enabled
         reloadOn: Mem.options.bar.behavior.position
         Bar {}
-    }
-
-    WidgetLoader {
-        enabled: Mem.options.desktop.screenCorners > 0 ?? false
-        ScreenCorners {}
     }
 
     WidgetLoader {
@@ -76,23 +49,12 @@ Scope {
     }
 
     WidgetLoader {
-        Hyprview {}
-    }
-
-    WidgetLoader {
         reloadOn: Mem.options.beam.behavior.topMode
         Beam {}
     }
 
     WidgetLoader {
-        Toasts {}
-    }
-    WidgetLoader {
+        enabled: GlobalStates.main.showScreenshot
         Screenshot {}
     }
-    WidgetLoader {
-        DesktopIcons {}
-    }
-
-    NIPC {}
 }

@@ -9,26 +9,16 @@ import qs.services
 Item {
     id: root
 
+    required property var sidebarBg
     required property bool show
     required property bool rightMode
     required property string selectedCategory
     required property QtObject colors
     readonly property var sidebar: GlobalStates.main.sidebar
+
     ScriptModel {
         id: bubbles
         values: [
-            {
-                "cat": "Downloads",
-                "bubbles": [
-                    {
-                        "icon": "clear_all",
-                        "enabled": true,
-                        "action": () => {
-                            DownloadService.manager.clearAll();
-                        }
-                    },
-                ]
-            },
             {
                 "cat": "Tasks",
                 "bubbles": [
@@ -160,13 +150,11 @@ Item {
                 "cat": "Beats",
                 "bubbles": [
                     {
-                        "icon": "download",
-                        "extraVisibleCondition": !BeatsService.isCurrentPlayer(),
-                        "action": () => BeatsService.downloadCurrentSong()
+                        "icon": "restart_alt",
+                        "action": () => BeatsService.restartDaemon()
                     },
                     {
                         "icon": "globe",
-                        // "extraVisibleCondition": BeatsService.isCurrentPlayer(),
                         "action": () => BeatsService.openWebClient()
                     },
                     {
@@ -177,6 +165,7 @@ Item {
             }
         ]
     }
+
     readonly property var panelActionsModel: [
         {
             icon: "close",
@@ -197,6 +186,7 @@ Item {
             action: () => sidebar.pinned = !sidebar.pinned
         },
         {
+            visible: SidebarData.isExpandable(sidebar.selectedCategory),
             icon: "expand_content",
             toggled: sidebar.expanded,
             action: () => sidebar.expanded = !sidebar.expanded
@@ -208,15 +198,20 @@ Item {
     clip: true
     height: bg.height
 
+    anchors.right: !rightMode ? undefined : sidebarBg.left
+    anchors.left: rightMode ? undefined : sidebarBg.right
+    anchors.bottom: sidebarBg.bottom
+    anchors.margins: Math.max(Math.floor(sidebar.rounding / 3), Padding.small)
+
     StyledRect {
         id: bg
 
-        radius: Rounding.verylarge
         color: root.colors.colLayer0
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         height: content.implicitHeight + Padding.massive
+        radius: Rounding.verylarge
 
         MouseArea {
             id: mouse

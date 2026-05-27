@@ -14,7 +14,6 @@ Item {
     Layout.fillHeight: true
     StyledRectangularShadow {
         target: bg
-        intensity: 0.2
     }
     StyledRect {
         id: bg

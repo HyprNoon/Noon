@@ -8,36 +8,30 @@ import qs.services
 BottomDialog {
     id: root
 
-    collapsedHeight: parent.height * 0.65
-    color: Colors.colLayer1
-    bgAnchors {
-        rightMargin: Padding.large
-        leftMargin: Padding.large
-    }
+    collapsedHeight: parent.height * 0.35
 
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.massive
         spacing: Padding.large
 
-        BottomDialogHeader {
+        PageHeader {
             title: "Appearance"
         }
-
-        BottomDialogSeparator {}
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.margins: Padding.large
             spacing: Padding.large
 
-            // --- Dark / Light Mode ---
             RowLayout {
+                Layout.preferredHeight: 50
                 Layout.fillWidth: true
                 spacing: Padding.small
 
                 Symbol {
-                    text: Mem.states.desktop.appearance.mode === "dark" ? "dark_mode" : "light_mode"
+                    text: Mem.looks.mode === "dark" ? "dark_mode" : "light_mode"
                     font.pixelSize: Fonts.sizes.verylarge
                     color: Colors.colOnSurfaceVariant
                 }
@@ -49,16 +43,16 @@ BottomDialog {
                 }
 
                 StyledSwitch {
-                    checked: Mem.states.desktop.appearance.mode === "dark"
+                    checked: Mem.looks.mode === "dark"
                     onToggled: {
-                        Mem.states.desktop.appearance.mode = checked ? "dark" : "light";
+                        Mem.looks.mode = checked ? "dark" : "light";
                         WallpaperService.toggleShellMode();
                     }
                 }
             }
 
-            // --- Auto Mode ---
             RowLayout {
+                Layout.preferredHeight: 50
                 Layout.fillWidth: true
                 spacing: Padding.small
 
@@ -75,15 +69,13 @@ BottomDialog {
                 }
 
                 StyledSwitch {
-                    checked: Mem.states.desktop.appearance.autoShellMode
-                    onToggled: Mem.states.desktop.appearance.autoShellMode = checked
+                    checked: Mem.looks.autoShellMode
+                    onToggled: Mem.looks.autoShellMode = checked
                 }
             }
 
-            BottomDialogSeparator {}
-
-            // --- Auto Scheme Selection ---
             RowLayout {
+                Layout.preferredHeight: 50
                 Layout.fillWidth: true
                 spacing: Padding.small
 
@@ -100,90 +92,11 @@ BottomDialog {
                 }
 
                 StyledSwitch {
-                    checked: Mem.states.desktop.appearance.autoSchemeSelection
-                    onToggled: Mem.states.desktop.appearance.autoSchemeSelection = checked
+                    checked: Mem.looks.autoSchemeSelection
+                    onToggled: Mem.looks.autoSchemeSelection = checked
                 }
             }
-
-            BottomDialogSeparator {}
-
-            // --- Color Intensity (Chroma) ---
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: Padding.small
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Padding.small
-
-                    Symbol {
-                        text: "colorize"
-                        font.pixelSize: Fonts.sizes.verylarge
-                        color: Colors.colOnSurfaceVariant
-                    }
-
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: qsTr("Color Intensity (Chroma)")
-                        color: Colors.colOnSurfaceVariant
-                    }
-
-                    StyledText {
-                        text: Math.round(Mem.states.desktop.Colors.chroma * 100) + "%"
-                        color: Colors.colOnSurfaceVariant
-                        opacity: 0.7
-                    }
-                }
-
-                StyledSlider {
-                    Layout.fillWidth: true
-                    from: 0
-                    to: 2
-                    value: Mem.states.desktop.colors.chroma
-                    onMoved: Mem.states.desktop.colors.chroma = value
-                }
-            }
-
-            // --- Tone Adjustment ---
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: Padding.small
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Padding.small
-
-                    Symbol {
-                        text: "contrast"
-                        font.pixelSize: Fonts.sizes.verylarge
-                        color: Colors.colOnSurfaceVariant
-                    }
-
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: qsTr("Tone Adjustment")
-                        color: Colors.colOnSurfaceVariant
-                    }
-
-                    StyledText {
-                        text: Math.round(Mem.states.desktop.Colors.tone * 100) + "%"
-                        color: Colors.colOnSurfaceVariant
-                        opacity: 0.7
-                    }
-                }
-
-                StyledSlider {
-                    Layout.fillWidth: true
-                    from: 0
-                    to: 2
-                    value: Mem.states.desktop.Colors.tone
-                    onMoved: Mem.states.desktop.Colors.tone = value
-                }
-            }
-
-            Item {
-                Layout.fillHeight: true
-            }
+            Spacer {}
         }
 
         RowLayout {

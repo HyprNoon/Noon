@@ -2,15 +2,15 @@ getAnimDirection = function()
     return vertical and "slidevert" or "slide"
 end
 toggle_float = function()
-    hl.dsp.window.float({mode = (mode == "float") and "tile" or "float"})
+    hl.dsp.window.float({ mode = (mode == "float") and "tile" or "float" })
 end
 mission_control = function()
     hl.dsp.global("hymission:toggle")
 end
 local suppressMaximizeRule = hl.window_rule({
     -- Ignore maximize requests from all apps. You'll probably like this.
-    name  = "suppress-maximize-events",
-    match = { class = ".*" },
+    name           = "suppress-maximize-events",
+    match          = { class = ".*" },
 
     suppress_event = "maximize",
 })
@@ -18,8 +18,8 @@ local suppressMaximizeRule = hl.window_rule({
 
 hl.window_rule({
     -- Fix some dragging issues with XWayland
-    name  = "fix-xwayland-drags",
-    match = {
+    name     = "fix-xwayland-drags",
+    match    = {
         class      = "^$",
         title      = "^$",
         xwayland   = true,

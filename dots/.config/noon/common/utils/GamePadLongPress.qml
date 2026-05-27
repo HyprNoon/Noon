@@ -1,5 +1,5 @@
 import QtQuick
-import Noon.Utils.Devices
+import Noon.Devices
 
 QtObject {
     id: root

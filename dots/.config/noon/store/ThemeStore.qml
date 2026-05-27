@@ -63,7 +63,7 @@ Singleton {
             {
                 "name": "auto",
                 "isPlugin": false,
-                "path": Directories?.standard.state + "/colors.json"
+                "path": Directories?.standard.state + "/user/generated/colors.json"
             }
         ];
 
@@ -269,6 +269,7 @@ Singleton {
             }
         }
     ]
+
     PModel {
         id: palettesModel
         folder: Qt.resolvedUrl(Directories.assets) + "/db/palettes"

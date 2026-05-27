@@ -6,7 +6,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
 
-Item {
+StyledRect {
     id: root
     property bool showDeviceSelector: false
     property bool deviceSelectorInput
@@ -16,25 +16,32 @@ Item {
         return node.isSink && node.isStream;
     })
     Keys.onEscapePressed: bottomDialog.show = false
+    color: Colors.colLayer1
+    radius: Rounding.verylarge
 
     ColumnLayout {
         anchors.fill: parent
-        Item {
+        anchors.margins: Padding.large
+        spacing: Padding.huge
+
+        PageHeader {
+            title: "Sounds"
+            subTitle: "Manage volume outputs."
+        }
+        StyledListView {
+            id: listView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            StyledListView {
-                id: listView
-                model: root.appPwNodes
-                clip: true
-                anchors.fill: parent
-                anchors.margins: Padding.huge
-                spacing: Padding.large
+            clip: true
+            spacing: 4
 
-                delegate: MixerItem {
-                    required property var modelData
-                    anchors.left: parent?.left
-                    anchors.right: parent?.right
-                }
+            model: root.appPwNodes
+            delegate: MixerItem {
+                list: listView
+                anchors.left: parent?.left
+                anchors.right: parent?.right
+                topRadius: index === 0 ? Rounding.verylarge : Rounding.tiny
+                bottomRadius: index === listView.count - 1 ? Rounding.huge : Rounding.tiny
             }
             PagePlaceholder {
                 visible: listView.count === 0
@@ -43,26 +50,33 @@ Item {
                 shape: MaterialShape.Shape.Bun
             }
         }
-
         // Device selector
-        ButtonGroup {
-            id: deviceSelectorRowLayout
+        StyledRect {
             Layout.fillWidth: true
             Layout.fillHeight: false
-            AudioDeviceSelectorButton {
-                Layout.fillWidth: true
-                input: false
-                onClicked: {
-                    bottomDialog.show = true;
-                    root.deviceSelectorInput = false;
+            implicitHeight: deviceSelectorRowLayout.implicitHeight + Padding.huge
+            radius: Rounding.huge
+            color: Colors.colSurfaceContainerLow
+
+            ButtonGroup {
+                id: deviceSelectorRowLayout
+                anchors.fill: parent
+                anchors.margins: Padding.normal
+                AudioDeviceSelectorButton {
+                    Layout.fillWidth: true
+                    input: false
+                    onClicked: {
+                        bottomDialog.show = true;
+                        root.deviceSelectorInput = false;
+                    }
                 }
-            }
-            AudioDeviceSelectorButton {
-                Layout.fillWidth: true
-                input: true
-                onClicked: {
-                    bottomDialog.show = true;
-                    root.deviceSelectorInput = true;
+                AudioDeviceSelectorButton {
+                    Layout.fillWidth: true
+                    input: true
+                    onClicked: {
+                        bottomDialog.show = true;
+                        root.deviceSelectorInput = true;
+                    }
                 }
             }
         }
@@ -80,12 +94,12 @@ Item {
             anchors.margins: Padding.huge
             spacing: 0
 
-            BottomDialogHeader {
+            PageHeader {
                 id: dialogTitle
                 title: root.deviceSelectorInput ? "Select input device" : "Select output device"
                 showCloseButton: false
             }
-            BottomDialogSeparator {}
+            PageSeparator {}
 
             StyledListView {
                 Layout.fillWidth: true

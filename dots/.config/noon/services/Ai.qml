@@ -15,24 +15,80 @@ Singleton {
     signal responseFinished
 
     readonly property Component aiMessageComponent: AiMessageData {}
+    readonly property int port: 4096
     readonly property string interfaceRole: "interface"
     readonly property bool isResponding: requester.running
     readonly property bool currentModelHasApiKey: true
-    readonly property var states: Mem.states.services.ai
+    readonly property var states: Mem.ai
     readonly property string currentSessionId: states.currentSessionId
     readonly property var tokenCount: states.tokenCount
     readonly property var modelList: states.models ?? []
     readonly property string currentModelId: states.model
     readonly property var skills: states.skills
-    readonly property var modelPoses: posesView.data
 
     property var sessions: []
     property var messageIDs: []
     property var messageQueue: []
     property var messageByID: ({})
+    property string _queryType: ""
     property string pendingSkillName: ""
     property string pendingFilePath: ""
     property var postResponseHook
+    property var sseXhr: null
+    property string sseBuffer: ""
+
+    function connectSSE() {
+        if (root.sseXhr)
+            return;
+        var xhr = new XMLHttpRequest();
+        root.sseXhr = xhr;
+        root.sseBuffer = "";
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+                var newData = xhr.responseText.substring(root.sseBuffer.length);
+                root.sseBuffer = xhr.responseText;
+                newData.split("\n\n").slice(0, -1).forEach(function (block) {
+                    var data = "";
+                    block.split("\n").forEach(function (l) {
+                        if (l.indexOf("data: ") === 0)
+                            data += l.substring(6);
+                    });
+                    if (data)
+                        try {
+                            root.handleSSE(JSON.parse(data));
+                        } catch (e) {}
+                });
+            }
+            if (xhr.readyState === XMLHttpRequest.DONE)
+                root.sseXhr = null;
+        };
+        xhr.open("GET", `http://127.0.0.1:${port}/event`);
+        xhr.send();
+    }
+
+    function handleSSE(event) {
+        if (event.type === "session.status") {
+            var s = event.properties && event.properties.status;
+            if (s) {
+                requester._sessionBusy = s.type === "busy";
+                if (s.type === "idle" && requester.running)
+                    requester.markDone();
+            }
+            return;
+        }
+        if (!requester.running)
+            return;
+        if (event.type === "message.updated") {
+            var info = event.properties && event.properties.info;
+            if (info && info.role === "user")
+                requester._userMessageId = info.id;
+        }
+        if (event.type === "message.part.updated") {
+            var part = event.properties && event.properties.part;
+            if (part && part.messageID !== requester._userMessageId)
+                requester.processPart(part);
+        }
+    }
 
     function idForMessage(message) {
         return Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
@@ -51,8 +107,8 @@ Singleton {
             "done": true
         });
         const id = idForMessage(aiMessage);
-        root.messageIDs = [...root.messageIDs, id];
         root.messageByID[id] = aiMessage;
+        root.messageIDs = [...root.messageIDs, id];
     }
 
     function removeMessage(index) {
@@ -89,7 +145,8 @@ Singleton {
     }
 
     function loadMessages(id) {
-        db.queryAsync("SELECT m.id as msg_id, m.data as msg_data, p.data as part_data " + "FROM message m LEFT JOIN part p ON p.message_id = m.id " + "WHERE m.session_id = ? " + "ORDER BY m.rowid ASC", [id]);
+        _queryType = "messages";
+        db.query("SELECT m.id as msg_id, m.data as msg_data, p.data as part_data " + "FROM message m LEFT JOIN part p ON p.message_id = m.id " + "WHERE m.session_id = ? " + "ORDER BY m.rowid ASC", [id]);
     }
 
     function getModel() {
@@ -111,9 +168,35 @@ Singleton {
         root.addMessage("Model set to " + modelId, root.interfaceRole);
     }
 
+    function createSessionAndSend(message) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", `http://127.0.0.1:${port}/session`);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
+                var resp = JSON.parse(xhr.responseText);
+                root.states.currentSessionId = resp.id;
+                requester._sessionBusy = false;
+            }
+            finishSend(message);
+        };
+        xhr.send(JSON.stringify({
+            title: message.substring(0, 50)
+        }));
+    }
+
     function sendUserMessage(message) {
         if (message.length === 0)
             return;
+        if (requester._sessionBusy)
+            createSessionAndSend(message);
+        else if (!root.currentSessionId)
+            createSessionAndSend(message);
+        else
+            finishSend(message);
+    }
+
+    function finishSend(message) {
         const filePath = root.pendingFilePath;
         const aiMessage = aiMessageComponent.createObject(root, {
             "role": "user",
@@ -125,8 +208,8 @@ Singleton {
             "files": filePath.length > 0 ? [filePath] : []
         });
         const id = idForMessage(aiMessage);
-        root.messageIDs = [...root.messageIDs, id];
         root.messageByID[id] = aiMessage;
+        root.messageIDs = [...root.messageIDs, id];
         root.messageQueue = [...root.messageQueue,
             {
                 id: id,
@@ -149,8 +232,8 @@ Singleton {
             "visibleToUser": false
         });
         const id = idForMessage(aiMessage);
-        root.messageIDs = [...root.messageIDs, id];
         root.messageByID[id] = aiMessage;
+        root.messageIDs = [...root.messageIDs, id];
         root.messageQueue = [...root.messageQueue,
             {
                 id: id,
@@ -201,6 +284,8 @@ Singleton {
         if (!requester.running)
             return;
         requester.running = false;
+        if (requester._xhr)
+            requester._xhr.abort();
         if (requester.message) {
             requester.message.thinking = false;
             requester.message.done = true;
@@ -213,14 +298,8 @@ Singleton {
     }
 
     function refreshSessions() {
-        root.sessions = db.tables.session.all().map(r => ({
-                    id: r.id,
-                    title: r.title,
-                    created: r.time_created,
-                    updated: r.time_updated,
-                    directory: r.directory,
-                    projectId: r.project_id
-                }));
+        _queryType = "sessions";
+        db.query("SELECT id, title, time_created, time_updated, directory, project_id FROM session ORDER BY time_updated DESC");
     }
 
     Process {
@@ -244,6 +323,7 @@ Singleton {
         id: getModels
         running: states.models.length === 0
         command: ["sh", "-c", "opencode models < /dev/null"]
+        onStarted: console.log("[AI]: Pulling Models")
         stdout: StdioCollector {
             onStreamFinished: {
                 const models = text.trim().split("\n").filter(m => m.trim().length > 0);
@@ -263,56 +343,67 @@ Singleton {
     Connections {
         target: db
         function onQueryFinished(rows) {
-            const grouped = {};
-            const order = [];
-
-            rows.forEach(row => {
-                const msgId = row.msg_id;
-                if (!grouped[msgId]) {
-                    grouped[msgId] = {
-                        msg_data: row.msg_data,
-                        parts: []
-                    };
-                    order.push(msgId);
-                }
-                if (row.part_data)
-                    grouped[msgId].parts.push(JSON.parse(row.part_data));
-            });
-
-            order.forEach(msgId => {
-                const {
-                    msg_data,
-                    parts
-                } = grouped[msgId];
-                const mData = JSON.parse(msg_data);
-
-                const content = parts.filter(p => p.type === "text").map(p => p.text).join("");
-                const tools = parts.filter(p => p.type === "tool").map(p => ({
-                            tool: p.tool,
-                            callID: p.callID,
-                            status: p.state.status,
-                            input: p.state.input,
-                            output: p.state.output
+            if (!rows.length || !_queryType)
+                return;
+            if (_queryType === "sessions") {
+                root.sessions = rows.map(r => ({
+                            id: r.id,
+                            title: r.title,
+                            created: r.time_created,
+                            updated: r.time_updated,
+                            directory: r.directory,
+                            projectId: r.project_id
                         }));
-                const files = parts.filter(p => p.type === "file").map(p => p.url).filter(Boolean);
-
-                if (content.length === 0 && tools.length === 0 && files.length === 0)
-                    return;
-
-                const aiMessage = root.aiMessageComponent.createObject(root, {
-                    "role": mData.role,
-                    "content": content,
-                    "rawContent": content,
-                    "model": mData.model?.modelID ?? "",
-                    "thinking": false,
-                    "done": true,
-                    "tools": tools,
-                    "files": files
-                });
-                const newId = root.idForMessage(aiMessage);
-                root.messageIDs = [...root.messageIDs, newId];
-                root.messageByID[newId] = aiMessage;
+                return;
+            }
+            const groups = {}, order = [];
+            rows.forEach(r => {
+                if (!groups[r.msg_id]) {
+                    groups[r.msg_id] = {
+                        d: JSON.parse(r.msg_data),
+                        p: []
+                    };
+                    order.push(r.msg_id);
+                }
+                if (r.part_data)
+                    groups[r.msg_id].p.push(JSON.parse(r.part_data));
             });
+            let i = 0;
+            (function ins() {
+                    const end = Math.min(i + 5, order.length);
+                    const batch = [];
+                    for (; i < end; ++i) {
+                        const g = groups[order[i]];
+                        const txt = g.p.filter(p => p.type === "text").map(p => p.text).join("");
+                        const tools = g.p.filter(p => p.type === "tool").map(p => ({
+                                    tool: p.tool,
+                                    callID: p.callID,
+                                    status: p.state.status,
+                                    input: p.state.input,
+                                    output: p.state.output
+                                }));
+                        const files = g.p.filter(p => p.type === "file").map(p => p.url).filter(Boolean);
+                        if (!txt && !tools.length && !files.length)
+                            continue;
+                        const msg = root.aiMessageComponent.createObject(root, {
+                            role: g.d.role,
+                            content: txt,
+                            rawContent: txt,
+                            model: g.d.model?.modelID ?? "",
+                            thinking: false,
+                            done: true,
+                            tools,
+                            files
+                        });
+                        const id = root.idForMessage(msg);
+                        root.messageByID[id] = msg;
+                        batch.push(id);
+                    }
+                    if (batch.length)
+                        root.messageIDs = root.messageIDs.concat(batch);
+                    if (i < order.length)
+                        Qt.callLater(ins);
+                })();
         }
     }
 
@@ -321,12 +412,35 @@ Singleton {
         property AiMessageData message
         property bool startedReasoning: false
         property bool running: false
-        property int lastProcessedIndex: 0
+        property var _xhr: null
+        property string _parsed: ""
+        property string _userMessageId: ""
+        property bool _sessionBusy: false
+
+        function processPart(p) {
+            if (p.type === "reasoning" && p.text) {
+                requester.message.thinking = false;
+                if (!requester.startedReasoning) {
+                    requester.message.content += "<think>";
+                    requester.startedReasoning = true;
+                }
+                requester.message.content += p.text;
+            } else if (p.type === "text" && p.text) {
+                requester.message.thinking = false;
+                if (requester.startedReasoning) {
+                    requester.message.content += "</think>";
+                    requester.startedReasoning = false;
+                }
+                requester.message.content += p.text;
+                requester.message.rawContent += p.text;
+            }
+        }
 
         function makeRequest(userMessage) {
             requester.running = true;
             requester.startedReasoning = false;
-            requester.lastProcessedIndex = 0;
+            requester._parsed = "";
+            requester._userMessageId = "";
 
             requester.message = root.aiMessageComponent.createObject(root, {
                 "role": "assistant",
@@ -337,11 +451,8 @@ Singleton {
             });
 
             const id = root.idForMessage(requester.message);
-            root.messageIDs = [...root.messageIDs, id];
             root.messageByID[id] = requester.message;
-
-            const sessionId = root.currentSessionId || "default";
-            const xhr = new XMLHttpRequest();
+            root.messageIDs = [...root.messageIDs, id];
 
             let body = {
                 "parts": [
@@ -360,63 +471,28 @@ Singleton {
                 };
             }
 
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
-                    const responseText = xhr.responseText;
-                    const newContent = responseText.substring(requester.lastProcessedIndex);
-                    requester.lastProcessedIndex = responseText.length;
-                    processChunks(newContent);
-                }
+            const sessionId = root.currentSessionId || "default";
+            if (!root.sseXhr)
+                root.connectSSE();
+            const xhr = new XMLHttpRequest();
+            requester._xhr = xhr;
 
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    requester.running = false;
-                    markDone();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 400) {
+                    requester.markDone();
                 }
             };
 
-            xhr.open("POST", `http://127.0.0.1:4096/session/${sessionId}/message`);
+            xhr.open("POST", `http://127.0.0.1:${port}/session/` + sessionId + "/message");
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(body));
-        }
-
-        function processChunks(chunkData) {
-            const lines = chunkData.split(/\r?\n/);
-            lines.forEach(line => {
-                const trimmed = line.trim();
-                if (!trimmed || trimmed.startsWith("<"))
-                    return;
-
-                try {
-                    const event = JSON.parse(trimmed);
-                    if (event.parts) {
-                        event.parts.forEach(p => {
-                            if (p.type === "reasoning" && p.text) {
-                                requester.message.thinking = false;
-                                if (!requester.startedReasoning) {
-                                    requester.message.content += "<think>";
-                                    requester.startedReasoning = true;
-                                }
-                                requester.message.content += p.text;
-                            } else if (p.type === "text" && p.text) {
-                                requester.message.thinking = false;
-                                if (requester.startedReasoning) {
-                                    requester.message.content += "</think>";
-                                    requester.startedReasoning = false;
-                                }
-                                requester.message.content += p.text;
-                                requester.message.rawContent += p.text;
-                            }
-                        });
-                    }
-                    if (event.info && event.info.done)
-                        markDone();
-                } catch (e) {}
-            });
         }
 
         function markDone() {
             if (!requester.message || requester.message.done)
                 return;
+
+            requester.running = false;
 
             if (requester.startedReasoning) {
                 requester.message.content += "</think>";
@@ -430,11 +506,5 @@ Singleton {
             root.responseFinished();
             root.processQueue();
         }
-    }
-
-    ConfigFileView {
-        id: posesView
-        fileName: "poses"
-        adapter: PosesSchema {}
     }
 }

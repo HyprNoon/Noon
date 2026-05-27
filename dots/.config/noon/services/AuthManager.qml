@@ -18,8 +18,8 @@ Singleton {
             id: "tasks",
             name: "Google Tasks",
             scopes: "https://www.googleapis.com/auth/tasks",
-            authId: Quickshell.env("NOON_TASKS_ID"),
-            secret: Quickshell.env("NOON_TASKS_SECRET"),
+            authId: Mem.env.NOON_TASKS_ID,
+            secret: Mem.env.NOON_TASKS_SECRET,
             domain: "tasks.google.com",
             icon: "https://www.gstatic.com/images/branding/product/2x/tasks_48dp.png",
             description: "Setup and get an synchronization of your local with Google Tasks"
@@ -28,8 +28,8 @@ Singleton {
             id: "calendar",
             name: "Google Calendar",
             scopes: "https://www.googleapis.com/auth/calendar",
-            secret: Quickshell.env("NOON_CALENDAR_SECRET"),
-            authId: Quickshell.env("NOON_CALENDAR_ID"),
+            secret: Mem.env.NOON_CALENDAR_SECRET,
+            authId: Mem.env.NOON_CALENDAR_ID,
             domain: "calendar.google.com",
             icon: "https://www.gstatic.com/images/branding/product/2x/calendar_48dp.png",
             description: "Setup and get your Google Calendar Events"

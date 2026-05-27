@@ -4,7 +4,7 @@ import qs.services
 import qs.common
 import qs.common.widgets
 
-SquareComponent {
+WidgetContainer {
     id: root
 
     readonly property var currentDevice: BluetoothService.filterConnectedDevices(BluetoothService.pairedDevices)[0]

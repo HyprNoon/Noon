@@ -8,8 +8,10 @@ StyledRect {
     property bool vertical: vertical
     property bool verticalMode: false
     property bool active: Mem.options.bar.appearance.barGroup
+    property color colBackground: Colors.colLayer1
     readonly property real padding: Padding.normal
-    color: active ? Colors.colLayer1 : "transparent"
+
+    color: active ? colBackground : "transparent"
     radius: Rounding.large
     clip: true
     Layout.fillHeight: !vertical

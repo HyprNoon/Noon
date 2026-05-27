@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+RESULT_FILE="/var/tmp/cast-picker-result"
+WINDOW_DATA="/var/tmp/cast-window-data"
+
+>"$RESULT_FILE"
+echo "$XDPH_WINDOW_SHARING_LIST" >"$WINDOW_DATA"
+
+noon ipc call sidebar reveal Cast 2>/dev/null
+
+for _ in $(seq 1 150); do
+  [[ -s "$RESULT_FILE" ]] && break
+  sleep 0.1
+done
+RESULT=$(<"$RESULT_FILE")
+rm -f "$WINDOW_DATA" 2>/dev/null
+
+[[ -z "$RESULT" || "$RESULT" == "__cancel__" ]] && exit 1
+
+echo "$RESULT"

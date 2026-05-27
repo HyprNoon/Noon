@@ -134,7 +134,6 @@ ForegroundVisited=#ebb2ff
 
 [DirSelect Dialog]
 DirSelectDialog Size=848,593
-History Items[$e]=file:///run/media/Data/General-Archive,file:$HOME/HyprNoon_qs
 Splitter State=\x00\x00\x00\xff\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\xa8\x00\x00\x02\xa8\x00\xff\xff\xff\xff\x01\x00\x00\x00\x01\x00
 
 [General]
@@ -188,4 +187,3 @@ activeForeground=227,226,233
 inactiveBackground=63,68,87
 inactiveBlend=161,169,177
 inactiveForeground=221,226,249
-

@@ -246,6 +246,7 @@ BarGroup {
 
                 CurrentAppPopUp {
                     hoverTarget: iconHoverArea
+                    workspaceId: button.workspaceValue
                 }
             }
         }

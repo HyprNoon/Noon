@@ -59,8 +59,8 @@ Rectangle {
 
     // Helper logic kept separate to keep the UI tree clean
     function getNetIcon() {
-        if ((NetworkService.networkName || "") !== "" && NetworkService.networkName !== "lo") {
-            const s = NetworkService.networkStrength ?? 0;
+        if ((NetworkService.manager.networkName || "") !== "" && NetworkService.manager.networkName !== "lo") {
+            const s = NetworkService.manager.networkStrength ?? 0;
             if (s > 80)
                 return "network-wireless-signal-excellent";
             if (s > 60)

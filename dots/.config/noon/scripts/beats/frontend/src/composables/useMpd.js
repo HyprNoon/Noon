@@ -107,17 +107,11 @@ class MPDClient {
   }
 
   async refresh() {
-    const [sStat, sSong] = await Promise.all([
-      this.cmd('status'),
-      this.cmd('currentsong'),
-    ])
+    const sStat = await this.cmd('status')
+    const sSong = await this.cmd('currentsong')
     if (sStat) Object.assign(this.status, this._parseKv(sStat))
     if (sSong) this.currentSong.value = this._parseKv(sSong)
     else this.currentSong.value = {}
-    try {
-      const resp = await fetch('/api/queue')
-      if (resp.ok) this.queue.value = await resp.json()
-    } catch (_) {}
   }
 
   _parseKv(lines) {
@@ -131,7 +125,7 @@ class MPDClient {
 
   _poll() {
     this.refresh()
-    this._poller = setInterval(() => this.refresh(), 1000)
+    this._poller = setInterval(() => this.refresh(), 3000)
   }
 
   coverUrl(rel) {

@@ -11,21 +11,33 @@ import qs.store
 
 StyledPanel {
     id: root
-    name: "blurred_layer"
+    name: "noanim_blurred_layer"
     property real scrollSum: 0
+    property bool hasAttachedFile: false
     readonly property bool reveal: GlobalStates.main.showBeam
     readonly property int mainRounding: Rounding.full
     readonly property int elevationValue: Sizes.elevationMargin + (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.height : 0)
-
+    readonly property int scrollArea: 5
     readonly property int beamTargetWidth: (BeamData.getHint()?.length ?? 0) > 25 || BeamData.query.length > 25 ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width
 
     visible: true
-    kbFocus: true
+    keyboardFocus: true
     exclusiveZone: -1
     fill: true
 
     mask: Region {
-        item: maskUnion
+        Region {
+            item: beamBg
+        }
+        Region {
+            item: hoverArea
+        }
+        Region {
+            item: beamPopup
+        }
+        Region {
+            item: responseArea
+        }
     }
 
     function hide() {
@@ -38,20 +50,17 @@ StyledPanel {
         hide();
     }
 
-    // function takeScreenshot() {
-    //     ScreenShotService.request({
-    //         temp: true,
-    //         region: ScreenShotService.Regions.Part
-    //     });
-    //     attachTimer.restart();
-    //     Qt.callLater(hide);
-    // }
-
-    // Timer {
-    //     id: attachTimer
-    //     interval: Mem.options.hacks.arbitraryRaceConditionDelay
-    //     onTriggered: Ai.attachFile(Qt.resolvedUrl(ScreenShotService.tempPath))
-    // }
+    function takeScreenshot() {
+        ScreenShotService.request({
+            temp: true,
+            region: ScreenShotService.Regions.Window
+        });
+        ScreenShotService.screenshotCompleted.connect(path => {
+            root.hasAttachedFile = path.length > 0;
+            Ai.attachFile(Qt.resolvedUrl(ScreenShotService.tempPath));
+            Qt.callLater(hide);
+        });
+    }
 
     FocusHandler {
         windows: [root]
@@ -59,21 +68,23 @@ StyledPanel {
         onCleared: root.hide()
     }
 
-    ScreenActionHint {
+    ScreenActionHintPanel {
         target: dropArea
-    }
-
-    Item {
-        id: maskUnion
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: beamBg.width
-        height: root.reveal ? beamBg.height : 5
+        hint: ({
+                "icon": "keyboard_double_arrow_right",
+                "text": "Drop To Open Downloader!"
+            })
     }
 
     MouseArea {
-        id: beamMouseArea
-        anchors.fill: parent
+        id: hoverArea
+        // enabled: !root.reveal
+        z: -1
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        implicitHeight: scrollArea
         hoverEnabled: true
         propagateComposedEvents: true
         acceptedButtons: Qt.NoButton
@@ -83,7 +94,7 @@ StyledPanel {
             id: idleTimer
             repeat: true
             interval: 5000
-            running: root.reveal && BeamData.query.length === 0 && !beamMouseArea.containsMouse
+            running: root.reveal && BeamData.query.length === 0 && !hoverArea.containsMouse
             onTriggered: root.hide()
         }
 
@@ -128,6 +139,12 @@ StyledPanel {
 
     StyledRectangularShadow {
         target: popup
+        transparency: 0.6
+    }
+
+    StyledRectangularShadow {
+        target: beamBg
+        transparency: 0.6
     }
 
     BeamBg {
@@ -203,8 +220,8 @@ StyledPanel {
                 color: Colors.colOnLayer0
                 placeholderTextColor: Colors.colSubtext
                 selectByMouse: true
-                leftPadding: Padding.huge
-                rightPadding: Padding.huge  // + osrButton.width
+                leftPadding: Padding.veryhuge
+                rightPadding: Padding.veryhuge + osrButton.width
                 font.pixelSize: Fonts.sizes.normal
                 font.family: Fonts.family.main
 
@@ -236,26 +253,26 @@ StyledPanel {
                 }
             }
 
-            // GroupButtonWithIcon {
-            //     id: osrButton
-            //     z: 999
-            //     anchors {
-            //         top: parent.top
-            //         bottom: parent.bottom
-            //         right: parent.right
-            //         rightMargin: Padding.large
-            //     }
-            //     buttonRadius: root.mainRounding
-            //     releaseAction: () => root.takeScreenshot()
-            //     colBackground: "transparent"
-            //     materialIcon: "screenshot_region"
-            //     implicitSize: beamBg.implicitHeight * 0.75
-            //     enabled: !ScreenShotService.isBusy
-            //     visible: BeamData.config?.showOsrButton ?? false
-            //     Behavior on opacity {
-            //         Anim {}
-            //     }
-            // }
+            GroupButtonWithIcon {
+                id: osrButton
+                z: 999
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    right: parent.right
+                    rightMargin: Padding.large
+                }
+                buttonRadius: root.mainRounding
+                releaseAction: () => root.takeScreenshot()
+                colBackground: "transparent"
+                materialIcon: "screenshot_region"
+                implicitSize: beamBg.implicitHeight * 0.75
+                enabled: !ScreenShotService.isBusy
+                visible: BeamData.config?.showOsrButton ?? false
+                Behavior on opacity {
+                    Anim {}
+                }
+            }
         }
 
         GroupButtonWithIcon {
@@ -267,10 +284,11 @@ StyledPanel {
             }
             releaseAction: () => root.sendMessage()
             buttonRadius: root.mainRounding
-            colBackground: "transparent"
-            implicitSize: beamBg.implicitHeight * 0.75
+            colBackground: BeamData.query.length > 0 ? Colors.colPrimaryContainer : "transparent"
+            iconSize: 22
+            implicitSize: beamBg.implicitHeight * 0.6
             animateIcon: true
-            materialIcon: BeamData.query.length === 0 && BeamData.activeState === "ai" ? "mic" : root.isResponding ? "stop" : "send"
+            materialIcon: BeamData.query.length === 0 && BeamData.activeState === "ai" ? "mic" : root.isResponding ? "stop" : "arrow_upward"
             Behavior on opacity {
                 Anim {}
             }

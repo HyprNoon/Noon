@@ -203,7 +203,7 @@ Item {
                     }
 
                     shown: Mem.states.sidebar.widgets.enabled.indexOf(modelData.id) !== -1
-                    source: sanitizeSource(Directories.shellDir + "/modules/main/desktop/widgets/", modelData.component)
+                    source: modelData.isPlugin ? Qt.resolvedUrl(modelData.entry) : sanitizeSource(Directories.shellDir + "/modules/main/desktop/widgets/", modelData.component)
                     width: isExpanded ? cellSize * 2 + gridSpacing : cellSize
                     height: cellSize
 

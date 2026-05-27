@@ -33,7 +33,7 @@ Singleton {
     property var registry: rebuildRegistry()
     readonly property var pluginsContent: PluginsManager?.beamPlugins
     readonly property var rawBeamPlugins: PluginsManager?.beamPlugins
-    readonly property list<string> availableAnimationStyles: ["slidebottom", "overshoot", "morphIn", "expo", "springPop"]
+    readonly property list<string> availableAnimationStyles: ["slidebottom", "overshoot", "expo", "springPop"]
     onRawBeamPluginsChanged: rebuildRegistry()
 
     readonly property var mainContent: {
@@ -113,31 +113,6 @@ Singleton {
                 NotesService.note(cleanQuery + separator);
             }
         },
-        "alarm": {
-            prefix: "`",
-            icon: "timer",
-            shape: "Diamond",
-            placeholder: "I Can Wake You ..",
-            showHint: false,
-            showOsrButton: false,
-            hinter: () => "",
-            executor: () => {
-                AlarmService.addTimer(cleanQuery, "Beam Timer");
-                Mem.states.sidebar.misc.selectedTabIndex = 3;
-                NoonUtils.callIpc("sidebar reveal Alarms");
-            }
-        },
-        "find": {
-            prefix: "@",
-            icon: "folder",
-            shape: "PixelCircle",
-            placeholder: "I Can Search Files ..",
-            showHint: true,
-            showOsrButton: false,
-            model: FindService.resultsModel,
-            debounce: 100,
-            executor: () => {}
-        },
         "launch": {
             prefix: ".",
             icon: "rocket_launch",
@@ -194,11 +169,17 @@ Singleton {
             showOsrButton: false,
             hinter: () => "",
             executor: () => {
-                const duration = TimerService.parseTimeString(cleanQuery);
-                if (duration > 0) {
-                    TimerService.addTimer("Focus Time", duration, true, true);
-                    NoonUtils.callIpc("sidebar reveal Timers");
-                }
+                const parts = cleanQuery.trim().split(/\s+/);
+                const name = cleanQuery.includes(":") ? "Alarm" : "FocusTimer";
+                const duration = TimerService.parseTimeString(parts[0]);
+                const rest = parts.slice(1)?.join(" ") || name;
+
+                if (duration > 0)
+                    TimerService.addTimer(rest, duration, true, true);
+                else if (cleanQuery.includes(":"))
+                    TimerService.wake(parts[0], rest);
+
+                NoonUtils.callIpc("sidebar reveal Timers");
             }
         },
         "todo": {
@@ -248,10 +229,10 @@ Singleton {
                 return "";
             },
             executor: () => {
-                const searchUrl = subConfig?.searchQuery || Mem.options.networking.searchPrefix;
+                const searchUrl = subConfig?.searchQuery || Mem.options.networking.searchEngine;
                 const searchText = subConfig ? cleanQuery.substring(subConfig.prefix.length) : cleanQuery;
                 if (!subConfig.exec)
-                    Quickshell.execDetached(["gio", "open", searchUrl + encodeURIComponent(searchText)]);
+                    NoonUtils.searchOnline(searchText);
                 else
                     subConfig.exec(searchText);
             },
@@ -259,7 +240,7 @@ Singleton {
                 "search": {
                     prefix: "",
                     icon: "search",
-                    searchQuery: Mem.options.networking.searchPrefix,
+                    searchQuery: Mem.options.networking.searchEngine,
                     shape: "PixelCircle"
                 },
                 "yt_music": {
@@ -518,7 +499,7 @@ Singleton {
 
         const prefix = config?.prefix || "";
 
-        const resultStates = ["calc", "translate", "find"];
+        const resultStates = ["calc", "translate"];
         if (resultStates.includes(activeState))
             return query;
 

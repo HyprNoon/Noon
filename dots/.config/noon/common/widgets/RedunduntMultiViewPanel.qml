@@ -57,9 +57,20 @@ StyledRect {
                     source: root.path + modelData + ".qml"
                     asynchronous: root.lazy
                     onLoaded: {
-                        if (listData.preload in _item) {
-                            // if (listData.preload && listData.preloadData)
-                            _item[listData.preload] = Qt.binding(() => listData.preloadData);
+                        const preloadTable = listData?.preloadTable;
+                        const preload = listData?.preload;
+                        const preloadData = listData?.preloadData;
+
+                        if (preloadTable) {
+                            for (const prop in preloadTable) {
+                                if ((prop in _item) && (prop in root)) {
+                                    // Capture the current prop name in a block-scoped variable
+                                    const targetProp = prop;
+                                    _item[targetProp] = Qt.binding(() => root[targetProp]);
+                                }
+                            }
+                        } else if (preload && (preload in _item) && preloadData !== undefined) {
+                            _item[preload] = Qt.binding(() => listData.preloadData);
                         }
                     }
                 }

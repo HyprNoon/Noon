@@ -7,6 +7,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import "variants"
 
 Scope {
     id: root

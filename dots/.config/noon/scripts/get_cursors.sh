@@ -1,4 +1,2 @@
 #!/bin/bash
-# Find all directories in standard icon paths that contain a "cursors" folder
-find /usr/share/icons ~/.local/share/icons ~/.icons -maxdepth 2 -type d -name "cursors" 2>/dev/null | \
-rev | cut -d'/' -f2 | rev | sort -u
+find /usr/share/icons ~/.local/share/icons ~/.icons -mindepth 2 -maxdepth 2 -type d -name "cursors" -printf "%h\n" 2>/dev/null | xargs -I {} basename {} | sort -u

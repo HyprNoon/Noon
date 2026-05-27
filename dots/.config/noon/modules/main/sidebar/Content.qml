@@ -1,6 +1,6 @@
 import "components/plugins"
+import "components/cast"
 import "components/apps"
-import "components/downloads"
 import "components/notes"
 import "components/timers"
 import "components/apis"
@@ -26,6 +26,8 @@ Item {
     id: root
 
     required property var panelWindow
+    readonly property bool hovered: mouseArea?.containsMouse ?? false
+    readonly property alias rail: rail
     readonly property bool effectiveSearchable: SidebarData.isSearchable(selectedCategory) ?? false
     property QtObject colors: SidebarData.getColors(selectedCategory) || Colors
     property bool auxVisible: false
@@ -135,13 +137,17 @@ Item {
 
         target: PolkitService
     }
-
+    HoverHandler {
+        id: mouseArea
+        anchors.fill: parent
+    }
     RowLayout {
         anchors.fill: parent
         layoutDirection: !panelWindow.rightMode ? Qt.LeftToRight : Qt.RightToLeft
         spacing: Padding.normal
 
         SidebarNavigationRail {
+            id: rail
             content: root
             selectedCategory: root.selectedCategory
             colors: root?.colors

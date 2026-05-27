@@ -9,7 +9,7 @@ import qs.common
 import qs.common.widgets
 import "calendar_layout.js" as CalendarLayout
 
-SquareComponent {
+WidgetContainer {
     id: root
     property var calendarLayout: CalendarLayout.getCalendarLayout(viewingDate, monthShift === 0)
     property int monthShift: 0

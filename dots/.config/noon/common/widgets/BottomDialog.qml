@@ -151,7 +151,7 @@ Item {
         visible: height > 0
         height: root.targetHeight
         topRadius: Rounding.verylarge
-        color: root.colors.colLayer0
+        color: root.colors.colLayer2
         children: root.contentItem
         Component.onCompleted: {
             if (contentItem)
@@ -162,6 +162,8 @@ Item {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
+            leftMargin: Padding.large
+            rightMargin: Padding.large
         }
 
         Behavior on anchors.rightMargin {

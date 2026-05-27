@@ -27,32 +27,32 @@ StyledPopup {
             model: [
                 {
                     label: qsTr("Connection:"),
-                    value: NetworkService.ethernet ? "Ethernet" : NetworkService.wifi ? "Wi-Fi" : "Disconnected",
+                    value: NetworkService.manager.ethernet ? "Ethernet" : NetworkService.manager.wifi ? "Wi-Fi" : "Disconnected",
                     show: true
                 },
                 {
                     label: qsTr("Network:"),
-                    value: NetworkService.networkName,
-                    show: NetworkService.networkName.length > 0
+                    value: NetworkService.manager.networkName,
+                    show: NetworkService.manager.networkName.length > 0
                 },
                 {
                     label: qsTr("Signal:"),
-                    value: NetworkService.networkStrengthText,
-                    show: NetworkService.wifi && NetworkService.networkStrength > 0
+                    value: NetworkService.manager.networkStrengthText,
+                    show: NetworkService.manager.wifi && NetworkService.manager.networkStrength > 0
                 },
                 {
                     label: qsTr("Download:"),
-                    value: NetworkService.downloadSpeedText,
+                    value: NetworkService.manager.downloadSpeedText,
                     show: true
                 },
                 {
                     label: qsTr("Upload:"),
-                    value: NetworkService.uploadSpeedText,
+                    value: NetworkService.manager.uploadSpeedText,
                     show: true
                 },
                 {
                     label: qsTr("IP:"),
-                    value: NetworkService.stats.ip_address,
+                    value: NetworkService.manager.ipAddress,
                     show: true
                 }
             ]

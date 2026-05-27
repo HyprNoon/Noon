@@ -7,18 +7,17 @@ import qs.services
 
 BottomDialog {
     id: root
-    collapsedHeight: 220
+    collapsedHeight: 250
     enableStagedReveal: false
     bottomAreaReveal: true
     hoverHeight: 300
-    color: Colors.colLayer2
 
     contentItem: ColumnLayout {
         spacing: Padding.small
         anchors.fill: parent
         anchors.margins: Padding.massive
 
-        BottomDialogHeader {
+        PageHeader {
             title: "List Tweaks"
             showCloseButton: false
         }
@@ -61,5 +60,6 @@ BottomDialog {
                 onCheckedChanged: Mem.options.sidebar.appearance.alternateListStripes = checked
             }
         }
+        Spacer {}
     }
 }

@@ -10,10 +10,12 @@ import qs.store
 
 Item {
     id: root
-    required property var panelWindow
     focus: true
-    readonly property bool isPendingArea: currentMode.region === ScreenShotService.Regions.Part && !ScreenShotService.hasRegion
-    readonly property var currentMode: modes[tabBar.currentIndex] ?? modes[0]
+
+    required property var panelWindow
+    readonly property bool isPendingArea: currentMode?.region === ScreenShotService.Regions.Part && !ScreenShotService.hasRegion
+    readonly property var currentMode: modes[tabBar.currentIndex]
+
     readonly property list<var> modes: [
         {
             "name": "full",
@@ -35,6 +37,7 @@ Item {
         }
     ]
     property bool reveal: GlobalStates.main.showScreenshot
+
     implicitWidth: bg.implicitWidth
     implicitHeight: Sizes.screenshot.size.height
     anchors.bottom: parent.bottom
@@ -47,22 +50,18 @@ Item {
     }
 
     function execute() {
-        if (isPendingArea) {
-            ScreenShotService.startRegionSelect();
-            return;
-        }
-        ScreenShotService.request({
-            region: root.currentMode.region,
-            temp: false
-        });
         if (root.currentMode.region === ScreenShotService.Regions.Part) {
             ScreenShotService.clearRegion();
+            ScreenShotService.startRegionSelect();
+        } else {
+            ScreenShotService.request({
+                region: root.currentMode.region,
+                temp: false
+            });
         }
-        GlobalStates.main.showScreenshot = false;
     }
-    Keys.onReturnPressed: () => {
-        execute();
-    }
+
+    Keys.onReturnPressed: execute()
 
     StyledRectangularShadow {
         target: bg

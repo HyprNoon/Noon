@@ -36,7 +36,6 @@ JsonAdapter {
 
         colors: JO {
             property string palattePath: "auto"
-            property bool palatte: false
         }
 
         transparency: JO {
@@ -46,7 +45,7 @@ JsonAdapter {
         }
 
         rounding: JO {
-            property bool syncCompositor: true
+            property bool syncCompositor: false
             property real scale: 1.5
             property real power: 2
         }
@@ -73,9 +72,7 @@ JsonAdapter {
     }
 
     property JO audio: JO {
-        property JO protection
-
-        protection: JO {
+        property JO protection: JO {
             property bool enable: false
             property real maxAllowedIncrease: 100
             property real maxAllowed: 200
@@ -97,28 +94,31 @@ JsonAdapter {
         property string bluetooth: "kcmshell6 kcm_bluetooth"
         property string network: "plasmawindowed org.kde.plasma.networkmanagement"
         property string networkEthernet: "kcmshell6 kcm_networkmanagement"
-        property string settings: "systemsettings"
-        property string terminal: "foot"
-        property string terminalAlt: "kitty"
-        property string browser: "zen-browser"
-        property string browserAlt: "firefox"
-        property string fileManager: "dolphin"
-        property string editor: "zeditor"
+    }
+
+    property JO keys: JO {
+        property JO wallpapers: JO {
+            property string wallhaven: ""
+            property string unsplash: ""
+        }
     }
 
     property JO services: JO {
         property JO idle
         property JO todo
         property JO time
-        property JO prayer
+        property JO timers
         property JO weather
         property JO notifications
         property JO nightLight
         property JO ambientSounds
         property JO games
+        property JO wallpapers
+
         property string backlightDevice: "dell::kbd_backlight"
         property bool easyEffects: false
         property string location: "Cairo"
+        property list<string> autoExecAppsList: ["vesktop", "kitty"]
 
         games: JO {
             property bool adaptiveTheme: false
@@ -133,14 +133,24 @@ JsonAdapter {
         nightLight: JO {
             property bool autoNightLightCycle: false
         }
+
         time: JO {
             property bool use12HourFormat: true
         }
 
-        prayer: JO {
-            property string method: "Egyptian"
+        wallpapers: JO {
+            property string method: "wallhaven"
         }
 
+        timers: JO {
+            property list<var> customPresets: [
+                {
+                    "duration": 1500,
+                    "icon": "timer",
+                    "name": "Example Timer"
+                },
+            ]
+        }
         weather: JO {
             property bool useFehrenheit: false
         }
@@ -182,10 +192,12 @@ JsonAdapter {
 
         content: JO {
             property bool apps: true
+            property bool screenTime: true
             property bool apis: true
             property bool shelf: true
             property bool tasks: true
             property bool history: true
+            property bool bookmarks: true
             property bool emojies: true
             property bool notifs: true
             property bool notes: true
@@ -207,7 +219,7 @@ JsonAdapter {
         }
 
         appearance: JO {
-            property int mode: 2
+            property string style: "float"
             property real itemListScale: 1
             property bool showNavTitles: false
             property bool showSliders: true
@@ -244,7 +256,7 @@ JsonAdapter {
     property JO networking: JO {
         property string userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
         property string sidebarAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Mobile Safari/537.36"
-        property string searchPrefix: "https://duckduckgo.com/?q="
+        property string searchEngine: "google"
     }
 
     property JO mediaPlayer: JO {
@@ -261,44 +273,46 @@ JsonAdapter {
         property JO shell
         property JO osd
         property JO bg
+        property JO popups
         property JO clock
-        property JO view
-        property JO lock
         property JO icons
-        property JO hyprland
         property JO behavior
         property JO widgets
 
-        property bool desktopClock: true
         property int screenCorners: 1
         property bool timerOverlayMode: true
+        property list<string> customResolutions: []
 
         shell: JO {
             property bool deloadOnFullscreen: true
             property string mode: ""
         }
         widgets: JO {
-            property bool enabled: true
+            property bool enabled: false
             property string mode: "col"
         }
         osd: JO {
             property string mode: "bottom_pill"
         }
-        view: JO {
-            property string mode: "spiral"
+        popups: JO {
+            property string notifications: "TopCenter"
         }
         bg: JO {
             property JO parallax
+            property JO live
 
             property real borderMultiplier: 0.2
             property bool depthMode: true
-            property bool useQs: true
 
             parallax: JO {
                 property bool enabled: false
                 property bool widgetParallax: false
                 property bool verticalParallax: false
                 property real parallaxStrength: 0.0
+            }
+
+            live: JO {
+                property int framerate: 24
             }
         }
 
@@ -310,16 +324,9 @@ JsonAdapter {
             property string font: "Badeen Display"
         }
 
-        lock: JO {
+        icons: JO {
             property bool enabled: true
-            property bool showAzkar: true
-        }
-
-        icons: JO {}
-
-        hyprland: JO {
-            property list<string> externalMonitorProfiles: ["1680x1050@68", "1920x1080@60", "1920x1080@72"]
-            property string externalMonitorProfile: "1680x1050@68"
+            property string currentIconTheme: "Breeze"
         }
 
         behavior: JO {
@@ -339,11 +346,9 @@ JsonAdapter {
         property JO keyboard
         property JO workspaces
 
-        property bool enabled: true
         property int batteryLowThreshold: 20
         property string horizontalLayout: "Dynamic"
         property string verticalLayout: "VDynamic"
-        property string currentLayout: "Dynamic"
 
         property JO vMap: JO {
             property int spacing: 6
@@ -360,7 +365,7 @@ JsonAdapter {
         property list<string> bars: ["Dynamic", "HyDe", "NovelKnocks", "Sleek", "VDynamic"]
 
         appearance: JO {
-            property int mode: 2
+            property string style: "concave"
             property string separatorsMode: "dot"
             property bool enableSeparators: true
             property bool useBg: true
@@ -395,14 +400,15 @@ JsonAdapter {
     }
 
     property JO dock: JO {
-        property JO appearance
 
         property bool enabled: false
         property bool hoverToReveal: true
         property int animationDuration: 200
-        appearance: JO {
+
+        property JO appearance: JO {
             property real iconSize: 100 * iconSizeMultiplier
             property real iconSizeMultiplier: 0.5
+            property string style: "float"
         }
     }
 

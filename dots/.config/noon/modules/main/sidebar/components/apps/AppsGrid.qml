@@ -9,6 +9,9 @@ LayerRect {
     id: root
     radius: Rounding.verylarge
     clip: true
+    onExpandedChanged: console.log("Child.expanded: ", expanded)
+
+    property bool expanded // : false
     readonly property alias gridView: contentView
     property string searchQuery: ""
     signal dismiss
@@ -74,8 +77,7 @@ LayerRect {
         anchors.fill: parent
         anchors.margins: Padding.huge
         model: filteredModel
-        cellWidth: Math.max(180, (parent?.width - (anchors.margins * 2)) / 2)
-        cellHeight: cellWidth + anchors.margins
+        columns: root.expanded ? 4 : 2
         opacity: popup.active ? 0 : 1
         Behavior on opacity {
             Anim {}
@@ -95,6 +97,7 @@ LayerRect {
                 anchors.bottomMargin: 40
                 toggled: isSelected
                 radius: Rounding.large
+                colBackground: Colors.colLayer2
 
                 MouseArea {
                     anchors.fill: parent
@@ -126,6 +129,7 @@ LayerRect {
             }
 
             StyledText {
+                font.pixelSize: Fonts.sizes.normal
                 text: modelData.category.replace(/([a-z])([A-Z])/g, '$1 $2')
                 anchors.top: groupTile.bottom
                 anchors.horizontalCenter: parent.horizontalCenter

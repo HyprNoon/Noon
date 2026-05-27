@@ -9,7 +9,6 @@ import qs.common
 import qs.common.widgets
 import qs.services
 import Quickshell.Services.Pipewire
-import "../components"
 
 StyledPanel {
     id: root

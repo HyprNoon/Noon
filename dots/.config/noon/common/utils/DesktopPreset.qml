@@ -16,7 +16,6 @@ QtObject {
         property QtObject bg: QtObject {
             property real borderMultiplier: 0.2
             property bool depthMode: true
-            property bool useQs: true
 
             property QtObject parallax: QtObject {
                 property bool enabled: false

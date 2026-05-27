@@ -55,7 +55,6 @@ Item {
     }
     StyledRectangularShadow {
         target: bg
-        intensity: 0.4
     }
     Anim on anchors.rightMargin {
         from: -75

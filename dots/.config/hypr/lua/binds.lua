@@ -1,25 +1,16 @@
--- Switch to workspace 1-10 (paged in groups of 10)
+-- Workspaces Switch
 for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mainMod .. "+" .. tostring(key), function()
-        local curr = hl.get_active_workspace().id
-        local target = math.floor((curr - 1) / 10) * 10 + i
-        hl.dispatch(hl.dsp.focus({ workspace = target }))
-    end)
+	hl.bind(mainMod .. "+" .. i % 10, hl.dsp.focus({ workspace = i }))
 end
 
--- Move active window to workspace 1-10 (paged in groups of 10)
+-- Move active window to workspace
 for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mainMod .. "+ALT+" .. tostring(key), function()
-        local curr = hl.get_active_workspace().id
-        local target = math.floor((curr - 1) / 10) * 10 + i
-        hl.dispatch(hl.dsp.window.move({ workspace = target }))
-    end)
+	hl.bind(mainMod .. "+ALT+" .. tostring(i % 10), hl.dsp.window.move({ workspace = i }))
 end
 
 -- Special workspace
 hl.bind(mainMod .. "+S", hl.dsp.workspace.toggle_special())
+hl.bind(mainMod .. "+ALT+S", hl.dsp.window.move({ workspace = "special" }))
 hl.bind(mainMod .. "+mouse:275", hl.dsp.workspace.toggle_special(), { mouse = true })
 
 hl.bind("CTRL+" .. mainMod .. "+bracketleft", hl.dsp.focus({ workspace = "e-1" }))
@@ -61,13 +52,15 @@ hl.bind(mainMod .. "+G", hl.dsp.group.toggle())
 hl.bind(mainMod .. "+CTRL+TAB", hl.dsp.group.next())
 
 hl.bind(mainMod .. "+Q", hl.dsp.window.close())
-hl.bind(mainMod .. "+ALT+SPACE", hl.dsp.window.float())
-
+hl.bind(mainMod .. "+ALT+SPACE", function()
+	hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
+	hl.dispatch(hl.dsp.window.resize({ x = 1280, y = 800 }))
+end)
 -- Movement
-hl.bind(mainMod .. "+SHIFT+Right", hl.dsp.window.move({direction = "right"}))
-hl.bind(mainMod .. "+SHIFT+Left", hl.dsp.window.move({direction = "left"}))
-hl.bind(mainMod .. "+SHIFT+Up", hl.dsp.window.move({direction = "up"}))
-hl.bind(mainMod .. "+SHIFT+Down", hl.dsp.window.move({direction = "down"}))
+hl.bind(mainMod .. "+SHIFT+Right", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. "+SHIFT+Left", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. "+SHIFT+Up", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. "+SHIFT+Down", hl.dsp.window.move({ direction = "down" }))
 
 -- Fullscreen / window state
 hl.bind(mainMod .. "+D", hl.dsp.window.fullscreen({ mode = "maximized" }))
@@ -83,61 +76,56 @@ hl.bind(mainMod .. "+down", hl.dsp.focus({ direction = "d" }))
 -- Mouse move/resize
 hl.bind(mainMod .. "+mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. "+mouse:274", hl.dsp.window.drag(), { mouse = true })
-hl.bind(mainMod .. "+mouse:273", hl.dsp.window.resize(), { mouse = true })
-
+hl.bind(mainMod .. "+CTRL+mouse:272", hl.dsp.window.resize(), { mouse = true })
 
 -- Layout: fine pixel scroll
 hl.bind(mainMod .. "+P", hl.dsp.window.pin())
 
 -- Scrolling Layout Controls
-if (layout == "scrolling") then
-    hl.bind(mainMod .. "+BracketRight", hl.dsp.layout("move +col"))
-    hl.bind(mainMod .. "+BracketLeft", hl.dsp.layout("move -col"))
-    hl.bind(mainMod .. "+ALT+right", hl.dsp.layout('move +200'))
-    hl.bind(mainMod .. "+ALT+left", hl.dsp.layout('move -200'))
-    hl.bind("CTRL+" .. mainMod .. "+right", hl.dsp.layout('swapcol r'))
-    hl.bind("CTRL+" .. mainMod .. "+left", hl.dsp.layout('swapcol l'))
-    hl.bind(mainMod .. "+SHIFT+right", hl.dsp.layout('colresize +conf'))
-    hl.bind(mainMod .. "+SHIFT+left", hl.dsp.layout('colresize -conf'))
-    hl.bind(mainMod .. "+SHIFT+up", hl.dsp.layout('colresize +0.1'))
-    hl.bind(mainMod .. "+SHIFT+down", hl.dsp.layout('colresize -0.1'))
-    hl.bind("CTRL+ALT+" .. mainMod .. "+equal", hl.dsp.layout('colresize all 0.5'))
-    -- Layout: fit / scroll to position
-    hl.bind(mainMod .. "+Home", hl.dsp.layout("fit tobeg"))
-    hl.bind(mainMod .. "+End", hl.dsp.layout("fit toend"))
-    hl.bind(mainMod .. "+A", hl.dsp.layout("fit active"))
-    hl.bind(mainMod .. "+SHIFT+A", hl.dsp.layout("fit all"))
-    hl.bind("CTRL+" .. mainMod .. "+A", hl.dsp.layout("fit visible"))
+if layout == "scrolling" then
+	hl.bind(mainMod .. "+BracketRight", hl.dsp.layout("move +col"))
+	hl.bind(mainMod .. "+BracketLeft", hl.dsp.layout("move -col"))
+	hl.bind(mainMod .. "+ALT+right", hl.dsp.layout("move +200"))
+	hl.bind(mainMod .. "+ALT+left", hl.dsp.layout("move -200"))
+	hl.bind("CTRL+" .. mainMod .. "+right", hl.dsp.layout("swapcol r"))
+	hl.bind("CTRL+" .. mainMod .. "+left", hl.dsp.layout("swapcol l"))
+	hl.bind(mainMod .. "+SHIFT+right", hl.dsp.layout("colresize +conf"))
+	hl.bind(mainMod .. "+SHIFT+left", hl.dsp.layout("colresize -conf"))
+	hl.bind(mainMod .. "+SHIFT+up", hl.dsp.layout("colresize +0.1"))
+	hl.bind(mainMod .. "+SHIFT+down", hl.dsp.layout("colresize -0.1"))
+	hl.bind("CTRL+ALT+" .. mainMod .. "+equal", hl.dsp.layout("colresize all 0.5"))
+	-- Layout: fit / scroll to position
+	hl.bind(mainMod .. "+Home", hl.dsp.layout("fit tobeg"))
+	hl.bind(mainMod .. "+End", hl.dsp.layout("fit toend"))
+	hl.bind(mainMod .. "+A", hl.dsp.layout("fit active"))
+	hl.bind(mainMod .. "+SHIFT+A", hl.dsp.layout("fit all"))
+	hl.bind("CTRL+" .. mainMod .. "+A", hl.dsp.layout("fit visible"))
 end
 
-
--- Layout: move column to workspace
-for i = 1, 9 do
-    hl.bind(mainMod .. "+ALT+" .. tostring(i),
-        hl.dsp.layout("movecoltoworkspace " .. tostring(i) .. ""))
-end
-hl.bind(mainMod .. "+ALT+0", hl.dsp.layout("movecoltoworkspace 10"))
 hl.bind("CTRL+SHIFT+" .. mainMod .. "+right", hl.dsp.layout("movecoltoworkspace +1"))
 hl.bind("CTRL+SHIFT+" .. mainMod .. "+left", hl.dsp.layout("movecoltoworkspace -1"))
-hl.bind(mainMod .. "+ALT+S", hl.dsp.layout("movecoltoworkspace special"))
 
 -- Screenshot area
 hl.bind(mainMod .. "+SHIFT+S", hl.dsp.exec_cmd(ipc .. " global toggle_screenshot"))
 
 -- OCR
-hl.bind(mainMod .. "+SHIFT+T", hl.dsp.exec_cmd(
-    'grim -g "$(slurp $SLURP_ARGS)" "tmp.png" && tesseract "tmp.png" - | wl-copy && rm "tmp.png"'
-))
+hl.bind(
+	mainMod .. "+SHIFT+T",
+	hl.dsp.exec_cmd('grim -g "$(slurp $SLURP_ARGS)" "tmp.png" && tesseract "tmp.png" - | wl-copy && rm "tmp.png"')
+)
 
 -- Color picker
 hl.bind(mainMod .. "+SHIFT+C", hl.dsp.exec_cmd("hyprpicker -a"))
 
 -- Fullscreen screenshot
-hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"),
-    { locked = true })
-hl.bind("CTRL+Print", hl.dsp.exec_cmd(
-    'mkdir -p $(xdg-user-dir PICTURES)/Screenshots && grim $(xdg-user-dir PICTURES)/Screenshots/Screenshot_"$(date \'+%Y-%m-%d_%H.%M.%S\')".png'
-), { locked = true })
+hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true })
+hl.bind(
+	"CTRL+Print",
+	hl.dsp.exec_cmd(
+		"mkdir -p $(xdg-user-dir PICTURES)/Screenshots && grim $(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"
+	),
+	{ locked = true }
+)
 
 -- Recording
 hl.bind(mainMod .. "+ALT+R", hl.dsp.exec_cmd(scriptsDir .. "/record_service.sh"))
@@ -145,8 +133,11 @@ hl.bind("CTRL+ALT+R", hl.dsp.exec_cmd(scriptsDir .. "/record_service.sh --fullsc
 hl.bind(mainMod .. "+SHIFT+ALT+R", hl.dsp.exec_cmd(scriptsDir .. "/record_service.sh --fullscreen-sound"))
 
 -- AI primary buffer query
-hl.bind(mainMod .. "+SHIFT+ALT+mouse:273",
-    hl.dsp.exec_cmd("~/.config/ags/scripts/ai/primary-buffer-query.sh"), { mouse = true })
+hl.bind(
+	mainMod .. "+SHIFT+ALT+mouse:273",
+	hl.dsp.exec_cmd("~/.config/ags/scripts/ai/primary-buffer-query.sh"),
+	{ mouse = true }
+)
 
 -- Zoom
 hl.bind(mainMod .. "+minus", hl.dsp.exec_cmd(scriptsDir .. "/hypr_zoom.sh decrease 0.1"), { repeating = true })
@@ -163,10 +154,6 @@ hl.bind("CTRL+" .. mainMod .. "+V", hl.dsp.exec_cmd("pavucontrol-qt"))
 hl.bind("CTRL+SHIFT+Escape", hl.dsp.exec_cmd(task_manager))
 hl.bind("CTRL+" .. mainMod .. "+SHIFT+Escape", hl.dsp.exec_cmd(task_manager_alt))
 
+hl.bind(mainMod .. "+SHIFT+L", hl.dsp.exec_cmd("sleep 0.1 && systemctl suspend || loginctl suspend"), { locked = true })
 
-hl.bind(mainMod .. "+SHIFT+L",
-    hl.dsp.exec_cmd("sleep 0.1 && systemctl suspend || loginctl suspend"),
-    { locked = true })
-
-hl.bind("CTRL+SHIFT+ALT+" .. mainMod .. "+Delete",
-    hl.dsp.exec_cmd("systemctl poweroff || loginctl poweroff"))
+hl.bind("CTRL+SHIFT+ALT+" .. mainMod .. "+Delete", hl.dsp.exec_cmd("systemctl poweroff || loginctl poweroff"))

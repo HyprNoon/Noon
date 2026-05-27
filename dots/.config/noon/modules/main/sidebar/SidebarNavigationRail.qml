@@ -10,7 +10,6 @@ Item {
     required property var content
     required property string selectedCategory
     required property QtObject colors
-    readonly property double stealth: SidebarData.isStealth(selectedCategory)
     readonly property bool sleek: !Mem.options.sidebar.appearance.showNavTitles
     property alias radius: bg.radius
     implicitWidth: Sizes.sidebar.bar
@@ -19,8 +18,7 @@ Item {
 
     StyledRectangularShadow {
         target: bg
-        intensity: 0.5
-        color: colors.colShadow
+        show: root.selectedCategory?.length > 0
     }
 
     StyledRect {
@@ -28,44 +26,26 @@ Item {
         clip: true
         anchors.fill: parent
         color: colors.colLayer2
-        StyledRect {
-            visible: opacity > 0
-            opacity: stealth
-            anchors.centerIn: parent
-            color: Colors.colSecondaryContainer
-            radius: Rounding.large
-            height: stealthText.contentWidth + Padding.massive * 1.5
-            width: stealthText.contentHeight
 
-            StyledText {
-                id: stealthText
-                anchors.centerIn: parent
-                rotation: -90
-                text: root.selectedCategory
-                font.pixelSize: Fonts.sizes.huge
-                color: Colors.colOnSecondaryContainer
-                font.variableAxes: Fonts.variableAxes.title
-            }
-        }
-        StyledFlickable {
-            visible: !stealth
-            opacity: !stealth
-            Behavior on opacity {
-                Anim {}
-            }
+        Item {
             anchors.fill: parent
-            contentHeight: Math.max(navRailList.contentHeight + verticalOffset * 2, height)
-            readonly property real verticalOffset: Math.max((height - navRailList.contentHeight) / 2, 0)
 
             ListView {
                 id: navRailList
+                width: parent.width
+                height: Math.min(contentHeight + topMargin + bottomMargin, parent.height)
                 anchors.centerIn: parent
-                implicitWidth: Sizes.sidebar.bar * 2 / 3
-                implicitHeight: contentHeight
                 spacing: sleek ? Padding.normal : Padding.verylarge
                 model: SidebarData.enabledCategories
-                y: parent?.verticalOffset ?? 0
                 currentIndex: SidebarData.enabledCategories.indexOf(root.selectedCategory)
+                interactive: height === parent.height
+
+                displayMarginBeginning: topMargin
+                displayMarginEnd: bottomMargin
+
+                topMargin: Padding.huge
+                bottomMargin: Padding.huge
+
                 highlightFollowsCurrentItem: false
                 highlight: Item {
                     width: navRailList.width
@@ -84,7 +64,7 @@ Item {
 
                     StyledRect {
                         anchors.centerIn: parent
-                        width: navRailList.width
+                        width: navRailList.width * 2 / 3
                         height: width * 0.8
                         radius: width / 2
                         color: root.colors.colSecondaryContainer
@@ -99,7 +79,7 @@ Item {
                     showText: !root.sleek
                     anchors.horizontalCenter: parent.horizontalCenter
                     implicitWidth: baseSize
-                    baseSize: Math.round(navRailList.width)
+                    baseSize: Math.round(navRailList.width * 2 / 3)
                     toggled: root.selectedCategory === modelData
                     buttonIcon: SidebarData?.getIcon(modelData, toggled ?? false)
                     buttonText: modelData || ""
@@ -107,6 +87,7 @@ Item {
                     highlightColorHover: index === navRailList?.currentIndex ? "transparent" : root.colors.colLayer2Hover
                     highlightColorActive: "transparent"
                     itemColorActive: root.colors.colOnSecondaryContainer
+
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -118,6 +99,7 @@ Item {
                                 content.incubateContent(modelData);
                         }
                     }
+
                     StyledToolTip {
                         content: modelData
                         extraVisibleCondition: root.sleek && selectedCategory !== ""

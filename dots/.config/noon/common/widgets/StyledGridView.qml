@@ -16,6 +16,9 @@ GridView {
     property real mouseScrollDeltaThreshold: Mem.options.interactions.scrolling.mouseScrollDeltaThreshold ?? 120
     property real scrollTargetY: 0
     property var _model
+    property int columns: 1
+    cellWidth: width / columns
+    cellHeight: width / columns
     model: (script && script.values) ? script : []
     ScriptModel {
         id: script

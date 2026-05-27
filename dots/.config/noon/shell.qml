@@ -12,36 +12,36 @@ import Quickshell
 import Quickshell.Widgets
 import qs.common
 import qs.common.utils
-import qs.modules.deloaded
-import qs.modules.xp
-import qs.modules.zen
-import qs.modules.main
-import qs.modules.nobuntu
-import qs.modules.applications
-import qs.modules.common
 
-ShellRoot {
+import "modules/xp"
+import "modules/zen"
+import "modules/main"
+import "modules/nobuntu"
+import "modules/applications"
+import "modules/common"
+
+Scope {
     id: root
-    readonly property Component deloadComponent: DormantSphere {}
-    readonly property Component main: Main {}
-    readonly property Component xp: XP {}
-    readonly property Component zen: Zen {}
-    readonly property Component nobuntu: NoBuntu {}
-    readonly property bool deload: Mem.states.desktop.shell.deload || (Mem.options.desktop.shell.deloadOnFullscreen && (GlobalStates.topLevel?.fullscreen ?? false))
     readonly property string mode: Mem.options.desktop.shell.mode
-    readonly property var shellMap: {
-        "main": main,
-        "xp": xp,
-        "zen": zen,
-        "nobuntu": nobuntu
-    }
+    readonly property bool deload: Mem.states.desktop.shell.deload || (Mem.options.desktop.shell.deloadOnFullscreen && (GlobalStates.topLevel?.fullscreen ?? false))
+    readonly property var shellMap: ({
+            "main": "main/Main.qml",
+            "xp": "xp/XP.qml",
+            "zen": "zen/Zen.qml",
+            "nobuntu": "nobuntu/NoBuntu.qml"
+        })
 
     Loader {
-        sourceComponent: deload ? deloadComponent : shellMap[mode]
+        active: !deload
+        source: Qt.resolvedUrl("modules/" + shellMap[mode])
         onLoaded: GlobalStates.handle_init(root.mode)
     }
-    AiIPC {}
+    WidgetLoader {
+        enabled: !deload
+        CommonModules {}
+    }
+
+    MCP {}
     GlobalIPC {}
     AppsIPC {}
-    CommonModules {}
 }

@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
 import qs.common
 import qs.common.widgets
 import qs.common.utils
@@ -9,27 +8,21 @@ import "content"
 Scope {
     id: root
     property string currentMode: GlobalStates.main.sysDialogs.mode
+    property bool canDismiss: GlobalStates.main.sysDialogs?.pendingData?.canDismiss ?? true
 
     Variants {
-        model: Quickshell.screens
+        model: MonitorsInfo.main
 
         StyledPanel {
             id: panel
-            visible: currentMode.length > 0 || bg.anchors.bottomMargin < 0
-
             required property var modelData
             screen: modelData
             exclusiveZone: -1
-            name: "systemDialog"
+            name: "dialog_panel"
             shell: "noon"
-            WlrLayershell.layer: WlrLayer.Overlay
-
-            anchors {
-                top: true
-                bottom: true
-                right: true
-                left: true
-            }
+            _layer: "Overlay"
+            fill: true
+            keyboardFocus: true
 
             FocusHandler {
                 windows: [panel]
@@ -149,7 +142,6 @@ Scope {
 
                 StyledRectangularShadow {
                     target: bg
-                    intensity: 0.65
                 }
                 StyledRect {
                     color: Colors.colScrim
@@ -164,7 +156,8 @@ Scope {
             }
 
             function dismiss() {
-                GlobalStates.main.sysDialogs.mode = "";
+                if (canDismiss)
+                    GlobalStates.main.sysDialogs.mode = "";
             }
         }
     }

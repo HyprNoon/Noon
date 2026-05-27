@@ -26,13 +26,9 @@ Loader {
     }
 
     function debouncedReload(delay = 100) {
-        debounceTimer.interval = delay;
-        debounceTimer.restart();
-    }
-
-    Timer {
-        id: debounceTimer
-        onTriggered: reload()
+        NoonUtils.singleshot(() => {
+            root.reload();
+        }, delay);
     }
 
     Behavior on opacity {

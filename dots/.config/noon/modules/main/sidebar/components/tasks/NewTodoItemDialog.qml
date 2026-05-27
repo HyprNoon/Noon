@@ -18,12 +18,13 @@ BottomDialog {
     contentItem: ColumnLayout {
         anchors.fill: parent
         anchors.margins: Padding.large
-        anchors.rightMargin: Padding.massive * 1.5
-        anchors.leftMargin: Padding.massive * 1.5
+        anchors.rightMargin: Padding.massive
+        anchors.leftMargin: Padding.massive
         spacing: Padding.normal
 
         AccountInfoSection {}
-        BottomDialogSeparator {}
+        PageSeparator {}
+
         StyledText {
             text: "New Task"
             font {

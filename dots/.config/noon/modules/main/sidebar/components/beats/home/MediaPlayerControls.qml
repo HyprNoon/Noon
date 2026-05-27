@@ -184,9 +184,9 @@ ColumnLayout {
     component MediaButton: GroupButtonWithIcon {
         Layout.fillHeight: false
         Layout.fillWidth: false
-        buttonRadiusPressed: Rounding.tiny
-        baseSize: 32
+        implicitSize: 44
         colors: BeatsService.colors
-        buttonRadius: Rounding.large
+        buttonRadius: Rounding.verylarge
+        buttonRadiusPressed: Rounding.tiny
     }
 }
