@@ -189,9 +189,13 @@ Singleton {
             shell: "main",
             stealth: true
         },
+        "TaskManager": {
+            icon: "memory",
+            searchable: true,
+            componentPath: "etc/TaskManager",
+            stealth: true
+        },
         "Cast": {
-            icon: "cast",
-            shape: "Bun",
             componentPath: "cast/Cast",
             stealth: true
         },

@@ -27,9 +27,12 @@ Singleton {
     readonly property string materialIcon: {
         if (!root.available)
             return;
+        if (root.isPluggedIn)
+            return "electric_bolt";
 
         const p = root.percentage * 100;
-        const prefix = root.isPluggedIn ? "battery_charging_" : "battery_";
+        const prefix = "battery_";
+
         if (p <= 2)
             return `battery_alert`;
         if (p <= 5)
