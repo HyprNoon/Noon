@@ -17,7 +17,6 @@ StyledPanel {
     readonly property bool reveal: GlobalStates.main.showBeam
     readonly property int mainRounding: Rounding.full
     readonly property int elevationValue: Sizes.elevationMargin + (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.height : 0)
-    readonly property int scrollArea: 5
     readonly property int beamTargetWidth: (BeamData.getHint()?.length ?? 0) > 25 || BeamData.query.length > 25 ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width
 
     visible: true
@@ -32,12 +31,9 @@ StyledPanel {
         Region {
             item: hoverArea
         }
-        Region {
-            item: beamPopup
-        }
-        Region {
-            item: responseArea
-        }
+        // Region {
+        //     item: popup
+        // }
     }
 
     function hide() {
@@ -84,7 +80,7 @@ StyledPanel {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        implicitHeight: scrollArea
+        implicitHeight: Math.max(0, Sizes.hyprland.gapsOut - 2)
         hoverEnabled: true
         propagateComposedEvents: true
         acceptedButtons: Qt.NoButton

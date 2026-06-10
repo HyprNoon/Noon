@@ -35,6 +35,11 @@ BarGroup {
             hoverItem: btPopup
         },
         {
+            icon: BatteryService.materialIcon,
+            hoverItem: batteryPopup
+        // visible: BatteryService.available
+        },
+        {
             icon: "notifications_off",
             visible: Notifications.silent
         },
@@ -50,6 +55,7 @@ BarGroup {
             tooltip: "CPU Temp: " + ResourcesService.stats.cpu_temp
         }
     ]
+    readonly property Component batteryPopup: BatteryPopup {}
     readonly property Component btPopup: BluetoothPopup {}
     readonly property Component networkPopup: NetworkPopup {}
     readonly property Component tooltipComp: StyledToolTip {

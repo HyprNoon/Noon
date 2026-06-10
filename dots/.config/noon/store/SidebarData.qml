@@ -40,7 +40,6 @@ Singleton {
             activeIcon: "cognition_2",
             componentPath: "apis/AiChat",
             expandable: true,
-            async: true,
             incubatable: true,
             detachable: true,
             shape: "PixelCircle",
@@ -58,7 +57,6 @@ Singleton {
             icon: "gallery_thumbnail",
             activeIcon: "image",
             componentPath: "wallpapers/WallpaperSelector",
-            async: true,
             searchable: true,
             shape: "Ghostish",
             enabled: Mem.options.sidebar.content.wallpapers
@@ -194,8 +192,8 @@ Singleton {
         "Cast": {
             icon: "cast",
             shape: "Bun",
-            componentPath: "cast/Cast"
-        // stealth: true
+            componentPath: "cast/Cast",
+            stealth: true
         },
         "Auth": {
             componentPath: "etc/Polkit",

@@ -8,6 +8,9 @@ ShaderRect {
     readonly property string side: Mem.options.bar.behavior.position
     readonly property bool showCorners: state === "concave"
     readonly property bool isBottom: side === "bottom"
+    readonly property bool isTop: side === "top" || side === ""
+    readonly property bool isLeft: side === "left"
+    readonly property bool isRight: side === "right"
     readonly property bool useBg: Mem.options.bar.appearance.useBg
     anchors.fill: parent
     enableBorders: false
@@ -26,9 +29,10 @@ ShaderRect {
             PropertyChanges {
                 target: bg
 
-                anchors.topMargin: !isBottom ? Sizes.barElevation : -Sizes.barElevation
-                anchors.bottomMargin: isBottom ? Sizes.barElevation : -Sizes.barElevation
-                anchors.margins: Sizes.hyprland.gapsOut
+                anchors.topMargin: isTop ? Sizes.barElevation : (isBottom ? 0 : Sizes.hyprland.gapsOut)
+                anchors.bottomMargin: isBottom ? Sizes.barElevation : (isTop ? 0 : Sizes.hyprland.gapsOut)
+                anchors.leftMargin: isLeft ? Sizes.barElevation : Sizes.hyprland.gapsOut
+                anchors.rightMargin: isRight ? Sizes.barElevation : Sizes.hyprland.gapsOut
 
                 radius: Rounding.verylarge
                 enableBorders: Mem.options.bar.appearance.outline
@@ -39,10 +43,15 @@ ShaderRect {
             PropertyChanges {
                 target: bg
                 enableBorders: false
-                anchors.leftMargin: Sizes.hyprland.gapsOut
-                anchors.rightMargin: Sizes.hyprland.gapsOut
+                anchors.topMargin: (isLeft || isRight) ? Sizes.hyprland.gapsOut : 0
+                anchors.bottomMargin: (isLeft || isRight) ? Sizes.hyprland.gapsOut : 0
+                anchors.leftMargin: (isTop || isBottom) ? Sizes.hyprland.gapsOut : 0
+                anchors.rightMargin: (isTop || isBottom) ? Sizes.hyprland.gapsOut : 0
+
                 topRadius: isBottom ? Rounding.large : 0
-                bottomRadius: !isBottom ? Rounding.large : 0
+                bottomRadius: isTop ? Rounding.large : 0
+                leftRadius: isRight ? Rounding.large : 0
+                rightRadius: isLeft ? Rounding.large : 0
             }
         }
     ]

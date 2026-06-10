@@ -81,7 +81,7 @@ StyledPanel {
                     }
 
                     StatusIcons {}
-                    MinimalBattery {}
+                    // MinimalBattery {}
                 }
             }
         }

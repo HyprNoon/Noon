@@ -12,12 +12,11 @@ StyledRect {
 
     clip: true
     radius: Rounding.verylarge
-    color: "transparent"
     property bool detached: false
     property bool expanded: false
     readonly property bool playing: BeatsService.player?.playbackState === MprisPlaybackState.Playing
     readonly property bool displayingLyrics: activeLyrics.showContent
-    property QtObject colors: BeatsService.colors
+    readonly property QtObject colors: BeatsService?.colors ?? Colors
 
     Behavior on width {
         enabled: false
@@ -169,20 +168,11 @@ StyledRect {
     gradient: Gradient {
         GradientStop {
             color: "transparent"
-            Anim on position {
-                from: 0
-                to: 0.95
-                duration: Animations.durations.verylarge
-            }
+            position: 0.95
         }
         GradientStop {
             position: 0.05
-            color: root.colors.colSecondaryContainer
-            CAnim on color {
-                from: "transparent"
-                to: Mem.options.mediaPlayer.enableGrad ? root.colors.colSecondaryContainer : "transparent"
-                duration: Animations.durations.small
-            }
+            color: Mem.options.mediaPlayer.enableGrad ? root.colors.colSecondaryContainer : "transparent"
         }
     }
 }

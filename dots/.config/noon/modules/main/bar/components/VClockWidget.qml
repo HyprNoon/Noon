@@ -28,7 +28,7 @@ BarGroup {
                 required property int index
                 text: modelData
                 font.variableAxes: Fonts.variableAxes.main
-                font.pixelSize: index === 2 ? Fonts.sizes.small : Fonts.sizes.normal
+                font.pixelSize: index === 2 ? Fonts.sizes.verysmall : Fonts.sizes.normal
                 color: Colors.colSecondary
                 Layout.alignment: Qt.AlignHCenter
             }

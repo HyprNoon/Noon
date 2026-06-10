@@ -105,6 +105,7 @@ StyledRect {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 hint: false
+                clip: true
                 model: ScriptModel {
                     values: Pipewire.nodes.values.filter(node => {
                         return !node.isStream && node.isSink !== root.deviceSelectorInput && node.audio;

@@ -14,7 +14,7 @@ Scope {
     id: root
     DialogPanel {}
     WidgetLoader {
-        enabled: Mem.options.desktop.bg.depthMode && !WallpaperService.fgReady && Mem.options.desktop.clock.enabled
+        enabled: !Mem.options.desktop.bg.depthMode && !WallpaperService.fgReady && Mem.options.desktop.clock.enabled
         DesktopClock {}
     }
     WidgetLoader {

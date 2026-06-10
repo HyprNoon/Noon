@@ -6,9 +6,10 @@ import Quickshell.Services.UPower
 import QtQuick
 
 Singleton {
+    id: root
     property bool available: UPower.displayDevice.isLaptopBattery
     property var chargeState: UPower.displayDevice.state
-    property bool isCharging: chargeState == UPowerDeviceState.Charging
+    property bool isCharging: chargeState === UPowerDeviceState.Charging
     property bool isPluggedIn: isCharging || chargeState == UPowerDeviceState.PendingCharge
     property real percentage: UPower.displayDevice?.percentage ?? 1
     readonly property bool allowAutomaticSuspend: Mem.options.battery.automaticSuspend
@@ -23,7 +24,31 @@ Singleton {
     property real energyRate: UPower.displayDevice.changeRate
     property real timeToEmpty: UPower.displayDevice.timeToEmpty
     property real timeToFull: UPower.displayDevice.timeToFull
+    readonly property string materialIcon: {
+        if (!root.available)
+            return;
 
+        const p = root.percentage * 100;
+        const prefix = root.isPluggedIn ? "battery_charging_" : "battery_";
+        if (p <= 2)
+            return `battery_alert`;
+        if (p <= 5)
+            return `${prefix}0_bar`;
+        if (p <= 14)
+            return `${prefix}1_bar`;
+        if (p <= 28)
+            return `${prefix}2_bar`;
+        if (p <= 42)
+            return `${prefix}3_bar`;
+        if (p <= 56)
+            return `${prefix}4_bar`;
+        if (p <= 70)
+            return `${prefix}5_bar`;
+        if (p <= 95)
+            return `${prefix}6_bar`;
+
+        return root.isPluggedIn ? "battery_charging_full" : "battery_full";
+    }
     Connections {
         target: PowerProfiles
         function onDegradationReasonChanged() {

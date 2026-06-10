@@ -79,7 +79,7 @@ StyledPanel {
                 target: bg
             }
 
-            VDynamicBarBg {
+            DynamicBarBg {
                 id: bg
                 VContent {
                     barRoot: bar

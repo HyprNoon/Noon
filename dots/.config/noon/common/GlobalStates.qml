@@ -30,23 +30,19 @@ Singleton {
     }
 
     function handle_init(mode) {
-        KeyringStorage.reload();
         NightLightService.reload();
         FirstRunService.setup();
+        NoonUtils.playSound("device_unlocked");
 
         switch (mode) {
         case "main":
             TimerService.reload();
-            NoonUtils.playSound("device_unlocked");
             break;
         case "zen":
-            NoonUtils.playSound("device_unlocked");
             break;
         case "nobuntu":
-            NoonUtils.playSound("device_unlocked");
             break;
         case "xp":
-            NoonUtils.playSound("init", "xp");
             break;
         }
         console.log("Initialized " + mode);

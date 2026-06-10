@@ -6,11 +6,11 @@ mainMod = "SUPER"
 
 -- Apps
 terminal = "kitty"
-terminal_alt = "foot"
+terminal_alt = "kitty"
 browser = "firefox"
 browser_alt = "firefox"
 editor = "zeditor"
-file_manager = "dolphin "
+file_manager = "dolphin"
 task_manager = terminal .. ' fish -c "btop"'
 task_manager_alt = terminal .. ' fish -c "nvtop"'
 
@@ -22,23 +22,23 @@ blur_passes = 4
 xray = true
 ignore_opacity = true
 new_optimizations = true
-shadows = false
+shadows = true
 shadows_power = 5
 shadows_range = 30
-gaps_in = 4
+gaps_in = 2
 gaps_out = 5
 gaps_special = 40
-borders = 1
-rounding = 21
+borders = 0
+rounding = 24
 rounding_power = 2
 layers_alpha = 0.4
 applications_opacity = 1
 hypr_col_alpha = 50
-font_main = "Roboto Flex"
-layout = "master"
+font_main = "Google Sans Flex"
+layout = "dwindle"
 vertical = true
 debug_overlay = false
-cursor_theme = "MacTahoe"
+cursor_theme = "GoogleDot-White"
 cursor_size = 24
 animation_style = "springs"
 animation_scale = 1
@@ -49,6 +49,124 @@ external_monitor_mode = "1920x1080@75"
 active_monitor = hl.get_active_monitor()
 m_width = active_monitor and active_monitor.width or 1920
 m_height = active_monitor and active_monitor.height or 1080
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

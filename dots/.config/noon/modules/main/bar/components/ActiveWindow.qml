@@ -23,7 +23,6 @@ MouseArea {
             color: Colors.colSubtext
             truncate: true
             text: MonitorsInfo.topLevel?.appId ?? qsTr("Desktop")
-            animateChange: true
             horizontalAlignment: Text.AlignLeft
         }
 
@@ -34,7 +33,6 @@ MouseArea {
             color: Colors.colOnLayer0
             truncate: true
             text: MonitorsInfo.topLevel?.title ?? `${qsTr("Workspace")} ${MonitorsInfo.focused?.activeWorkspace?.id ?? 0}`
-            animateChange: true
             horizontalAlignment: Text.AlignLeft
         }
     }
