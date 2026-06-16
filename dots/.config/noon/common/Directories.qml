@@ -45,6 +45,7 @@ Singleton {
         readonly property string gamesCoverArts: FileUtils.trimFileProtocol(standard.state + "/user/generated/gamesCoverArts")
         readonly property string screenshots: FileUtils.trimFileProtocol(standard.pictures + "/Screenshots")
         readonly property string screenTimeDB: FileUtils.trimFileProtocol(standard.state + "/screenTime")
+        readonly property string clipboardCache: FileUtils.trimFileProtocol(standard.cache + "/media/clipboard")
     }
 
     // wallpapers directories
@@ -82,7 +83,7 @@ Singleton {
             // misc
             venv, assets, records, gallery, sounds, scriptsDir, shellConfigs, favicons,
             // services
-            services.latex, services.gamesCoverArts, services.screenshots, services.screenTimeDB,
+            services.latex, services.gamesCoverArts, services.screenshots, services.screenTimeDB, services.clipboardCache,
             // wallpapers
             wallpapers.main, wallpapers.colGenScript, wallpapers.depthDir, wallpapers.gowallDir, wallpapers.favorite,
             // beats

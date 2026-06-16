@@ -72,20 +72,20 @@ StyledRect {
                 anchors.left: parent?.left
                 implicitHeight: sectionContent.implicitHeight + Padding.massive
                 radius: Rounding.veryhuge
-                color: Colors.colLayer1
+                color: "transparent" //Colors.colLayer1
 
                 ColumnLayout {
                     id: sectionContent
-                    spacing: 4
+                    spacing: 3
                     anchors.fill: parent
                     anchors.margins: Padding.large
 
                     StyledText {
                         text: modelData?.section ?? ""
-                        color: Colors.colOnLayer1
+                        color: Colors.colOnSurface
                         font.pixelSize: Fonts.sizes.normal
                         // font.variableAxes: Fonts.variableAxes.title
-                        leftPadding: Padding.massive
+                        leftPadding: Padding.large
                         Layout.preferredHeight: 20
                         Layout.bottomMargin: Padding.small
                     }
@@ -100,7 +100,7 @@ StyledRect {
                             required property int index
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-
+                            color: Colors.colSurfaceContainerHigh
                             topRadius: index === 0 ? Rounding.verylarge : Rounding.verytiny + 1
                             bottomRadius: index === itemsRepeater.count - 1 ? Rounding.verylarge : Rounding.verytiny + 1
                             icon: modelData?.icon ?? "settings"

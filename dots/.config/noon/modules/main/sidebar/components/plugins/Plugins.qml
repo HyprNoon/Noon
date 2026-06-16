@@ -19,14 +19,16 @@ LayerRect {
         anchors.margins: Padding.huge
         spacing: Padding.huge
 
-        StyledText {
-            id: groupTitle
-            Layout.margins: Padding.huge
-            text: swipeView.currentItem.modelData.group
-            color: Colors.colOnLayer0
-            font.pixelSize: Fonts.sizes.title
-            font.variableAxes: Fonts.variableAxes.title
-            Layout.preferredHeight: 40
+        PageHeader {
+            id: header
+            title: swipeView.currentItem.modelData.group
+            subTitle: "Found " + Object.keys(swipeView.currentItem.modelData.data)?.length + " Plugins in " + title
+
+            sideButton {
+                visible: true
+                materialIcon: "refresh"
+                onClicked: PluginsManager.refreshAll()
+            }
         }
 
         SwipeView {
@@ -97,7 +99,7 @@ LayerRect {
                             icon: modelData.icon
                             enabled: modelData?.enabled
                             shape: modelData?.shape
-                            group: groupTitle?.text
+                            group: header?.title
                             name: modelData?.name
                             subtext: modelData?.description ?? ""
                             topRadius: index === 0 ? Rounding.verylarge : Rounding.small

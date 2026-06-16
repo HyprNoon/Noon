@@ -50,7 +50,7 @@ Item {
                 }
 
                 onClicked: if (model.page !== undefined && model.page >= 0)
-                    GlobalStates.applications.reader.document_page_view.goToPage(model.page)
+                    Globals.applications.reader.document_page_view.goToPage(model.page)
             }
         }
         Separator {}

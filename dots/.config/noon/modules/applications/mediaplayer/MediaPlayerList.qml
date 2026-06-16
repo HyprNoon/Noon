@@ -9,7 +9,7 @@ import Qt.labs.folderlistmodel
 
 Item {
     id: root
-    property var queue: GlobalStates.applications.mediaplayer.queue
+    property var queue: Globals.applications.mediaplayer.queue
     property string path: Qt.resolvedUrl(Directories.standard.videos)
     property bool expanded: false
     property var model: queue.length > 0 ? queue : itemsModel

@@ -36,7 +36,7 @@ Item {
             "region": ScreenShotService.Regions.Part
         }
     ]
-    property bool reveal: GlobalStates.main.showScreenshot
+    property bool reveal: Globals.main.showScreenshot
 
     implicitWidth: bg.implicitWidth
     implicitHeight: Sizes.screenshot.size.height

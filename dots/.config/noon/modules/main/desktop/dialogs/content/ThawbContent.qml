@@ -28,7 +28,6 @@ Item {
         PageHeader {
             title: "Thawb  -  ثوب"
             subTitle: "Get New Thawb"
-            showCloseButton: false
         }
 
         Spacer {}

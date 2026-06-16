@@ -1,6 +1,7 @@
 [config]
 
 [templates.btop]
+enabled = false
 input_path = "~/.config/matugen/templates/applications/btop.theme"
 output_path = '~/.config/btop/themes/noon.theme'
 
@@ -12,10 +13,7 @@ output_path = "~/.config/opencode/themes/noon.json"
 input_path = "~/.config/matugen/templates/applications/obsidian.css"
 output_path = "~/Documents/Notes/.obsidian/snippets/noon.css"
 
-# [templates.sequences]
-# input_path = "~/.config/matugen/templates/terminal/sequences.txt"
-# output_path = '~/.local/state/noon/user/generated/terminal/sequences.txt'
-
+#IGNORE
 [templates.temp_qt]
 input_path = '~/.config/matugen/templates/qt/qt2.colors'
 output_path = '~/.local/share/color-schemes/Noon2.colors'
@@ -25,6 +23,7 @@ input_path = '~/.config/matugen/templates/qt/qt.colors'
 output_path = '~/.local/share/color-schemes/Noon.colors'
 post_hook = '~/.config/matugen/templates/qt/hot_reload.sh'
 
+#IGNORE
 [templates.noon]
 input_path = '~/.config/matugen/templates/colors.json'
 output_path = '~/.local/state/noon/user/generated/colors.json'
@@ -34,6 +33,7 @@ input_path = '~/.config/matugen/templates/starship.toml'
 output_path = '~/.config/starship.toml'
 
 [templates.nvim]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/nvim.lua'
 output_path = '~/.config/nvim/lua/noon/colors.lua'
 post_hook = 'pkill -SIGUSR1 nvim'
@@ -43,15 +43,18 @@ input_path = '~/.config/matugen/templates/hyprland/colors.lua'
 output_path = '~/.config/hypr/colors.lua'
 
 [templates.hyprtoolkit]
+enabled = false
 input_path = '~/.config/matugen/templates/hyprland/hyprtoolkit.conf'
 output_path = '~/.config/hypr/hyprtoolkit.conf'
 
 [templates.gtk3]
+enabled = false
 input_path = '~/.config/matugen/templates/gtk/colors.css'
 output_path = '~/.config/gtk-3.0/gtk.css'
 pre_hook = "rm ~/.config/gtk-3.0/gtk.css"
 
 [templates.gtk4]
+enabled = false
 input_path = '~/.config/matugen/templates/gtk/colors.css'
 output_path = '~/.config/gtk-4.0/gtk.css'
 pre_hook = "rm ~/.config/gtk-4.0/gtk.css"
@@ -62,6 +65,7 @@ output_path = '~/.cache/noon/user/generated/colors/firefox.json'
 post_hook = 'python /usr/lib/noon-mirsal/mirsald pull-palette'
 
 [templates.spicetify]
+enabled = false
 input_path = "~/.config/matugen/templates/applications/spicetify.ini"
 output_path = "~/.config/spicetify/Themes/noon/color.ini"
 
@@ -74,10 +78,12 @@ input_path = '~/.config/matugen/templates/applications/zed.json'
 output_path = '~/.config/zed/themes/noon.json'
 
 [templates.only_office]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/onlyoffice.json'
 output_path = '~/.config/onlyoffice/DesktopEditors/themes/noon.json'
 
 [templates.telegram]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/telegram.tdesktop-theme'
 output_path = '~/.cache/noon/user/generated/colors/noon.tdesktop-theme'
 
@@ -86,14 +92,17 @@ input_path = "~/.config/matugen/templates/applications/vscode.json"
 output_path = '~/.vscode-oss/extensions/noon/colors.json'
 
 [templates.fuzzel]
+enabled = false
 input_path = "~/.config/matugen/templates/applications/fuzzel.ini"
 output_path = '~/.config/fuzzel/colors.ini'
 
 [templates.cava]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/cava.ini'
 output_path = '~/.config/cava/themes/noon.ini'
 
 [templates.zathura]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/zathura'
 output_path = '~/.config/zathura/zathurarc'
 
@@ -102,6 +111,7 @@ input_path = '~/.config/matugen/templates/applications/heroic.css'
 output_path = '~/.cache/noon/user/generated/heroic.css'
 
 [templates.yazi]
+enabled = false
 input_path = '~/.config/matugen/templates/applications/yazi.toml'
 output_path = '~/.config/yazi/theme.toml'
 
@@ -116,6 +126,7 @@ output_path = '~/.config/foot/colors.ini'
 post_hook = 'pkill -SIGUSR2 foot'
 
 [templates.ghostty]
+enabled = true
 input_path = '~/.config/matugen/templates/applications/ghostty'
 output_path = '~/.config/ghostty/themes/Noon'
 post_hook = 'pkill -SIGUSR2 ghostty'

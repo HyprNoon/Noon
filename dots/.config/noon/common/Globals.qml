@@ -29,11 +29,27 @@ Singleton {
         name: "superHeld"
     }
 
+    IdleInhibitor {
+        id: idleInhibitor
+        enabled: Mem.options.services.idle.inhibit
+        window: main.sidebar
+    }
+
+    IdleMonitor {
+        id: idleMonitor
+        timeout: Mem.options.services.idle.timeOut
+        onIsIdleChanged: {
+            console.log(isIdle);
+            if (idleMonitor.isIdle && !Mem.options.services.idle.inhibit)
+                main.locked = true;
+        }
+    }
+
     function handle_init(mode) {
         NightLightService.reload();
         FirstRunService.setup();
         NoonUtils.playSound("device_unlocked");
-
+        ScreenTimeService.tracker.init(root);
         switch (mode) {
         case "main":
             TimerService.reload();

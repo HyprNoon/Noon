@@ -30,7 +30,7 @@ Scope {
     }
 
     Binding {
-        target: GlobalStates.main
+        target: Globals.main
         property: "showOsdValues"
         value: showOsdValues
     }
@@ -68,7 +68,7 @@ Scope {
 
     OsdValueIndicator {
         id: osdIndicator
-        active: showOsdValues && GlobalStates.main.canNotify
+        active: showOsdValues && Globals.main.canNotify
 
         value: root.brightnessMonitor?.brightness ?? 50
         icon: "routine"

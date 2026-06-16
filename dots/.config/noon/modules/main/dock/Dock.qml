@@ -21,7 +21,7 @@ Scope {
             screen: modelData
             _layer: "Top"
             required property var modelData
-            readonly property bool reveal: root.pinned || mouseArea.containsMouse || (!GlobalStates.topLevel?.activated && !GlobalStates.main.sidebar.expanded)
+            readonly property bool reveal: root.pinned || mouseArea.containsMouse || (!Globals.topLevel?.activated && !Globals.main.sidebar.expanded)
 
             implicitWidth: Screen.width
             implicitHeight: bg?.height + Sizes.elevationMargin * 3
@@ -29,7 +29,7 @@ Scope {
             fill: true
             anchors.top: false
             Binding {
-                target: GlobalStates.main
+                target: Globals.main
                 property: "dock"
                 value: dockRoot
             }
@@ -52,7 +52,7 @@ Scope {
                 states: [
                     State {
                         name: "revealed"
-                        when: dockRoot.reveal && !GlobalStates.main.showBeam && !GlobalStates.main.showOsdValues
+                        when: dockRoot.reveal && !Globals.main.showBeam && !Globals.main.showOsdValues
                         PropertyChanges {
                             target: mouseArea
                             anchors.topMargin: 5

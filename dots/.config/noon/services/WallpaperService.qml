@@ -26,7 +26,7 @@ Singleton {
     readonly property bool _loaded: {
         if (currentWallpaper.length > 1) {
             if (Mem.options.desktop.bg.deloadOnFullscreen && !Mem.looks.isLive) {
-                return !GlobalStates?.topLevel?.fullscreen ?? true;
+                return !Globals?.topLevel?.fullscreen ?? true;
             } else {
                 return !Mem.looks.isLive;
             }
@@ -66,8 +66,7 @@ Singleton {
             return false;
 
         const cleanDir = clean(directory);
-        // Aligned with thumbnail script: -d (dir), -s (size), -w (workers), -i (only images flag)
-        const cmd = ["python3", Directories.wallpapers.thumbScript, "-d", cleanDir, "-s", thumbnailSize, "-i"];
+        const cmd = ["python3", Directories.wallpapers.thumbScript, "-d", cleanDir, "-s", thumbnailSize];
         thumbnailGenerator.command = cmd;
         thumbnailGenerator.running = true;
         return true;

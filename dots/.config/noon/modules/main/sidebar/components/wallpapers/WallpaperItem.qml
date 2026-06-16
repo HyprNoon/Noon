@@ -1,7 +1,4 @@
-import QtQuick.Controls.Material
 import QtQuick
-import QtQuick.Layouts
-import Quickshell
 import qs.common
 import qs.common.functions
 import qs.common.utils
@@ -17,29 +14,12 @@ StyledRect {
     property var applyAction: () => WallpaperService.applyWallpaper(fileUrl)
 
     readonly property bool isVideoFile: {
-        const name = fileUrl.toString().toLowerCase();
-        for (let i = 0; i < NameFilters.video.length; i++) {
-            if (name.endsWith(NameFilters.video[i]))
+        const vid = ["mp4", "mov", "m4v", "avi", "mkv", "webm"];
+        for (const ext in vid) {
+            if (fileUrl.endsWith(ext))
                 return true;
         }
         return false;
-    }
-
-    readonly property Component imageComp: StyledImage {
-        sourceSize: undefined
-    }
-    readonly property Component vidComp: VideoPreview {
-        Symbol {
-            text: "play_arrow"
-            color: Colors.colOnBackground
-            font.pixelSize: 20
-            fill: 1
-            anchors {
-                top: parent.top
-                right: parent.right
-                margins: 8
-            }
-        }
     }
 
     anchors.fill: parent
@@ -52,17 +32,22 @@ StyledRect {
         Anim {}
     }
 
-    StyledLoader {
-        id: _loader
-        z: 10
+    Symbol {
+        z: 9999
+        icon: "play_arrow"
+        iconSize: 20
+        visible: wallpaperItem.isVideoFile
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: Padding.large
+        fill: 1
+        color: Colors.colOnSurface
+    }
+
+    StyledImage {
         anchors.fill: parent
-        sourceComponent: isVideoFile ? vidComp : imageComp
-        onLoaded: if (ready) {
-            if (!isVideoFile)
-                item.source = Qt.binding(() => WallpaperService.getThumbnailPath(wallpaperItem.fileUrl));
-            else
-                item.source = Qt.binding(() => Qt.resolvedUrl(wallpaperItem.fileUrl));
-        }
+        source: WallpaperService.getThumbnailPath(wallpaperItem.fileUrl)
+        sourceSize: undefined
     }
 
     MouseArea {
@@ -75,14 +60,6 @@ StyledRect {
                 wallpaperMenu.popup(event.x, event.y);
             else if (event.button === Qt.LeftButton)
                 applyAction();
-        }
-        onEntered: {
-            if (isVideoFile && videoPlayer.playbackState !== MediaPlayer.PlayingState)
-                videoPlayer.play();
-        }
-        onExited: {
-            if (isVideoFile && videoPlayer.playbackState === MediaPlayer.PlayingState)
-                videoPlayer.pause();
         }
     }
 

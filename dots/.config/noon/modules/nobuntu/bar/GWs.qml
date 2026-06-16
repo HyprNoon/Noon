@@ -44,7 +44,7 @@ StyledRect {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Hyprland.dispatch(`workspace ${index + 1}`)
+                    onClicked: HyprlandService.focusWs(index + 1)
                     cursorShape: Qt.PointingHandCursor
                 }
             }
@@ -52,7 +52,7 @@ StyledRect {
     }
 
     WheelHandler {
-        onWheel: event => Hyprland.dispatch(`workspace ${event.angleDelta.y < 0 ? '+1' : '-1'}`)
+        onWheel: event => HyprlandService.focusWs(`r${event.angleDelta.y < 0 ? '+1' : '-1'}`)
     }
     MouseArea {
         id: _bg_event_area

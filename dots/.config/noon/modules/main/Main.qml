@@ -17,7 +17,7 @@ import "desktop"
 Scope {
     Desktop {}
     NIPC {}
-
+    // NotifPanel {}
     WidgetLoader {
         enabled: Notifications.popupAppNameList.length > 0
         NotificationPopup {}
@@ -34,7 +34,7 @@ Scope {
     }
 
     WidgetLoader {
-        enabled: GlobalStates.main.locked
+        enabled: Globals.main.locked
         Lock {}
     }
 
@@ -54,7 +54,7 @@ Scope {
     }
 
     WidgetLoader {
-        enabled: GlobalStates.main.showScreenshot
+        enabled: Globals.main.showScreenshot
         Screenshot {}
     }
 }

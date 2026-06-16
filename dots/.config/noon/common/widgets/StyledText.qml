@@ -9,7 +9,7 @@ Text {
     property real animationDistanceX: 0
     property real animationDistanceY: 6
     property bool truncate: false
-
+    property int animationDuration: Animations.durations.normal
     elide: truncate ? Text.ElideRight : Text.ElideNone
     wrapMode: truncate ? Text.NoWrap : Text.Wrap
     maximumLineCount: truncate ? 1 : undefined
@@ -40,6 +40,7 @@ Text {
                     target: root
                     property: "x"
                     to: textAnimationBehavior.originalX - root.animationDistanceX
+                    duration: root.animationDuration
                     easing.type: Easing.InSine
                 }
 
@@ -47,6 +48,7 @@ Text {
                     target: root
                     property: "y"
                     to: textAnimationBehavior.originalY - root.animationDistanceY
+                    duration: root.animationDuration
                     easing.type: Easing.InSine
                 }
 
@@ -54,6 +56,7 @@ Text {
                     target: root
                     property: "opacity"
                     to: 0
+                    duration: root.animationDuration
                     easing.type: Easing.InSine
                 }
             }
@@ -78,6 +81,7 @@ Text {
                     target: root
                     property: "x"
                     to: textAnimationBehavior.originalX
+                    duration: root.animationDuration
                     easing.type: Easing.OutSine
                 }
 
@@ -85,6 +89,7 @@ Text {
                     target: root
                     property: "y"
                     to: textAnimationBehavior.originalY
+                    duration: root.animationDuration
                     easing.type: Easing.OutSine
                 }
 
@@ -93,6 +98,7 @@ Text {
                     property: "opacity"
                     to: 1
                     easing.type: Easing.OutSine
+                    duration: root.animationDuration
                 }
             }
         }

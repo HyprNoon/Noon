@@ -9,7 +9,7 @@ JsonAdapter {
         property JO windowControls: JO {
             property bool minimize: false
             property bool maximize: false
-            property bool close: true
+            property bool close: false
         }
     }
     property JO appearance: JO {
@@ -278,11 +278,15 @@ JsonAdapter {
         property JO icons
         property JO behavior
         property JO widgets
+        property JO toasts
 
         property int screenCorners: 1
         property bool timerOverlayMode: true
         property list<string> customResolutions: []
 
+        toasts: JO {
+            property bool enabled: true
+        }
         shell: JO {
             property bool deloadOnFullscreen: true
             property string mode: ""
@@ -351,13 +355,13 @@ JsonAdapter {
         property string verticalLayout: "VDynamic"
 
         property JO vMap: JO {
-            property int spacing: 6
+            property int spacing: 5
             property list<string> topArea: ["materialStatusIcons", "battery", "weather", "tray"]
             property list<string> centerArea: []
             property list<string> bottomArea: ["media", "resources", "separator", "volume", "brightness", "separator", "progressWs", "separator", "clock", "separator", "keyboard", "separator", "power"]
         }
         property JO hMap: JO {
-            property int spacing: 6
+            property int spacing: 5
             property list<string> leftArea: ["power", "separator", "progressWs", "separator", "title"]
             property list<string> centerArea: ["media", "separator", "clock"]
             property list<string> rightArea: ["tray", "battery", "materialStatusIcons"]
@@ -371,8 +375,7 @@ JsonAdapter {
             property bool useBg: true
             property bool barGroup: false
             property bool outline: true
-            property int height: 45
-            property int width: 50
+            property int size: 50
         }
 
         behavior: JO {

@@ -16,39 +16,16 @@ Variants {
         fill: true
         mask: Region {}
         Repeater {
-            model: [
-                {
-                    top: true,
-                    left: true,
-                    corner: RoundCorner.TopLeft
-                },
-                {
-                    top: true,
-                    right: true,
-                    corner: RoundCorner.TopRight
-                },
-                {
-                    bottom: true,
-                    left: true,
-                    corner: RoundCorner.BottomLeft
-                },
-                {
-                    bottom: true,
-                    right: true,
-                    corner: RoundCorner.BottomRight
-                }
-            ]
+            model: ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]
             delegate: RoundCorner {
                 required property var modelData
-                anchors {
-                    top: modelData.top ? parent.top : undefined
-                    left: modelData.left ? parent.left : undefined
-                    bottom: modelData.bottom ? parent.bottom : undefined
-                    right: modelData.right ? parent.right : undefined
-                }
-                size: Rounding.verylarge
-                corner: modelData.corner
-                color: "black"
+                anchors.top: modelData.includes("Top") ? parent.top : undefined
+                anchors.left: modelData.includes("Left") ? parent.left : undefined
+                anchors.bottom: modelData.includes("Bottom") ? parent.bottom : undefined
+                anchors.right: modelData.includes("Right") ? parent.right : undefined
+                size: Mem?.hypr?.rounding ?? Rounding.verylarge
+                corner: RoundCorner[modelData]
+                color: "#000"
             }
         }
     }

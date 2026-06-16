@@ -71,7 +71,7 @@ PopupWindow {
                     Layout.fillWidth: true
                     clip: true
                     radius: bg.radius - content.anchors.margins
-                    model: ClipboardService.manager.entries
+                    model: ClipboardService.entries
                     delegate: StyledRect {
                         required property var modelData
                         width: list.width
@@ -92,7 +92,7 @@ PopupWindow {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onPressed: {
-                                ClipboardService.manager.copy(modelData);
+                                ClipboardService.copy(modelData);
                                 Qt.callLater(() => root.visible = false);
                             }
                         }

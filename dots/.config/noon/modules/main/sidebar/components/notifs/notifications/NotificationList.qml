@@ -11,35 +11,22 @@ import qs.services
 LayerRect {
     id: root
 
-    radius: Rounding.huge
-    anchors.margins: Padding.small
+    radius: Rounding.veryhuge
     clip: false
 
     // Scrollable window
     NotificationListView {
         id: listview
         hint: true
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: statusRow.top
-        layer.enabled: true
+        anchors.fill: parent
+        anchors.margins: Padding.large
         popup: false
-    }
-
-    // Placeholder when list is empty
-    Item {
-        anchors.fill: listview
-        visible: opacity > 0
-        opacity: (Notifications.list.length === 0) ? 1 : 0
 
         PagePlaceholder {
+            shown: Notifications.list.length === 0
+            anchors.centerIn: parent
             icon: Notifications.silent ? "notifications_off" : "notifications_active"
             shape: MaterialShape.Ghostish
-        }
-
-        Behavior on opacity {
-            Anim {}
         }
     }
 

@@ -1,40 +1,39 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import qs.services
+import qs.common
 import qs.common.widgets
+import qs.services
 
 BarGroup {
     id: root
-    Layout.preferredWidth: columnLayout.implicitWidth + padding
-    Layout.preferredHeight: columnLayout.implicitHeight + padding
+    implicitWidth: content.implicitWidth
+    implicitHeight: content.implicitHeight
 
     readonly property var content: [
         {
             "icon": "colorize",
-            "action": function () {
-                NoonUtils.execDetached("hyprpicker -a -q");
+            "action": () => {
+                NoonUtils.execDetached(["hyprpicker", "-a", "-q"]);
             }
         },
         {
             "icon": "screenshot",
-            "action": function () {
-                ScreenShotService.takeScreenShot();
-            }
+            "action": () => ScreenShotService.takeScreenShot()
         },
         {
             "icon": "dashboard",
-            "action": function () {
+            "action": () => {
                 NoonUtils.callIpc("sidebar reveal Apps");
             }
         }
     ]
 
     GridLayout {
-        id: columnLayout
+        id: content
 
-        rows: !vertical ? 1 : 4
-        columns: vertical ? 1 : 4
+        rows: !root.vertical ? 1 : 4
+        columns: root.vertical ? 1 : 4
         columnSpacing: 4
         rowSpacing: 4
         anchors.centerIn: parent
@@ -45,8 +44,7 @@ BarGroup {
                 toggled: false
                 materialIcon: modelData.icon
                 materialIconFill: hovered
-                iconSize: Math.round(root.height * (hovered ? 0.5 : 0.45))
-                implicitSize: Math.round(root.height * 0.75)
+                implicitSize: Math.round(Math.min(root.width, root.height) * 0.75)
                 releaseAction: () => modelData.action()
             }
         }

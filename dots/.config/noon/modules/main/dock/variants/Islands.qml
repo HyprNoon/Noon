@@ -13,7 +13,7 @@ import Quickshell.Wayland
 Scope {
     id: root
     property bool pinned: Mem.states.dock.pinned ?? false
-    property bool showOsk: GlobalStates.main.oskOpen
+    property bool showOsk: Globals.main.oskOpen
 
     Variants {
         model: [Quickshell.screens[0]]
@@ -26,7 +26,7 @@ Scope {
 
             required property var modelData
             readonly property real rounding: 2 * Rounding.verylarge * Mem.options.dock.appearance.iconSizeMultiplier
-            readonly property bool reveal: root.showOsk || root.pinned || mouseArea.containsMouse || (!ToplevelManager.activeToplevel?.activated && !GlobalStates.main.sidebar.expanded)
+            readonly property bool reveal: root.showOsk || root.pinned || mouseArea.containsMouse || (!ToplevelManager.activeToplevel?.activated && !Globals.main.sidebar.expanded)
 
             implicitWidth: content.implicitWidth + 10 * rounding
             implicitHeight: root.showOsk ? 340 : content.implicitHeight + Sizes.elevationMargin
@@ -46,7 +46,7 @@ Scope {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.topMargin: {
-                    if (dockRoot.reveal && !GlobalStates.main.showBeam && !GlobalStates.main.showOsdValues)
+                    if (dockRoot.reveal && !Globals.main.showBeam && !Globals.main.showOsdValues)
                         return 5;
                     else
                         dockRoot.implicitHeight - 5;

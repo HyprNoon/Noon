@@ -49,8 +49,8 @@ Singleton {
             return `${prefix}5_bar`;
         if (p <= 95)
             return `${prefix}6_bar`;
-
-        return root.isPluggedIn ? "battery_charging_full" : "battery_full";
+        const final = root.isPluggedIn ? "battery_charging_full" : "battery_full";
+        return final ?? "battery_0_bar";
     }
     Connections {
         target: PowerProfiles

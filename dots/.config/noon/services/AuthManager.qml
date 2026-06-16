@@ -60,12 +60,11 @@ Singleton {
     }
     Process {
         id: mainProc
-        onStarted: console.log(command.join(" "))
     }
     FileView {
         id: oauthView
         preload: true
         watchChanges: true
-        path: Directories.standard.state + "/user/generated/oauth.json"
+        path: Directories.standard.state + "/user/generated/2fa.json"
     }
 }

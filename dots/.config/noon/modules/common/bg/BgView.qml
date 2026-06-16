@@ -36,7 +36,7 @@ Item {
         if (!Mem.options.desktop.bg.parallax.widgetParallax || !enableParallax)
             return 0;
         const directionOffset = Mem.options.bar.behavior.position === "left" ? -1 : 1;
-        return directionOffset * Mem.options.desktop.bg.parallax.parallaxStrength * GlobalStates.main.sidebar.sidebarWidth;
+        return directionOffset * Mem.options.desktop.bg.parallax.parallaxStrength * Globals.main.sidebar.sidebarWidth;
     }
 
     readonly property real bgParallaxX: verticalParallaxMode ? calculateWidgetMargin() : -effectiveMovableXSpace - (parallaxFactor - 0.5) * 2 * effectiveMovableXSpace

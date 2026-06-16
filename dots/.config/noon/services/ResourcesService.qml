@@ -10,10 +10,8 @@ import qs.common.utils
 
 Singleton {
     id: root
-    property alias stats: watcher.stats
-
-    ResourcesWatcher {
-        id: watcher
+    readonly property var stats: watcher.stats
+    readonly property ResourcesWatcher watcher: ResourcesWatcher {
         updateInterval: 6000
         diskUpdateInterval: 600000
     }

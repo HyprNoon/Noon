@@ -175,9 +175,9 @@ Item {
                 anchors.right: parent?.right
 
                 text: modelData.s
-                font.family: "Rubik"
+                font.family: Fonts.family.title
                 font.pixelSize: Fonts.sizes.title
-                font.weight: active ? 800 : 600
+                font.weight: 750
                 color: BeatsService.colors.colOnLayer2
                 wrapMode: Text.Wrap
                 horizontalAlignment: isSynced ? Text.AlignLeft : Text.AlignCenter

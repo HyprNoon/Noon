@@ -10,7 +10,7 @@ Scope {
     id: root
 
     WidgetLoader {
-        active: GlobalStates.common.openGameUI
+        active: Globals.common.openGameUI
         BigView {}
     }
 

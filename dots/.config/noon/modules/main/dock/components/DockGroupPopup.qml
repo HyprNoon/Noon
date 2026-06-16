@@ -14,10 +14,10 @@ PopupWindow {
     property var parentButton
 
     // Connections {
-    //     target: GlobalStates.main.dock
-    //     enabled: GlobalStates.main.dock
+    //     target: Globals.main.dock
+    //     enabled: Globals.main.dock
     //     function onRevealChanged() {
-    //         if (!GlobalStates.main.dock.reveal)
+    //         if (!Globals.main.dock.reveal)
     //             root.visible = false;
     //     }
     // }

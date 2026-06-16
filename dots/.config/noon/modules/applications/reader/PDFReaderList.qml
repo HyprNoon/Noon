@@ -9,7 +9,7 @@ import Qt.labs.folderlistmodel
 
 Item {
     id: root
-    property string currentPath: GlobalStates.applications.reader.currentPath
+    property string currentPath: Globals.applications.reader.currentPath
     property alias model: itemsModel
 
     anchors {

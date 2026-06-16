@@ -147,7 +147,7 @@ Item {
         onTriggered: dismiss()
     }
     function dismiss() {
-        GlobalStates.toasts.data = GlobalStates.toasts.data.filter(item => item.id !== modelData.id);
+        Globals.toasts.data = Globals.toasts.data.filter(item => item.id !== modelData.id);
     }
 
     MouseArea {

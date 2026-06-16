@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import qs.common
 import qs.common.utils
 import Noon.Hypr
@@ -35,6 +36,9 @@ Singleton {
     Component.onCompleted: bindVars()
     function switchKeyboardLayout() {
         NoonUtils.execDetached(["hyprctl", "switchxkblayout", "current", "next"]);
+    }
+    function focusWs(ws) {
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${ws} })`);
     }
     function bindVars() {
         const mappings = {

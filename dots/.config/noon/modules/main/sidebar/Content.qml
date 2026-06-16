@@ -113,7 +113,7 @@ Item {
             [Qt.Key_O]: () => SidebarData.isExpandable(selectedCategory) && !auxVisible && (panelWindow.expanded = !panelWindow.expanded),
             [Qt.Key_P]: () => panelWindow.pinned = !panelWindow.pinned,
             [Qt.Key_Q]: () => Qt.callLater(closeAux),
-            [Qt.Key_R]: () => selectedCategory === "History" && ClipboardService.manager.wipe()
+            [Qt.Key_R]: () => selectedCategory === "History" && ClipboardService.wipe()
         };
 
         if (isCtrl && ctrlMap[key])

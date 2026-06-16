@@ -81,7 +81,7 @@ Item {
                         hoverEnabled: true
                         onClicked: {
                             modelData.execute();
-                            GlobalStates.nobuntu.overview.show = false;
+                            Globals.nobuntu.overview.show = false;
                         }
                     }
                 }

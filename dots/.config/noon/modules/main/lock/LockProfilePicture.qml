@@ -13,7 +13,7 @@ Item {
     id: root
     implicitHeight: 400
     implicitWidth: 400
-    readonly property bool isLocked: GlobalStates.main.locked
+    readonly property bool isLocked: Globals.main.locked
     Anim on x {
         from: 0
         to: (Screen?.width - width) / 2

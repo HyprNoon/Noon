@@ -79,7 +79,7 @@ LayerRect {
             iconSource: NoonUtils.iconPath(modelData.icon)
             mainScale: contentView.viewScale
             releaseAction: () => {
-                GlobalStates.main.sidebar.hide();
+                Globals.main.sidebar.hide();
                 modelData.execute();
             }
             altAction: () => {

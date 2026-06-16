@@ -25,7 +25,7 @@ AppWindow {
         root.visible = false;
     }
 
-    visible: GlobalStates.xp.showControlPanel
+    visible: Globals.xp.showControlPanel
     title: "control_panel"
     maximumSize: Qt.size(1600, 900)
     minimumSize: Qt.size(1280, 720)

@@ -18,7 +18,7 @@ RowLayout {
             {
                 icon: copied ? "check" : "content_copy",
                 action: () => {
-                    ClipboardService.manager.copy(root.messageData.content);
+                    ClipboardService.copy(root.messageData.content);
                     root.copied = true;
                 }
             },

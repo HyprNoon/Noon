@@ -97,7 +97,6 @@ StyledRect {
             PageHeader {
                 id: dialogTitle
                 title: root.deviceSelectorInput ? "Select input device" : "Select output device"
-                showCloseButton: false
             }
             PageSeparator {}
 

@@ -15,7 +15,7 @@ StyledPanel {
 
     readonly property int shadowAccount: 100
     property bool top: false
-    visible: GlobalStates.xp.showStartMenu
+    visible: Globals.xp.showStartMenu
     shell: "xp"
     name: "startMenu"
     implicitHeight: XSizes.startMenu.size.height + shadowAccount

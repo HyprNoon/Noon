@@ -13,10 +13,10 @@ Scope {
         target: "noon"
 
         function toggle_expose() {
-            GlobalStates.main.exposeView = !GlobalStates.main.exposeView;
+            Globals.main.exposeView = !Globals.main.exposeView;
         }
         function toggle_beam() {
-            GlobalStates.main.showBeam = !GlobalStates.main.showBeam;
+            Globals.main.showBeam = !Globals.main.showBeam;
         }
         function translate(query: string): string {
             BeamData.query = "< " + query;

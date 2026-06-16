@@ -177,7 +177,7 @@ StyledRect {
             Layout.fillHeight: true
             radius: Rounding.large
             _model: dayData
-
+            clip: true
             delegate: StyledRect {
                 required property var modelData
                 required property int index

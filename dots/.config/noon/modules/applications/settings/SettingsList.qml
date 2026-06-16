@@ -8,7 +8,7 @@ import qs.common.widgets
 
 Item {
     id: root
-    property string currentPath: GlobalStates.applications.editor.currentPath
+    property string currentPath: Globals.applications.editor.currentPath
 
     anchors {
         fill: parent

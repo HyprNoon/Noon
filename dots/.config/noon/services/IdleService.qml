@@ -15,17 +15,4 @@ Singleton {
     function toggleInhibit() {
         Mem.options.services.idle.inhibit = !Mem.options.services.idle.inhibit;
     }
-
-    IdleInhibitor {
-        enabled: Mem.options.services.idle.inhibit
-        window: DummyPanel {}
-    }
-
-    IdleMonitor {
-        timeout: Mem.options.services.idle.timeOut
-        onIsIdleChanged: {
-            if (isIdle)
-                NoonUtils.callIpc("global lock");
-        }
-    }
 }

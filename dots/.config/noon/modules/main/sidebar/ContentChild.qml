@@ -22,7 +22,7 @@ Item {
     property bool _aux: false
     property alias searchInput: searchBar.searchInput
     property int selectedTabIndex: 0
-    property var parentRoot: GlobalStates.main.sidebar
+    property var parentRoot: Globals.main.sidebar
     readonly property var contentItem: contentStack.currentItem
 
     signal contentFocusRequested

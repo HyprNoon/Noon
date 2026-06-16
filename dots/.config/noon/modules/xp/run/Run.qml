@@ -13,7 +13,7 @@ import qs.common.widgets
 AppWindow {
     id: root
     title: "run"
-    visible: GlobalStates.xp.showRun
+    visible: Globals.xp.showRun
     maximumSize: XSizes.run.sizeMax
     minimumSize: XSizes.run.size
     onVisibleChanged: {
@@ -136,7 +136,7 @@ AppWindow {
                             if (root.selectedEntry) {
                                 root.selectedEntry.execute();
                             }
-                            GlobalStates.xp.showRun = false;
+                            Globals.xp.showRun = false;
                         }
                         onTextChanged: {
                             if (root.suggestions.values.length > 0)
@@ -255,14 +255,14 @@ AppWindow {
                         downAction: () => {
                             if (root.selectedEntry) {
                                 root.selectedEntry.execute();
-                                GlobalStates.xp.showRun = false;
+                                Globals.xp.showRun = false;
                             }
                         }
                     }
                     BottomRunButton {
                         text: "Cancel"
                         downAction: () => {
-                            GlobalStates.xp.showRun = false;
+                            Globals.xp.showRun = false;
                         }
                     }
                     BottomRunButton {

@@ -59,22 +59,7 @@ Item {
             description: qsTr("Send LaTeX test messages"),
             execute: () => {
                 Ai.clearMessages();
-                const tests = [
-                    "Inline: $$E = mc^2$$",
-                    "Quadratic: $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$",
-                    "Integral: $$\\int_{a}^{b} f(x)\\,dx = F(b) - F(a)$$",
-                    "Matrix: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$",
-                    "Summation: $$\\sum_{k=1}^{n} \\frac{1}{k} \\approx \\ln(n) + \\gamma$$",
-                    "Greek: $$\\alpha \\beta \\gamma \\delta \\epsilon \\theta \\pi \\sigma \\omega \\phi \\psi \\mu$$",
-                    "Limit: $$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$",
-                    "Trig: $$\\sin^2 \\theta + \\cos^2 \\theta = 1$$",
-                    "Nested fraction: $$\\frac{1 + \\frac{1}{x}}{1 - \\frac{1}{x}}$$",
-                    "Piecewise: $$f(x) = \\begin{cases} x^2 & x \\ge 0 \\\\ -x & x < 0 \\end{cases}$$",
-                    "Decorations: $$\\hat{a} \\; \\bar{b} \\; \\vec{c} \\; \\dot{d} \\; \\ddot{e}$$",
-                    "Binomial: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$",
-                    "Text in math: $$\\text{area} = \\pi r^2 \\quad \\text{for } r \\ge 0$$",
-                    "Set builder: $$\\{ x \\in \\mathbb{R} \\mid |x| < 1 \\}$$",
-                ];
+                const tests = ["Inline: $$E = mc^2$$", "Quadratic: $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$", "Integral: $$\\int_{a}^{b} f(x)\\,dx = F(b) - F(a)$$", "Matrix: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$", "Summation: $$\\sum_{k=1}^{n} \\frac{1}{k} \\approx \\ln(n) + \\gamma$$", "Greek: $$\\alpha \\beta \\gamma \\delta \\epsilon \\theta \\pi \\sigma \\omega \\phi \\psi \\mu$$", "Limit: $$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$", "Trig: $$\\sin^2 \\theta + \\cos^2 \\theta = 1$$", "Nested fraction: $$\\frac{1 + \\frac{1}{x}}{1 - \\frac{1}{x}}$$", "Piecewise: $$f(x) = \\begin{cases} x^2 & x \\ge 0 \\\\ -x & x < 0 \\end{cases}$$", "Decorations: $$\\hat{a} \\; \\bar{b} \\; \\vec{c} \\; \\dot{d} \\; \\ddot{e}$$", "Binomial: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$", "Text in math: $$\\text{area} = \\pi r^2 \\quad \\text{for } r \\ge 0$$", "Set builder: $$\\{ x \\in \\mathbb{R} \\mid |x| < 1 \\}$$",];
                 tests.forEach(t => Ai.addMessage(t, "ai"));
             }
         }
@@ -90,7 +75,7 @@ Item {
     }
 
     function decodeImageAndAttach(entry) {
-        Ai.attachFile(ClipboardService.manager.getImagePath(entry));
+        Ai.attachFile(ClipboardService.getImagePath(entry));
     }
 
     function handleCommandSuggestions(query) {
@@ -263,8 +248,8 @@ Item {
                     event.accepted = true;
                     return;
                 }
-                const entry = ClipboardService.manager.entries[0];
-                if (ClipboardService.manager.isImage(0)) {
+                const entry = ClipboardService.entries[0];
+                if (ClipboardService.isImage(0)) {
                     decodeImageAndAttach(entry);
                     event.accepted = true;
                 } else if (StringUtils.cleanCliphistEntry(entry).startsWith("file://")) {

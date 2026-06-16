@@ -12,7 +12,7 @@ StyledRect {
     property var taskData
     property alias symbol: symb.text
     property alias colSymbol: symb.color
-    property bool isEditing: false
+
     readonly property string daysRemaining: {
         if (!modelData.due)
             return "";
@@ -27,9 +27,10 @@ StyledRect {
         const diff = Math.ceil((due - today) / 86400000);
         return diff === 0 ? "today" : diff === 1 ? "tomorrow" : "in " + diff + " days";
     }
+
     anchors.rightMargin: Padding.normal
     anchors.leftMargin: Padding.normal
-    height: 70
+    height: Math.max(70, textArea.contentHeight + Padding.massive)
     radius: Rounding.large
     opacity: 0.9
     color: index % 2 !== 0 ? "transparent" : Colors.colLayer2
@@ -44,11 +45,6 @@ StyledRect {
         color: Colors.colPrimary
     }
 
-    onIsEditingChanged: {
-        if (isEditing) {
-            textArea.forceActiveFocus();
-        }
-    }
     RowLayout {
         anchors.fill: parent
         anchors.leftMargin: Padding.massive
@@ -72,41 +68,62 @@ StyledRect {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: -1
-            TextArea {
+            spacing: Padding.verysmall
+
+            StyledText {
                 id: textArea
                 opacity: taskData.status === TodoService.Status.Done ? 0.7 : 1
                 Layout.fillWidth: true
                 wrapMode: TextEdit.Wrap
-                renderType: Text.NativeRendering
-                readOnly: !root.isEditing
                 font {
                     strikeout: taskData.status === TodoService.Status.Done
                     family: Fonts.family.reading
                     hintingPreference: Font.PreferNoHinting
                     pixelSize: Fonts.sizes.large
                 }
-                selectByMouse: root.isEditing
-                selectedTextColor: Colors.m3.m3onSecondaryContainer
-                selectionColor: Colors.colSecondaryContainer
                 color: Colors.colOnLayer1
                 text: taskData.content
-                onTextChanged: {
-                    if (root.isEditing) {
-                        TodoService.editItem(root.index, text);
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 24
+                spacing: Padding.large
+
+                StyledText {
+                    id: date
+                    visible: modelData.due !== -1
+                    color: Colors.colSubtext
+                    text: modelData.due + " " + daysRemaining
+                    font.pixelSize: 13
+                    horizontalAlignment: Text.AlignLeft
+                    rightPadding: Padding.massive
+                }
+
+                Flow {
+                    id: tags
+                    spacing: Padding.verysmall
+                    Layout.preferredHeight: 22
+                    Layout.rightMargin: Padding.huge
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignRight
+                    layoutDirection: Qt.RightToLeft
+                    Repeater {
+                        model: root.taskData.tags
+                        delegate: StyledRect {
+                            height: 22
+                            width: tagText.contentWidth + Padding.huge
+                            radius: Rounding.large
+                            color: Colors.colSecondaryContainer
+                            StyledText {
+                                id: tagText
+                                text: modelData
+                                anchors.centerIn: parent
+                                color: Colors.colOnSecondaryContainer
+                                font.pixelSize: Fonts.sizes.verysmall
+                            }
+                        }
                     }
                 }
-            }
-
-            StyledText {
-                id: date
-                visible: modelData.due !== -1
-                color: Colors.colSubtext
-                text: modelData.due + " " + daysRemaining
-                font.pixelSize: 14
-                horizontalAlignment: Text.AlignRight
-                Layout.fillWidth: true
-                rightPadding: Padding.massive
             }
         }
     }

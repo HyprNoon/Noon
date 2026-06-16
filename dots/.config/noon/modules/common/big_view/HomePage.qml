@@ -45,7 +45,7 @@ Item {
                     requestPage(currentIndex);
                 }
             } else if (event.key === Qt.Key_Escape) {
-                GlobalStates.common.openGameUI = false;
+                Globals.common.openGameUI = false;
             } else
                 return;
 
@@ -80,7 +80,7 @@ Item {
         }
 
         function onFaceRightPressed() {
-            GlobalStates.common.openGameUI = false;
+            Globals.common.openGameUI = false;
         }
     }
 

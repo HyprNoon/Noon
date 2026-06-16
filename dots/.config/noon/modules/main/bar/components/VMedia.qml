@@ -24,7 +24,7 @@ BarGroup {
             fill: 1
             anchors.centerIn: parent
             font.pixelSize: progress.implicitSize
-            text: BeatsService?.isPlaying ? "pause" : "music_note"
+            text: BeatsService?._playing ? "music_note" : "pause"
             color: Colors.m3.m3onSecondaryContainer
         }
     }

@@ -22,7 +22,7 @@ Scope {
             name: "blurred_layer"
             shell: "noon"
             fill: true
-            visible: GlobalStates.main.showScreenshot
+            visible: Globals.main.showScreenshot
             screen: modelData
             keyboardFocus: true
             mask: Region {
@@ -45,8 +45,8 @@ Scope {
 
             FocusHandler {
                 windows: [panel]
-                active: GlobalStates.main.showScreenshot
-                onCleared: GlobalStates.main.showScreenshot = false
+                active: Globals.main.showScreenshot
+                onCleared: Globals.main.showScreenshot = false
             }
 
             ScreenShotBottomControls {

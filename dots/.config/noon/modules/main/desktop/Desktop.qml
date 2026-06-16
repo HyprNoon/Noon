@@ -34,7 +34,7 @@ Scope {
     }
 
     WidgetLoader {
-        enabled: GlobalStates.toasts.data.length > 0
+        enabled: Globals.toasts.data.length > 0
         Toasts {}
     }
 }

@@ -15,28 +15,34 @@ Scope {
 
         onUnlocked: {
             lock.locked = false;
-            GlobalStates.main.locked = false;
+            Globals.main.locked = false;
         }
     }
 
     Connections {
         function onLockedChanged() {
-            if (GlobalStates.main.locked) {
+            if (Globals.main.locked) {
                 NoonUtils.playSound("locked");
                 lock.locked = true;
-            } else if (!GlobalStates.main.locked) {
+            } else if (!Globals.main.locked) {
                 NoonUtils.playSound("unlocked");
                 lock.locked = false;
             }
         }
 
-        target: GlobalStates.main
+        target: Globals.main
+    }
+
+    Timer {
+        interval: 300000
+        running: lock.locked
+        onTriggered: NoonUtils.execDetached(["loginctl", "suspend"])
     }
 
     WlSessionLock {
         id: lock
 
-        locked: GlobalStates.main.locked
+        locked: Globals.main.locked
 
         WlSessionLockSurface {
             LockSurface {

@@ -7,9 +7,10 @@ import qs.services
 BarGroup {
     id: root
 
-    implicitHeight: 20 + (active ? Padding.massive : 0)
-
+    implicitHeight: text.contentHeight + Padding.huge
+    implicitWidth: text.contentWidth + Padding.huge
     StyledText {
+        id: text
         anchors.centerIn: parent
         text: HyprlandService.keyboardLayoutShortName
         animateChange: true

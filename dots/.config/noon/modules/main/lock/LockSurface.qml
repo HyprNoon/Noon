@@ -15,7 +15,7 @@ Rectangle {
 
     required property LockContext context
     property alias blurredArt: backgroundImage
-    color: Colors.colLayer0
+    color: Colors.m3.m3surface
 
     BlurImage {
         id: backgroundImage

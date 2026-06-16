@@ -20,7 +20,6 @@ BottomDialog {
         PageHeader {
             title: "Your Widgets"
             subTitle: "You Have " + (root.db.length - Mem.states.sidebar.widgets.enabled.length) + " disabled widgets !"
-            showCloseButton: false
         }
 
         StyledListView {

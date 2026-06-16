@@ -43,7 +43,7 @@ Item {
         }
     }
     Binding {
-        target: GlobalStates.applications.reader
+        target: Globals.applications.reader
         property: "document_page_view"
         value: root.document_page_view
     }

@@ -26,7 +26,7 @@ StyledPopup {
 
                 Symbol {
                     anchors.centerIn: parent
-                    icon: NetworkService.manager.ethernet ? "lan" : NetworkService.manager.wifi ? "wifi" : "wifi-off"
+                    icon: NetworkService.manager.ethernet ? "lan" : NetworkService.manager.wifi ? "wifi" : "wifi_off"
                     color: NetworkService.manager.ethernet || NetworkService.manager.wifi ? Colors.m3.m3onPrimaryContainer : Colors.m3.m3onErrorContainer
                     font.pixelSize: 20
                 }
@@ -90,7 +90,7 @@ StyledPopup {
                     StyledText {
                         text: NetworkService.manager.downloadSpeedText
                         font.weight: Font.Medium
-                        font.pixelSize: Fonts.sizes.medium
+                        font.pixelSize: Fonts.sizes.small
                         color: Colors.m3.m3onSurface
                     }
                 }
@@ -119,7 +119,7 @@ StyledPopup {
                     StyledText {
                         text: NetworkService.manager.uploadSpeedText
                         font.weight: Font.Medium
-                        font.pixelSize: Fonts.sizes.medium
+                        font.pixelSize: Fonts.sizes.small
                         color: Colors.m3.m3onSurface
                     }
                 }

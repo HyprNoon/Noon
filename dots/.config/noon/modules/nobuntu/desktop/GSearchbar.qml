@@ -36,7 +36,7 @@ Item {
             if (results.length > 0) {
                 results[0].execute();
             }
-            GlobalStates.nobuntu.overview.show = false;
+            Globals.nobuntu.overview.show = false;
         }
         IconImage {
             z: 999

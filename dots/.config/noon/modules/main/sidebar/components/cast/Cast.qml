@@ -109,7 +109,6 @@ StyledRect {
         PageHeader {
             title: "Share Screen"
             subTitle: "Select a screen or window to share"
-            showCloseButton: false
         }
 
         StyledText {

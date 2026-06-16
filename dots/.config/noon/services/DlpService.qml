@@ -19,9 +19,10 @@ Singleton {
             return;
 
         let final = [...root.cmd];
+        const query = (info.artist ?? "") + (info?.title ?? "");
 
-        if (info.title || info.artist)
-            final = final.concat(["--search", info.artist ?? "", info.title ?? ""]);
+        if (query.length > 0)
+            final = final.concat(["--search", `"${query}"` ?? ""]);
         else if (info.url)
             final = final.concat(["--url", `"${info.url}"`]);
 
@@ -35,7 +36,7 @@ Singleton {
 
         if (info.directory)
             final = final.concat(["-d", FileUtils.trimFileProtocol(info.directory)]);
-        console.log(final);
+        console.log(final.join(' a '));
         NoonUtils.execDetached(final);
     }
 }

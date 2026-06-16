@@ -36,7 +36,7 @@ ListView {
             anchors.fill: parent
             onClicked: {
                 DesktopEntries.byId(modelData).execute();
-                GlobalStates.xp.showStartMenu = false;
+                Globals.xp.showStartMenu = false;
             }
         }
         RowLayout {

@@ -11,11 +11,10 @@ StyledPanel {
 
     readonly property string pos: Mem.options.bar.behavior.position
     readonly property bool autoHide: Mem.options.bar.behavior.autoHide
-    readonly property int mode: Mem.options.bar.appearance.mode
     readonly property bool useBg: Mem.options.bar.appearance.useBg
     readonly property int peekSize: 10
     readonly property bool isBottom: pos === "bottom"
-    readonly property int barHeight: Mem.options.bar.appearance.height
+    readonly property int barHeight: Mem.options.bar.appearance.size
     readonly property int elevation: mode === 0 ? Sizes.barElevation : 0
     readonly property int hideMargin: autoHide && !hovered ? -(barHeight - peekSize) : 0
 

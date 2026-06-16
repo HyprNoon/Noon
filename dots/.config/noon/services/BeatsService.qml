@@ -20,7 +20,8 @@ Singleton {
     readonly property QtObject colors: palette.colors
     readonly property alias daemonOptions: daemonView.data
 
-    readonly property string tracksDir: Qt.resolvedUrl(daemonOptions.players.main.musicDirectory)
+    readonly property string tracksDir: daemonOptions.players.main.musicDirectory
+    readonly property string tracksUrl: Qt.resolvedUrl(daemonOptions.players.main.musicDirectory)
     readonly property var library: daemonOptions.players.main.library
     readonly property alias queue: queueFetcher.data
 
@@ -82,7 +83,9 @@ Singleton {
 
     function fetchLibrary() {
         refreshTracks();
-        libraryFetcher.running = true;
+        NoonUtils.singleshot(() => {
+            libraryFetcher.running = true;
+        }, 200);
     }
 
     function handleOverlappingPlayers() {
@@ -304,9 +307,10 @@ Singleton {
     }
 
     FileSystemWatcher {
-        folder: root.tracksDir
+        folder: root.tracksUrl
         onContentsChanged: {
-            refreshTracks();
+            console.log("[BEATS]: contentChanged");
+            root.fetchLibrary();
         }
     }
 

@@ -11,7 +11,7 @@ RowLayout {
     property alias title: titleArea.text
     property alias subTitle: subTitleArea.text
     property QtObject colors: Colors
-    property bool showCloseButton: false
+    property alias sideButton: sideButton
     Layout.fillWidth: true
     Layout.preferredHeight: 50
     Layout.margins: Padding.large
@@ -44,8 +44,9 @@ RowLayout {
     Item {
         Layout.fillWidth: true
     }
-    RippleButtonWithIcon {
-        visible: root.showCloseButton && root.target
+    GroupButtonWithIcon {
+        id: sideButton
+        visible: false
         materialIcon: "close"
         implicitSize: 42
         colors: root.colors

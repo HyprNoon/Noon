@@ -26,7 +26,7 @@ GroupButton {
     buttonRadius: !toggled ? largeRadius : smallRadius
     buttonRadiusPressed: !toggled ? largeRadius : smallRadius
     colBackground: Colors.colLayer2
-    altAction: () => GlobalStates.main.dialogs.current = dialogName
+    altAction: () => Globals.main.dialogs.current = dialogName
 
     Loader {
         anchors.fill: parent

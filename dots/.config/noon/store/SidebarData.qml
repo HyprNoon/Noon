@@ -87,7 +87,8 @@ Singleton {
             preExpand: true,
             baseSize: sizePresets.overview,
             expandSize: sizePresets.overviewExpanded,
-            enabled: Mem.options.sidebar.content.overview
+            // hehe
+            stealth: !Mem.options.sidebar.content.overview
         },
         "Beats": {
             icon: "music_note",

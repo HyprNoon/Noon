@@ -14,10 +14,14 @@ StyledPanel {
     name: "noanim_blurred_layer"
     property real scrollSum: 0
     property bool hasAttachedFile: false
-    readonly property bool reveal: GlobalStates.main.showBeam
+    readonly property bool reveal: Globals.main.showBeam
     readonly property int mainRounding: Rounding.full
-    readonly property int elevationValue: Sizes.elevationMargin + (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.height : 0)
-    readonly property int beamTargetWidth: (BeamData.getHint()?.length ?? 0) > 25 || BeamData.query.length > 25 ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width
+    readonly property int elevationValue: Sizes.elevationMargin + (Mem.options.bar.behavior.position === "bottom" ? Mem.options.bar.appearance.size : 0)
+    readonly property int beamTargetWidth: {
+        const hint = BeamData.getHint();
+        const query = BeamData.query;
+        return Math.max(hint, query) > 25 ? Sizes.beamSizeExpanded.width : Sizes.beamSize.width;
+    }
 
     visible: true
     keyboardFocus: true
@@ -37,7 +41,7 @@ StyledPanel {
     }
 
     function hide() {
-        GlobalStates.main.showBeam = false;
+        Globals.main.showBeam = false;
     }
 
     function sendMessage() {
@@ -66,10 +70,10 @@ StyledPanel {
 
     ScreenActionHintPanel {
         target: dropArea
-        hint: ({
-                "icon": "keyboard_double_arrow_right",
-                "text": "Drop To Open Downloader!"
-            })
+        hint: {
+            "icon": "keyboard_double_arrow_down",
+            "text": "You Can Drop Now"
+        }
     }
 
     MouseArea {
@@ -96,12 +100,12 @@ StyledPanel {
 
         onWheel: wheel => {
             if (wheel.modifiers === Qt.ControlModifier) {
-                GlobalStates.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "incubate" : "";
+                Globals.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "incubate" : "";
                 wheel.accepted = true;
                 return;
             }
             if (wheel.modifiers === Qt.ShiftModifier) {
-                GlobalStates.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "cheats" : "";
+                Globals.main.sysDialogs.mode = wheel.angleDelta.y < 0 ? "cheats" : "";
                 wheel.accepted = true;
                 return;
             }
@@ -109,10 +113,10 @@ StyledPanel {
             root.scrollSum += wheel.angleDelta.y;
 
             if (!root.reveal && root.scrollSum <= -20) {
-                GlobalStates.main.showBeam = true;
+                Globals.main.showBeam = true;
                 root.scrollSum = 0;
             } else if (root.reveal && root.scrollSum >= 20) {
-                GlobalStates.main.showBeam = false;
+                Globals.main.showBeam = false;
                 root.scrollSum = 0;
             }
 
@@ -123,7 +127,19 @@ StyledPanel {
             id: dropArea
             anchors.fill: parent
             keys: ["text/uri-list"]
-            onDropped: drop => NoonUtils.runDownloader(drop.urls[0].toString())
+            onDropped: drop => {
+                if (!drop || !drop.hasUrls || drop.urls.length === 0)
+                    return;
+
+                let urlStrings = drop.urls.map(url => url.toString());
+                let firstUrl = urlStrings[0];
+
+                if (firstUrl.startsWith("http")) {
+                    NoonUtils.runDownloader(firstUrl);
+                } else if (firstUrl.startsWith("file://")) {
+                    Mem.states.sidebar.shelf.filePaths = [...Mem.states.sidebar.shelf.filePaths, ...urlStrings];
+                }
+            }
         }
     }
 
@@ -145,7 +161,7 @@ StyledPanel {
 
     BeamBg {
         id: beamBg
-        reveal: root.reveal && !GlobalStates.main.showOsdValues
+        reveal: root.reveal && !Globals.main.showOsdValues
         rounding: root.mainRounding
         elevationValue: root.elevationValue
 

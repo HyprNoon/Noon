@@ -119,12 +119,10 @@ LayerRect {
         animateAppearance: true
         animateMovement: true
         popin: true
-        Component.onCompleted: Qt.callLater(() => listView.currentIndex = listView.model?.findIndex(t => t.title === title))
         spacing: Padding.small
         model: filteredModel
         highlightFollowsCurrentItem: true
         highlightMoveDuration: 300
-
         // onCurrentIndexChanged: {
         //     if (currentIndex >= 0) {
         //         WallpaperService.applyWallpaper(filteredModel.values[currentIndex].fileUrl.toString());

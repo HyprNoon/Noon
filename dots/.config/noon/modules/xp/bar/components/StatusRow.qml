@@ -24,7 +24,7 @@ StyledRect {
             id: desktopMouse
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: Hyprland.dispatch("workspace special")
+            onClicked: HyprlandService.focusWs("special")
         }
     }
     StyledRect {

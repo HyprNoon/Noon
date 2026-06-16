@@ -51,7 +51,7 @@ Button {
         onPressed: event => {
             switch (event.button) {
             case Qt.LeftButton:
-                GlobalStates.xp.showStartMenu = !GlobalStates.xp.showStartMenu;
+                Globals.xp.showStartMenu = !Globals.xp.showStartMenu;
                 break;
             }
         }

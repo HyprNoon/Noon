@@ -24,7 +24,7 @@ RippleButton {
             url += ` -site:${site}`;
         }
         Qt.openUrlExternally(url);
-        GlobalStates.main.sidebar.expanded = false;
+        Globals.main.sidebar.expanded = false;
     }
 
     PointingHandInteraction {}

@@ -34,7 +34,7 @@ LayerRect {
             const existing = new Set(Mem.states.sidebar.shelf.filePaths);
             const unique = drop.urls.map(url => url.toString()).filter(p => !existing.has(p));
             Mem.states.sidebar.shelf.filePaths = [...existing, ...unique];
-            if (!GlobalStates.main.sidebar.pinned) {
+            if (!Globals.main.sidebar.pinned) {
                 NoonUtils.callIpc("sidebar hide");
             }
             NoonUtils.playSound("event_accepted");

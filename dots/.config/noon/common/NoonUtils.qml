@@ -25,13 +25,13 @@ Singleton {
         if (!dialog)
             return;
         if (data)
-            GlobalStates.main.sysDialogs.pendingData = data;
-        GlobalStates.main.sysDialogs.mode = dialog;
+            Globals.main.sysDialogs.pendingData = data;
+        Globals.main.sysDialogs.mode = dialog;
     }
 
     function clearSysDialogs() {
-        GlobalStates.main.sysDialogs.pendingData = null;
-        GlobalStates.main.sysDialogs.mode = "";
+        Globals.main.sysDialogs.pendingData = null;
+        Globals.main.sysDialogs.mode = "";
     }
 
     function searchOnline(query) {
@@ -124,11 +124,11 @@ Singleton {
             id: obj?.id ?? -1,
             title: obj?.header ?? "Noon",
             message: obj?.content ?? "",
-            icon: obj?.materialIcon ?? "check",
+            icon: obj?.icon ?? "check",
             status: obj?.status ?? ""
         };
 
-        let currentData = [...GlobalStates.toasts.data];
+        let currentData = [...Globals.toasts.data];
         const itemId = currentData.findIndex(item => item.id === info.id);
 
         if (itemId !== -1) {
@@ -140,7 +140,7 @@ Singleton {
             currentData.push(info);
         }
 
-        GlobalStates.toasts.data = currentData;
+        Globals.toasts.data = currentData;
     }
 
     function notify(content, title) {
@@ -214,8 +214,8 @@ Singleton {
     function runDownloader(url) {
         if (isOnline(url)) {
             if (checkIfDlp(url)) {
-                GlobalStates.main.sysDialogs.pendingData = url;
-                GlobalStates.main.sysDialogs.mode = "dlp";
+                Globals.main.sysDialogs.pendingData = url;
+                Globals.main.sysDialogs.mode = "dlp";
             }
         }
     }

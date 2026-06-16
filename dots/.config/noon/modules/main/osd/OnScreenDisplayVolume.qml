@@ -17,7 +17,7 @@ Scope {
     property var focusedScreen: MonitorsInfo.focused
 
     Binding {
-        target: GlobalStates.main
+        target: Globals.main
         property: "showOsdValues"
         value: root.showOsdValues
     }
@@ -75,7 +75,7 @@ Scope {
 
     OsdValueIndicator {
         id: osdIndicator
-        active: showOsdValues && GlobalStates.main.canNotify
+        active: showOsdValues && Globals.main.canNotify
 
         value: AudioService.sink?.audio.volume ?? 0
         icon: AudioService.sink?.audio.muted ? "volume_off" : "volume_up"

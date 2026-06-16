@@ -95,7 +95,7 @@ Singleton {
         if (!obj)
             return;
 
-        GlobalStates.main.showScreenshot = false;
+        Globals.main.showScreenshot = false;
 
         const outPath = obj.temp ? root.tempPath : root.mainDir + "/screenshot-" + new Date().toISOString().replace(/[:.]/g, "-") + ".png";
         const actions = {

@@ -22,12 +22,23 @@ Singleton {
     readonly property bool useGoogleTasks: false
     Component.onCompleted: Qt.callLater(pull)
 
-    function _insertTask(desc, status, date, children) {
+    function _extractTags(text) {
+        var tags = [];
+        var cleaned = text.replace(/#(\w+)/g, function(_, tag) {
+            if (tags.indexOf(tag) === -1)
+                tags.push(tag);
+            return "";
+        });
+        return { tags: tags, content: cleaned.replace(/\s+/g, " ").trim() };
+    }
+
+    function _insertTask(desc, status, date, children, tags) {
         return {
             content: desc,
             status: status,
             due: date,
-            children: []
+            children: children || [],
+            tags: tags || []
         };
     }
 
@@ -35,30 +46,35 @@ Singleton {
         var trimmed = desc.trim();
         if (trimmed.length === 0)
             return;
+        var parsed = _extractTags(trimmed);
+        var cleanDesc = parsed.content;
+        var tags = parsed.tags;
         var updated = store.tasks.slice();
-        var match = trimmed.match(/\[([0-9]+)-([0-9]+)\]/);
+        var match = cleanDesc.match(/\[([0-9]+)-([0-9]+)\]/);
         if (match) {
             var start = parseInt(match[1], 10);
             var end = parseInt(match[2], 10);
             for (var i = start; i <= end; i++) {
-                updated.push(_insertTask(trimmed.replace(/\[[0-9]+-[0-9]+\]/, i), status, date, children));
+                updated.push(_insertTask(cleanDesc.replace(/\[[0-9]+-[0-9]+\]/, i), status, date, children, tags));
             }
         } else {
-            updated.push(_insertTask(trimmed, status, date, children));
+            updated.push(_insertTask(cleanDesc, status, date, children, tags));
         }
         store.tasks = updated;
         Qt.callLater(push);
     }
 
     function editItem(index, newContent) {
-        if (!index || index < 0 || !newContent)
+        if (index < 0 || index >= store.tasks.length || !newContent)
             return;
-        store.tasks[index].content = newContent.trim();
+        var parsed = _extractTags(newContent);
+        store.tasks[index].content = parsed.content;
+        store.tasks[index].tags = parsed.tags;
         Qt.callLater(push);
     }
 
     function setStatus(index, status) {
-        if (!index || index < 0 || status < 0)
+        if (index < 0 || index >= store.tasks.length || status < 0)
             return;
         store.tasks[index].status = status;
         Qt.callLater(push);
@@ -77,10 +93,12 @@ Singleton {
     }
 
     function deleteItem(index) {
-        if (index > -1 && index < list.length) {
-            store.tasks.splice(index, 1).slice(0);
-            Qt.callLater(push);
-        }
+        if (index < 0 || index >= store.tasks.length)
+            return;
+        var updated = store.tasks.slice();
+        updated.splice(index, 1);
+        store.tasks = updated;
+        Qt.callLater(push);
     }
 
     function removeDone() {
@@ -89,6 +107,10 @@ Singleton {
 
     function getTasksByStatus(status) {
         return list.filter(item => item.status === status);
+    }
+
+    function getTasksByTag(tag) {
+        return list.filter(item => item.tags && item.tags.indexOf(tag) !== -1);
     }
 
     function getProgress() {
@@ -104,7 +126,8 @@ Singleton {
             if (tasks.length > 0) {
                 output += `## ${statusNames[s]} (${tasks.length})\n`;
                 tasks.forEach(task => {
-                    output += `${list.indexOf(task)}. ${task.content}\n`;
+                    var tagStr = task.tags && task.tags.length > 0 ? " [" + task.tags.join(", ") + "]" : "";
+                    output += `${list.indexOf(task)}. ${task.content}${tagStr}\n`;
                 });
                 output += "\n";
             }

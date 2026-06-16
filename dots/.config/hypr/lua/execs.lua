@@ -12,9 +12,10 @@ hl.on("hyprland.start", function()
 		"gnome-keyring-daemon --start --components=secrets",
 		"hypridle",
 		"nm-applet",
+		"wl-paste --watch cliphist store",
 	}
 
 	for _, cmd in ipairs(apps) do
-		hl.dsp.exec_cmd(cmd)
+		hl.exec_cmd(cmd)
 	end
 end)

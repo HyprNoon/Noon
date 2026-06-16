@@ -74,7 +74,7 @@ LayerRect {
                 anchors.fill: parent
                 onReleased: {
                     root.dismiss();
-                    ClipboardService.manager.copy(modelData.emoji);
+                    ClipboardService.copy(modelData.emoji);
                     EmojisService.recordEmojiUse(modelData.emoji);
                 }
             }
@@ -101,7 +101,7 @@ LayerRect {
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0) {
                     const e = model.values[currentIndex].emoji;
-                    ClipboardService.manager.copy(e);
+                    ClipboardService.copy(e);
                     EmojisService.recordEmojiUse(e);
                     root.dismiss();
                 }

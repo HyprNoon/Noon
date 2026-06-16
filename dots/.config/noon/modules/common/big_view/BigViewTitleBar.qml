@@ -70,6 +70,6 @@ RowLayout {
         colBackground: Colors.colSurfaceContainerHigh
         colBackgroundHover: Colors.colSurfaceContainerHighestHover
         colBackgroundActive: Colors.colSurfaceContainerHighestActive
-        releaseAction: () => GlobalStates.common.openGameUI = false
+        releaseAction: () => Globals.common.openGameUI = false
     }
 }

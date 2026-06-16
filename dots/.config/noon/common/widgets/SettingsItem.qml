@@ -168,14 +168,14 @@ StyledRect {
         // anchors.margins: Padding.large
         anchors.leftMargin: Padding.veryhuge
         anchors.rightMargin: Padding.veryhuge
-        spacing: Padding.massive
+        spacing: Padding.huge
 
         StyledRect {
             visible: !root.hideTitle
             Layout.preferredHeight: 45
             Layout.preferredWidth: 45
             radius: Rounding.full
-            color: root.isActive ? colors.colPrimary : colors.colLayer3
+            color: root.isActive ? colors.colPrimary : colors.colSurfaceContainerHighest
 
             Symbol {
                 id: iconSymbol
@@ -230,11 +230,11 @@ StyledRect {
 
         StyledLoader {
             id: refreshLoader
-            Layout.leftMargin: -Padding.verylarge
+            Layout.leftMargin: -Padding.normal
             shown: root.canRefresh
             sourceComponent: RippleButtonWithIcon {
                 materialIcon: "refresh"
-                // colBackground: "transparent"
+                colBackground: Colors.colSurfaceContainerHighest
                 implicitSize: 45
                 releaseAction: () => root.refreshAction()
             }

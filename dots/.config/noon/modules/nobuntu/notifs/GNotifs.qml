@@ -11,7 +11,7 @@ StyledPanel {
     id: root
     name: "notifs"
     shell: "nobuntu"
-    visible: GlobalStates.nobuntu.notifs.show
+    visible: Globals.nobuntu.notifs.show
     anchors {
         top: true
         right: true
@@ -24,7 +24,7 @@ StyledPanel {
     FocusHandler {
         windows: [root]
         active: root.visible
-        onCleared: GlobalStates.nobuntu.notifs.show = false
+        onCleared: Globals.nobuntu.notifs.show = false
     }
     StyledRect {
         id: bg

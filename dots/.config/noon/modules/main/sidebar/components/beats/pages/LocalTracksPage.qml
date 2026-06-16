@@ -67,12 +67,15 @@ StyledRect {
         anchors.margins: Padding.large
         reuseItems: false
         model: filteredModel
-        property int columns: root.expanded ? 4 : 2
+        readonly property int columns: controls.listMode ? 1 : root.expanded ? 4 : 2
         cellWidth: width / columns
-        cellHeight: cellWidth
+        cellHeight: controls.listMode ? 76 : cellWidth
         property string libPath: BeatsService.daemonOptions.players.main.musicDirectory + "/"
         delegate: TrackItem {
-            implicitSize: grid.cellWidth - Padding.large
+            // model: filteredModel
+            listMode: controls?.listMode ?? false
+            implicitHeight: grid.cellHeight - margins
+            implicitWidth: grid.cellWidth - margins
             title: modelData?.title ?? ""
             artist: modelData?.artist ?? ""
             coverArt: grid.libPath + modelData?.cover ?? ""

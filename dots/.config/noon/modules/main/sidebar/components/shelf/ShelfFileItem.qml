@@ -152,7 +152,7 @@ StyledRect {
                 "materialIcon": "open_in_new",
                 "action": () => {
                     NoonUtils.openFile(path);
-                    if (!GlobalStates.main.sidebar.pinned) {
+                    if (!Globals.main.sidebar.pinned) {
                         NoonUtils.callIpc("sidebar hide");
                     }
                 }
@@ -190,7 +190,7 @@ StyledRect {
                 "visible": NoonUtils.checkIfDlp(root.path),
                 "action": () => {
                     NoonUtils.runDownloader(path);
-                    if (!GlobalStates.main.sidebar.pinned) {
+                    if (!Globals.main.sidebar.pinned) {
                         NoonUtils.callIpc("sidebar hide");
                     }
                 }

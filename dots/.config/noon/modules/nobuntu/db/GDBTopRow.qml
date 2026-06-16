@@ -47,7 +47,7 @@ Item {
                 iconSize: 18
                 onPressed: {
                     modelData.action();
-                    GlobalStates.nobuntu.db.show = false;
+                    Globals.nobuntu.db.show = false;
                 }
             }
         }
@@ -61,7 +61,7 @@ Item {
                 iconSize: 18
                 onPressed: {
                     modelData.action();
-                    GlobalStates.nobuntu.db.show = false;
+                    Globals.nobuntu.db.show = false;
                 }
             }
         }

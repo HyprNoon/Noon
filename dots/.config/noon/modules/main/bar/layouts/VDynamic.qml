@@ -11,15 +11,15 @@ StyledPanel {
 
     readonly property string pos: Mem.options.bar.behavior.position
     readonly property bool autoHide: Mem.options.bar.behavior.autoHide
-    readonly property int mode: Mem.options.bar.appearance.mode
     readonly property bool useBg: Mem.options.bar.appearance.useBg
     readonly property int peekSize: 10
 
-    readonly property int barWidth: Mem.options.bar.appearance.width
+    readonly property int barWidth: Mem.options.bar.appearance.size
     readonly property int hideMargin: autoHide && !hovered ? -(barWidth - peekSize) : 0
 
     name: "bar"
     shell: "noon"
+    _layer: "Top"
 
     implicitWidth: barWidth + 100
     exclusiveZone: autoHide ? (hovered && !useBg ? barWidth : peekSize) : barWidth

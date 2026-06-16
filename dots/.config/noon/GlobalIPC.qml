@@ -24,7 +24,7 @@ Scope {
         }
 
         function toggle_screenshot(): void {
-            GlobalStates.main.showScreenshot = !GlobalStates.main.showScreenshot;
+            Globals.main.showScreenshot = !Globals.main.showScreenshot;
         }
 
         function trigger_autostart_apps(): void {
@@ -50,7 +50,7 @@ Scope {
                 NoonUtils.requestDialog("thawb", link);
         }
         function toggle_dormant_sphere() {
-            GlobalStates.showDormantShere = !GlobalStates.showDormantShere;
+            Globals.showDormantShere = !Globals.showDormantShere;
         }
         function toggle_dormant_state() {
             Mem.states.desktop.shell.deload = !Mem.states.desktop.shell.deload;
@@ -75,7 +75,7 @@ Scope {
             BrightnessService.decreaseBrightness();
         }
         function clear_clipboard() {
-            ClipboardService.manager.wipe();
+            ClipboardService.wipe();
         }
         function refresh_appearance() {
             WallpaperService.refreshTheme();
@@ -112,7 +112,7 @@ Scope {
         }
 
         function lock() {
-            GlobalStates.main.locked = true;
+            Globals.main.locked = true;
             IdleService.idleMonitor.reset();
         }
 
@@ -135,8 +135,8 @@ Scope {
                 };
             });
 
-            GlobalStates.main.dmenu.items = preparedItems;
-            GlobalStates.main.dmenu.action = callback;
+            Globals.main.dmenu.items = preparedItems;
+            Globals.main.dmenu.action = callback;
             NoonUtils.callIpc("sidebar reveal DMenu");
         }
 

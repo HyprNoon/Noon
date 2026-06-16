@@ -70,11 +70,11 @@ Singleton {
     }
 
     hyprland: QtObject {
-        property real borders: Mem.hypr.borders || 0
-        property real gapsOut: Mem.hypr.gaps_out || 0
-        property real gapsIn: Mem.hypr.gaps_in || 0
-        property real blurSize: Mem.hypr.blur_size || 0
-        property real blurPasses: Mem.hypr.blur_passes || 0
-        property real shadowsRange: Mem.hypr.shadows_range || 0
+        property real borders: Mem.hypr.borders ?? 0
+        property real gapsOut: Mem.hypr.gaps_out ?? 0
+        property real gapsIn: Mem.hypr.gaps_in ?? 0
+        property real blurSize: Mem.hypr.blur_size ?? 0
+        property real blurPasses: Mem.hypr.blur_passes ?? 0
+        property real shadowsRange: Mem.hypr.shadows_range ?? 0
     }
 }

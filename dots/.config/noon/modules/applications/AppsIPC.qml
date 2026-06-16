@@ -9,32 +9,37 @@ import "editor"
 import "reader"
 import "settings"
 
-Scope {
-    id: root
-    readonly property Component settings: Settings {}
-    readonly property Component reader: PDFReader {}
-    readonly property Component editor: Editor {}
-    readonly property Component mediaplayer: MediaPlayer {}
+IpcHandler {
+    id: ipc
+    target: "apps"
 
-    IpcHandler {
-        id: ipc
-        target: "apps"
+    function settings() {
+        createAppWindow("settings/Settings.qml");
+    }
 
-        function settings() {
-            root.settings.createObject(root);
-        }
-        function pdf() {
-            root.reader.createObject(root);
-        }
-        function editor() {
-            root.editor.createObject(root);
-        }
-        function edit(file: string): void {
-            GlobalStates.applications.editor.currentFile = file;
-            root.editor.createObject(root);
-        }
-        function media() {
-            root.mediaplayer.createObject(root);
+    function pdf() {
+        createAppWindow("reader/PDFReader.qml");
+    }
+
+    function editor() {
+        createAppWindow("editor/Editor.qml");
+    }
+
+    function edit(file) {
+        Globals.applications.editor.currentFile = file;
+        createAppWindow("editor/Editor.qml");
+    }
+
+    function media() {
+        createAppWindow("mediaplayer/MediaPlayer.qml");
+    }
+
+    function createAppWindow(path) {
+        var component = Qt.createComponent(Qt.resolvedUrl(path));
+        if (component.status === Component.Ready) {
+            component.createObject(root);
+        } else if (component.status === Component.Error) {
+            console.error("Error loading component:", component.errorString());
         }
     }
 }

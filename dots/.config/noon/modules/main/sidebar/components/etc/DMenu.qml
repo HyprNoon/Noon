@@ -12,8 +12,8 @@ LayerRect {
     radius: Rounding.verylarge
 
     property string searchQuery: ""
-    readonly property var content_model: GlobalStates.main.dmenu.items
-    readonly property var action: GlobalStates.main.dmenu.action
+    readonly property var content_model: Globals.main.dmenu.items
+    readonly property var action: Globals.main.dmenu.action
     signal searchFocusRequested
     signal contentFocusRequested
     signal dismiss

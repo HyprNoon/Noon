@@ -13,6 +13,7 @@ StyledRect {
     property bool _expanded: mode !== ""
     property alias inputArea: inputArea
     property bool isSearching: false
+    property bool listMode: false
     anchors.margins: Padding.huge
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
@@ -154,6 +155,10 @@ StyledRect {
                         {
                             icon: "refresh",
                             action: () => BeatsService.fetchLibrary()
+                        },
+                        {
+                            icon: listMode ? "list" : "window",
+                            action: () => listMode = !listMode
                         },
                         {
                             icon: "folder",

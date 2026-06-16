@@ -14,7 +14,7 @@ Item {
     required property bool rightMode
     required property string selectedCategory
     required property QtObject colors
-    readonly property var sidebar: GlobalStates.main.sidebar
+    readonly property var sidebar: Globals.main.sidebar
 
     ScriptModel {
         id: bubbles
@@ -93,29 +93,29 @@ Item {
                     {
                         "icon": "open_in_new",
                         "action": () => {
-                            Qt.openUrlExternally(GlobalStates.web_session?.url ?? "");
+                            Qt.openUrlExternally(Globals.web_session?.url ?? "");
                             NoonUtils.callIpc("sidebar hide");
                         }
                     },
                     {
                         "icon": "keyboard_double_arrow_left",
-                        "enabled": GlobalStates.web_session?.canGoBack ?? false,
+                        "enabled": Globals.web_session?.canGoBack ?? false,
                         "action": () => {
-                            GlobalStates.web_session.goBack();
+                            Globals.web_session.goBack();
                         }
                     },
                     {
                         "icon": "keyboard_double_arrow_right",
-                        "enabled": GlobalStates.web_session?.canGoForward ?? false,
+                        "enabled": Globals.web_session?.canGoForward ?? false,
                         "action": () => {
-                            GlobalStates.web_session.goForward();
+                            Globals.web_session.goForward();
                         }
                     },
                     {
                         "icon": "restart_alt",
-                        "enabled": !GlobalStates.web_session?.loading ?? false,
+                        "enabled": !Globals.web_session?.loading ?? false,
                         "action": () => {
-                            GlobalStates.web_session.reload();
+                            Globals.web_session.reload();
                         }
                     }
                 ]
@@ -126,7 +126,7 @@ Item {
                     {
                         "icon": "clear_all",
                         "action": () => {
-                            ClipboardService.manager.wipe();
+                            ClipboardService.wipe();
                         }
                     }
                 ]

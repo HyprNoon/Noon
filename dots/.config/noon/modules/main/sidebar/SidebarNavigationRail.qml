@@ -26,7 +26,30 @@ Item {
         clip: true
         anchors.fill: parent
         color: colors.colLayer2
+        StyledRect {
+            z: 9999
+            readonly property bool show: SidebarData?.isStealth(root.selectedCategory)
+            anchors.fill: parent
+            visible: opacity > 0
+            opacity: show ? 1 : 0
+            color: colors.colLayer2
 
+            StyledRect {
+                anchors.centerIn: parent
+                color: Colors.colPrimaryContainer
+                radius: Rounding.full
+                implicitWidth: catName.contentHeight + Padding.small * 2
+                implicitHeight: catName.contentWidth + Padding.massive * 2
+
+                StyledText {
+                    id: catName
+                    text: show ? root.selectedCategory : ""
+                    font.pixelSize: Fonts.sizes.large
+                    anchors.centerIn: parent
+                    rotation: -90
+                }
+            }
+        }
         Item {
             anchors.fill: parent
 
@@ -110,7 +133,7 @@ Item {
                         xAxis.enabled: true
                         yAxis.enabled: false
                         onActiveChanged: if (SidebarData.isDetachable(modelData) && !SidebarData.isDetached(modelData)) {
-                            GlobalStates.main.sidebar.detach(modelData);
+                            Globals.main.sidebar.detach(modelData);
                         }
                     }
                 }

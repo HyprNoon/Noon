@@ -24,9 +24,9 @@ StyledIconImage {
     }
 
     Connections {
-        target: GlobalStates.nobuntu.clipboard
+        target: Globals.nobuntu.clipboard
         function onShowChanged() {
-            _popup_loader.active = GlobalStates.nobuntu.clipboard.show;
+            _popup_loader.active = Globals.nobuntu.clipboard.show;
         }
     }
 

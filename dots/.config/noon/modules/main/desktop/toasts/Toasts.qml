@@ -23,7 +23,7 @@ Variants {
 
         Item {
             id: container
-            readonly property bool rightMode: !GlobalStates.main?.sidebar?.rightMode
+            readonly property bool rightMode: !Globals.main?.sidebar?.rightMode
             anchors.right: rightMode ? parent.right : undefined
             anchors.left: rightMode ? undefined : parent.left
             anchors.bottom: parent.bottom
@@ -42,7 +42,7 @@ Variants {
                 verticalLayoutDirection: ListView.BottomToTop
                 reuseItems: false
                 spacing: Padding.normal
-                _model: GlobalStates.toasts.data
+                _model: Globals.toasts.data
                 delegate: Toast {
                     anchors.horizontalCenter: parent?.horizontalCenter
                     width: Sizes.toastWidth

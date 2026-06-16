@@ -36,7 +36,8 @@ BarGroup {
         },
         {
             icon: BatteryService.materialIcon,
-            hoverItem: batteryPopup
+            hoverItem: batteryPopup,
+            color: BatteryService.isLowAndNotCharging ? Colors.colError : Colors.colSecondary
         // visible: BatteryService.available
         },
         {
@@ -79,7 +80,7 @@ BarGroup {
 
             delegate: Symbol {
                 icon: modelData.icon || ""
-                color: Colors.colSecondary
+                color: modelData?.color ?? Colors.colSecondary
                 font.pixelSize: Fonts.sizes.verylarge
                 fill: 1
                 MouseArea {
@@ -89,7 +90,7 @@ BarGroup {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         if (modelData.dialog) {
-                            GlobalStates.main.dialogs.current = modelData.dialog;
+                            Globals.main.dialogs.current = modelData.dialog;
                             NoonUtils.callIpc("sidebar reveal Notifs");
                         } else
                             modelData?.action() ?? null;

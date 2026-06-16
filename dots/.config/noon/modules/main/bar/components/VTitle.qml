@@ -9,7 +9,7 @@ import qs.store
 Item {
     id: root
 
-    readonly property string appId: MonitorsInfo.topLevel.appId ?? ""
+    readonly property string appId: MonitorsInfo?.topLevel?.appId ?? ""
     readonly property var titleSubstitutions: {
         "org.kde.dolphin": "Files",
         "dev.zed.Zed": "Zed",
@@ -27,7 +27,7 @@ Item {
         return titleSubstitutions[id] || id;
     }
 
-    height: nameText.contentWidth + Padding.massive
+    implicitHeight: nameText.contentWidth + Padding.massive
     Layout.fillWidth: true
     StyledText {
         id: nameText
@@ -36,7 +36,6 @@ Item {
         color: Colors.colOnLayer1
         elide: Text.ElideRight
         maximumLineCount: 1
-        animateChange: true
         rotation: -90
 
         font.pixelSize: Fonts.family.verylarge

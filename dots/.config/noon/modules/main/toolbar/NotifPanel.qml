@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import qs.common
@@ -6,18 +7,34 @@ import qs.common.widgets
 
 Scope {
     id: root
+    property string selectedCategory: ""
+    readonly property var contentMap: [
+        {
+            name: "Dash",
+            icon: "dashboard"
+        },
+        {
+            name: "Wallpapers",
+            icon: "image"
+        },
+        {
+            name: "Workspaces",
+            icon: "workspaces"
+        },
+        {
+            name: "Beats",
+            icon: "music_note"
+        }
+    ]
     Variants {
         model: MonitorsInfo.main
         StyledPanel {
             id: panel
             property var modelData
-            name: "toolbar"
+            name: "noanim_blurred_layer"
             shell: "noon"
-
-            anchors.top: true
-            implicitWidth: 999
-            implicitHeight: 999
-
+            fill: true
+            _layer: "Overlay"
             mask: Region {
                 item: bg
             }
@@ -44,80 +61,38 @@ Scope {
             StyledRect {
                 id: bg
                 z: 0
+                readonly property bool expanded: hoverArea.containsMouse
+                readonly property size collapsedSize: Qt.size(300, 50)
+                readonly property size expandedSize: Qt.size(1100, 420)
 
-                anchors {
-                    top: parent.top
-                    horizontalCenter: parent.horizontalCenter
-                    margins: Padding.massive
-                    topMargin: 0
-                }
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
                 color: Colors.colLayer0
                 clip: true
-                layer.enabled: false
-                implicitWidth: collapsedSize.width
-                implicitHeight: collapsedSize.height
+                width: expanded ? expandedSize.width : collapsedSize.width
+                height: expanded ? expandedSize.height : collapsedSize.height
+                bottomRadius: Rounding.silly
 
-                readonly property bool expanded: hoverArea.containsMouse
-                readonly property size collapsedSize: Qt.size(500, 82)
-                readonly property size expandedSize: Qt.size(800, 385)
-
-                Content {
-                    panel: root.panel
-                    state: bg.state
-                    visible: state !== "hidden"
+                Item {
                     anchors.fill: parent
                     anchors.margins: Padding.large
-                }
 
-                states: [
-                    State {
-                        name: "hidden"
-                        when: false
-                        PropertyChanges {
-                            target: bg
-                            implicitHeight: hoverArea.hoverZone
-                            implicitWidth: 200 //collapsedSize.width
-                            opacity: 1
-                            bottomRadius: Rounding.tiny
-                            color: Colors.colPrimary
-                        }
-                    },
-                    State {
-                        name: "collapsed"
-                        when: !bg.expanded
-                        PropertyChanges {
-                            target: bg
-                            implicitWidth: collapsedSize.width
-                            implicitHeight: collapsedSize.height
-                            opacity: 1
-                            bottomRadius: Rounding.massive
-                            color: Colors.colLayer0
-                        }
-                    },
-                    State {
-                        name: "expanded"
-                        when: bg.expanded
-                        PropertyChanges {
-                            target: bg
-                            implicitWidth: expandedSize.width
-                            implicitHeight: expandedSize.height
-                            opacity: 1
-                            bottomRadius: Rounding.massive
-                            color: Colors.colLayer0
+                    ColumnLayout {
+                        anchors.fill: parent
+                        RowLayout {
+                            NavRail {
+                                model: root.contentMap
+                                selectedCategory: root.selectedCategory
+                                bg {
+                                    radius: Rounding.large
+                                }
+                            }
+                            Spacer {}
                         }
                     }
-                ]
-
-                transitions: Transition {
-                    Anim {
-                        properties: "implicitHeight,implicitWidth,radius,bottomRadius"
-                    }
-                    // Anim {
-                    //     property: "opacity"
-                    //     duration: 100
-                    // }
                 }
             }
+
             RoundCorner {
                 anchors {
                     top: bg.top
@@ -125,7 +100,7 @@ Scope {
                 }
                 color: bg.color
                 corner: RoundCorner.TopLeft
-                size: bg.bottomRadius
+                size: Rounding.veryhuge
                 opacity: bg.opacity
             }
             RoundCorner {
@@ -135,7 +110,7 @@ Scope {
                 }
                 color: bg.color
                 corner: RoundCorner.TopRight
-                size: bg.bottomRadius
+                size: Rounding.veryhuge
                 opacity: bg.opacity
             }
             StyledRectangularShadow {

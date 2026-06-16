@@ -1,28 +1,33 @@
 #!/usr/bin/env python3
 
 import fcntl
+import hashlib
 import os
+import subprocess
 import sys
+import tempfile
 from multiprocessing import Pool
 from pathlib import Path
 from typing import List
 
 import click
-import gi
 from loguru import logger
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 from tqdm import tqdm
 
-gi.require_version("GnomeDesktop", "3.0")
-from gi.repository import Gio, GnomeDesktop  # isort:skip
+VIDEO_EXTENSIONS = {".mp4", ".webm", ".mkv", ".mov", ".avi", ".m4v"}
+
+THUMBNAIL_CACHE = Path.home() / ".cache" / "thumbnails"
 
 thumbnail_size_map = {
-    "normal": GnomeDesktop.DesktopThumbnailSize.NORMAL,
-    "large": GnomeDesktop.DesktopThumbnailSize.LARGE,
-    "x-large": GnomeDesktop.DesktopThumbnailSize.XLARGE,
-    "xx-large": GnomeDesktop.DesktopThumbnailSize.XXLARGE,
+    "normal": 128,
+    "large": 256,
+    "x-large": 512,
+    "xx-large": 1024,
 }
 
-factory = None
+thumbnail_size = None
 logger.remove()
 logger.add(sys.stdout, level="INFO")
 logger.add("/tmp/thumbnails_service.log", level="DEBUG", rotation="100 MB")
@@ -48,33 +53,112 @@ def release_lock() -> None:
 
 
 def init_worker(size: str) -> None:
-    global factory
-    factory = GnomeDesktop.DesktopThumbnailFactory.new(thumbnail_size_map[size])
+    global thumbnail_size
+    thumbnail_size = size
 
 
-def make_thumbnail(fpath: str) -> bool:
+def get_thumbnail_dir(size: str) -> Path:
+    return THUMBNAIL_CACHE / size
+
+
+def get_thumbnail_path(uri: str, size: str) -> Path:
+    md5 = hashlib.md5(uri.encode()).hexdigest()
+    return get_thumbnail_dir(size) / f"{md5}.png"
+
+
+def ensure_cache_dirs() -> None:
+    for size in thumbnail_size_map:
+        get_thumbnail_dir(size).mkdir(parents=True, exist_ok=True)
+
+
+def is_fresh(uri: str, mtime: float) -> bool:
+    thumb_path = get_thumbnail_path(uri, thumbnail_size)
+    if not thumb_path.exists():
+        return False
+    try:
+        img = Image.open(thumb_path)
+        return img.info.get("Thumb::MTime") == str(int(mtime))
+    except Exception:
+        return False
+
+
+def make_video_thumbnail(fpath: str) -> bool:
     mtime = os.path.getmtime(fpath)
-    f = Gio.file_new_for_path(str(fpath))
-    uri = f.get_uri()
-    info = f.query_info("standard::content-type", Gio.FileQueryInfoFlags.NONE, None)
-    mime_type = info.get_content_type()
+    uri = Path(fpath).resolve().as_uri()
 
-    if factory.lookup(uri, mtime) is not None:
+    if is_fresh(uri, mtime):
         logger.debug("FRESH       {}".format(uri))
         return False
 
-    if not factory.can_thumbnail(uri, mime_type, mtime):
-        logger.debug("UNSUPPORTED {}".format(uri))
+    fd, tmppath = tempfile.mkstemp(suffix=".png")
+    os.close(fd)
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", fpath, "-vframes", "1", "-an", tmppath],
+            capture_output=True,
+            timeout=30,
+            check=True,
+        )
+        img = Image.open(tmppath)
+        img.thumbnail(
+            (thumbnail_size_map[thumbnail_size], thumbnail_size_map[thumbnail_size]),
+            Image.LANCZOS,
+        )
+
+        metadata = PngInfo()
+        metadata.add_text("Thumb::URI", uri)
+        metadata.add_text("Thumb::MTime", str(int(mtime)))
+        metadata.add_text("Software", "Noon Thumbnails")
+
+        save_path = get_thumbnail_path(uri, thumbnail_size)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        img.save(str(save_path), format="PNG", pnginfo=metadata)
+
+        logger.debug("OK          {}".format(uri))
+        return True
+    except Exception:
+        logger.debug("ERROR       {}".format(uri))
+        return False
+    finally:
+        if os.path.exists(tmppath):
+            os.unlink(tmppath)
+
+
+def make_image_thumbnail(fpath: str) -> bool:
+    mtime = os.path.getmtime(fpath)
+    uri = Path(fpath).resolve().as_uri()
+
+    if is_fresh(uri, mtime):
+        logger.debug("FRESH       {}".format(uri))
         return False
 
-    thumbnail = factory.generate_thumbnail(uri, mime_type)
-    if thumbnail is None:
+    try:
+        img = Image.open(fpath)
+        img.thumbnail(
+            (thumbnail_size_map[thumbnail_size], thumbnail_size_map[thumbnail_size]),
+            Image.LANCZOS,
+        )
+
+        metadata = PngInfo()
+        metadata.add_text("Thumb::URI", uri)
+        metadata.add_text("Thumb::MTime", str(int(mtime)))
+        metadata.add_text("Software", "Noon Thumbnails")
+
+        save_path = get_thumbnail_path(uri, thumbnail_size)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        img.save(str(save_path), format="PNG", pnginfo=metadata)
+
+        logger.debug("OK          {}".format(uri))
+        return True
+    except Exception:
         logger.debug("ERROR       {}".format(uri))
         return False
 
-    logger.debug("OK          {}".format(uri))
-    factory.save_thumbnail(thumbnail, uri, mtime)
-    return True
+
+def make_thumbnail(fpath: str) -> bool:
+    if Path(fpath).suffix.lower() in VIDEO_EXTENSIONS:
+        return make_video_thumbnail(fpath)
+    return make_image_thumbnail(fpath)
 
 
 @logger.catch()
@@ -177,6 +261,7 @@ def main(
     machine_progress: bool,
 ) -> None:
     acquire_lock()
+    ensure_cache_dirs()
     try:
         img_dirs = [Path(img_dir) for img_dir in img_dirs.split()]
         for img_dir in img_dirs:

@@ -58,8 +58,8 @@ LayerRect {
 
         Keys.onPressed: event => {
             // Get based on content
-            const selectedItem = TodoService.list.find(item => item.content === filteredModel.values[list.currentIndex].content);
-            const selectedItemIndex = TodoService.list.indexOf(selectedItem);
+            const selectedItem = list.model.values[list.currentIndex];
+            const selectedItemIndex = list.currentIndex;
             if (event.modifiers === Qt.ControlModifier && selectedItemIndex > -1) {
                 switch (event.key) {
                 case Qt.Key_N:

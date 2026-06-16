@@ -54,7 +54,6 @@ Singleton {
                     "key": "desktop.icons.currentIconTheme",
                     "type": "combobox",
                     "reloadOnChange": true,
-                    "store": "state",
                     "canRefresh": true,
                     "refreshAction": () => IconThemesService.reload(),
                     "comboBoxValues": IconThemesService.availableIconThemeIds
@@ -115,6 +114,11 @@ Singleton {
             "shell": "Global",
             "items": [
                 {
+                    "icon": "notifications",
+                    "name": "Toasts",
+                    "key": "desktop.toasts.enabled"
+                },
+                {
                     "icon": "timer",
                     "name": "Desktop Clock",
                     "key": "desktop.clock.enabled"
@@ -122,12 +126,13 @@ Singleton {
                 {
                     "icon": "brand_family",
                     "name": "Arabic Mode",
+                    "store": "states",
                     "key": "desktop.clock.arabicMode"
                 },
                 {
                     "icon": "timer",
                     "name": "Center Clock",
-                    "store": "state",
+                    "store": "states",
                     "enableTooltip": false,
                     "key": "desktop.clock.center"
                 },
@@ -146,7 +151,7 @@ Singleton {
                     "comboBoxValues": ["TopCenter", "TopRight", "TopLeft", "BottomCenter", "BottomRight", "bottomLeft"]
                 },
                 {
-                    "store": "state",
+                    "store": "states",
                     "icon": "font_download",
                     "name": "Clock Weight",
                     "key": "fonts.variableAxes.display.wght",
@@ -156,7 +161,7 @@ Singleton {
                     "sliderMaxValue": 1000
                 },
                 {
-                    "store": "state",
+                    "store": "states",
                     "icon": "font_download",
                     "name": "Clock Width",
                     "key": "fonts.variableAxes.display.wdth",
@@ -171,7 +176,7 @@ Singleton {
                     "key": "desktop.clock.verticalMode"
                 },
                 {
-                    "store": "state",
+                    "store": "states",
                     "icon": "timer",
                     "name": "Clock Size",
                     "key": "desktop.clock.scale",
@@ -321,6 +326,13 @@ Singleton {
                     "comboBoxValues": HyprlandService?.availableAnimations ?? []
                 },
                 {
+                    "icon": "blur_on",
+                    "name": "Animation Scale",
+                    "type": "text",
+                    "store": "hypr",
+                    "key": "animation_scale"
+                },
+                {
                     "icon": "monitor",
                     "name": "External Monitor Profile",
                     "type": "combobox",
@@ -372,14 +384,8 @@ Singleton {
                 },
                 {
                     "icon": "width_full",
-                    "name": "Width",
-                    "key": "bar.appearance.width",
-                    "type": "spin"
-                },
-                {
-                    "icon": "height",
-                    "name": "Height",
-                    "key": "bar.appearance.height",
+                    "name": "Size",
+                    "key": "bar.appearance.size",
                     "type": "spin"
                 },
                 {

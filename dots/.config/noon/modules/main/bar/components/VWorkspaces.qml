@@ -65,7 +65,7 @@ BarGroup {
     }
 
     WheelHandler {
-        onWheel: event => Hyprland.dispatch(`workspace r${event.angleDelta.y < 0 ? '+' : '-'}1`)
+        onWheel: event => HyprlandService.focusWs(`r${event.angleDelta.y < 0 ? '+' : '-'}1`)
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
     }
 
@@ -74,7 +74,7 @@ BarGroup {
         acceptedButtons: Qt.BackButton
         onPressed: event => {
             if (event.button === Qt.BackButton) {
-                Hyprland.dispatch(`togglespecialworkspace`);
+                HyprlandService.focusWs("special");
             }
         }
     }
@@ -177,12 +177,12 @@ BarGroup {
 
                 readonly property var windowToplevel: root.findToplevelForWindow(biggestWindow)
                 readonly property string appIconSource: biggestWindow?.class ? NoonUtils.iconPath(DesktopEntries?.byId(biggestWindow?.class)?.icon) : ""
-                readonly property bool showNumber: Mem.options.bar.workspaces.alwaysShowNumbers || GlobalStates.superHeld || !biggestWindow
+                readonly property bool showNumber: Mem.options.bar.workspaces.alwaysShowNumbers || Globals.superHeld || !biggestWindow
                 readonly property int positionMultiplier: Mem.options.bar.behavior.position === "left" ? -1 : 1
 
                 Layout.fillWidth: true
                 height: workspaceButtonHeight
-                onPressed: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${workspaceValue} })`)
+                onPressed: HyprlandService.focusWs(workspaceValue)
 
                 background: Item {
                     implicitHeight: workspaceButtonHeight

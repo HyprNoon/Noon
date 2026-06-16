@@ -22,7 +22,7 @@ BarGroup {
         anchors.fill: parent
         onWheel: event => {
             const dir = event.angleDelta.y < 0 ? "+1" : "-1";
-            Hyprland.dispatch(`hl.dsp.focus({ workspace = "r${dir}" })`);
+            HyprlandService.focusWs("r${dir}");
         }
     }
 
@@ -60,7 +60,7 @@ BarGroup {
         text: Mem.options.bar.workspaces.unicodeChar
         MouseArea {
             anchors.fill: parent
-            onClicked: Hyprland.dispatch(`workspace ${dot.wsId}`)
+            onClicked: HyprlandService.focusWs(dot.wsId)
         }
     }
     readonly property Component rectComp: StyledRect {
@@ -76,7 +76,7 @@ BarGroup {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: Hyprland.dispatch(`workspace ${dot.wsId}`)
+            onClicked: HyprlandService.focusWs(dot.wsId)
         }
     }
 }

@@ -22,12 +22,12 @@ Image {
     fillMode: Image.PreserveAspectCrop
     layer.enabled: root.blur
 
-    StyledRect {
-        visible: root.tint
-        anchors.fill: parent
-        color: root.tintColor
-        opacity: 1 - root.tintLevel
-    }
+    // StyledRect {
+    //     visible: root.tint
+    //     anchors.fill: parent
+    //     color: root.tintColor
+    //     opacity: 1 - root.tintLevel
+    // }
 
     Behavior on opacity {
         Anim {}
@@ -36,7 +36,7 @@ Image {
     layer.effect: MultiEffect {
         source: root
         // saturation: 0.2
-        blurEnabled: true
+        blurEnabled: root.blur
         blurMax: root.blurMax
         blur: root.blurSize
     }

@@ -76,6 +76,7 @@ LayerRect {
         currentIndex: -1
         anchors.fill: parent
         anchors.margins: Padding.huge
+        cellHeight: cellWidth + Padding.massive
         model: filteredModel
         columns: root.expanded ? 4 : 2
         opacity: popup.active ? 0 : 1
@@ -105,10 +106,12 @@ LayerRect {
                 }
 
                 GridLayout {
-                    anchors.fill: parent
-                    anchors.margins: Padding.large
+                    anchors.centerIn: parent
                     columns: 2
                     rows: 2
+                    columnSpacing: Padding.veryhuge
+                    rowSpacing: Padding.veryhuge
+
                     Repeater {
                         model: modelData.items.slice(0, 4)
                         StyledIconImage {
@@ -129,11 +132,12 @@ LayerRect {
             }
 
             StyledText {
+                color: Colors.colOnLayer2
                 font.pixelSize: Fonts.sizes.normal
                 text: modelData.category.replace(/([a-z])([A-Z])/g, '$1 $2')
                 anchors.top: groupTile.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: Padding.small
+                anchors.topMargin: Padding.large
             }
         }
 

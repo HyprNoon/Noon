@@ -23,7 +23,7 @@ Item {
     z: isSelected ? 2 : 0
     function launch() {
         GameLauncherService.launchGame(modelData.id);
-        GlobalStates.common.openGameUI = false;
+        Globals.common.openGameUI = false;
         NoonUtils.callIpc("global deload");
     }
     Item {

@@ -29,7 +29,7 @@ LayerRect {
     ScriptModel {
         id: filteredModel
         values: {
-            const entries = ClipboardService.manager.entries;
+            const entries = ClipboardService.entries;
             if (!entries.length)
                 return [];
 
@@ -56,7 +56,7 @@ LayerRect {
         highlightFollowsCurrentItem: true
         highlightMoveDuration: 150
 
-        delegate: Loader {
+        delegate: StyledLoader {
             id: loader
             required property int index
             required property var modelData
@@ -69,10 +69,8 @@ LayerRect {
             property bool isSelected: listView.currentIndex === index
 
             onLoaded: {
-                if (item) {
-                    item.itemData = Qt.binding(() => loader.modelData);
-                    item.selected = Qt.binding(() => loader.isSelected);
-                }
+                _item.itemData = modelData;
+                _item.selected = Qt.binding(() => loader.isSelected);
             }
         }
 
@@ -128,7 +126,7 @@ LayerRect {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        ClipboardService.manager.copyByIndex(itemData.index);
+                        ClipboardService.copyByIndex(itemData.index);
                         NoonUtils.playSound("event_accepted");
                         root.dismiss();
                     }
@@ -155,7 +153,7 @@ LayerRect {
                 colTitle: !hovered && isColor ? ColorUtils.getReadableColOn(colBackground) : colors.colOnLayer2
                 colSubtext: !hovered && isColor ? ColorUtils.colorWithLightness(colTitle, 0.2) : colors.colSubtext
                 releaseAction: () => {
-                    ClipboardService.manager.copyByIndex(itemData.index);
+                    ClipboardService.copyByIndex(itemData.index);
                     NoonUtils.playSound("event_accepted");
                     root.dismiss();
                 }
@@ -179,14 +177,14 @@ LayerRect {
                 event.accepted = true;
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                 if (currentIndex >= 0 && currentIndex < model.values.length) {
-                    ClipboardService.manager.copyByIndex(model.values[currentIndex].index);
+                    ClipboardService.copyByIndex(model.values[currentIndex].index);
                     NoonUtils.playSound("event_accepted");
                     root.dismiss();
                 }
                 event.accepted = true;
             } else if (event.key === Qt.Key_Delete) {
                 if (currentIndex >= 0 && currentIndex < model.values.length) {
-                    ClipboardService.manager.deleteEntry(model.values[currentIndex].index);
+                    ClipboardService.deleteEntry(model.values[currentIndex].index);
                     if (currentIndex >= count) {
                         currentIndex = count - 1;
                     }

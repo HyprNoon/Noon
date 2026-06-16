@@ -124,7 +124,7 @@ StyledPanel {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${index + 1} })`);
+                        onClicked: HyprlandService.focusWs(index + 1);
                         cursorShape: Qt.PointingHandCursor
                     }
                 }
@@ -132,7 +132,7 @@ StyledPanel {
         }
 
         WheelHandler {
-            onWheel: event => Hyprland.dispatch(`workspace ${event.angleDelta.y < 0 ? '+1' : '-1'}`)
+            onWheel: event => HyprlandService.focusWs(`${event.angleDelta.y < 0 ? '+1' : '-1'}`)
         }
         MouseArea {
             id: _bg_event_area

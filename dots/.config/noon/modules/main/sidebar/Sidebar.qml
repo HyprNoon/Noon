@@ -71,8 +71,8 @@ Variants {
 
         function incubate(cat = selectedCategory) {
             if (SidebarData.isIncubatable(cat)) {
-                GlobalStates.main.sysDialogs.mode = "incubate";
-                GlobalStates.main.sysDialogs.pendingData = cat;
+                Globals.main.sysDialogs.mode = "incubate";
+                Globals.main.sysDialogs.pendingData = cat;
                 Mem.states.desktop.dialogs.lastIncubatedCategory = cat;
             }
         }
@@ -113,7 +113,7 @@ Variants {
         }
 
         Binding {
-            target: GlobalStates.main
+            target: Globals.main
             property: "sidebar"
             value: root
         }
@@ -255,7 +255,7 @@ Variants {
             target: "sidebar"
             function reveal_aux(cat: string) {
                 content.toggleAux(cat);
-                GlobalStates.main.holdNotif(cat);
+                Globals.main.holdNotif(cat);
             }
 
             function reveal(cat: string) {

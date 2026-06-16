@@ -13,7 +13,7 @@ Singleton {
     readonly property ScreenTimeManager tracker: ScreenTimeManager {
         bridge: HyprlandService?.bridge ?? null
         dbPath: Directories.services.screenTimeDB
-        saveInterval: 120000
+        saveInterval: 12000
     }
 
     readonly property var appTimes: tracker.appTimes

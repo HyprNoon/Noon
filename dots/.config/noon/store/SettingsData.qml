@@ -369,15 +369,9 @@ Singleton {
                             "key": "bar.appearance.enableSeparators"
                         },
                         {
-                            "icon": "width_full",
-                            "name": "Bar Width",
-                            "key": "bar.appearance.width",
-                            "type": "spin"
-                        },
-                        {
                             "icon": "height",
-                            "name": "Bar Height",
-                            "key": "bar.appearance.height",
+                            "name": "Bar Size",
+                            "key": "bar.appearance.size",
                             "type": "spin"
                         }
                     ]

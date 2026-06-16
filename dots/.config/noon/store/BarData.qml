@@ -13,7 +13,7 @@ Singleton {
     readonly property list<string> appearanceModes: ["float", "sharp", "concave", "convex"]
     readonly property list<string> positions: ["left", "right", "bottom", "top"]
     readonly property list<string> layoutProps: ["fillHeight", "fillWidth", "preferredWidth", "preferredHeight", "topMargin", "bottomMargin", "leftMargin", "rightMargin", "margins", "implicitWidth", "implicitHeight", "width", "height", "minimumWidth", "minimumHeight", "maximumWidth", "maximumHeight"]
-    readonly property int currentBarExclusiveSize: isVertical ? settings.appearance.width : settings.appearance.height
+    readonly property int currentBarExclusiveSize: settings.appearance.size
 
     // Bar Modules
     readonly property var contentTable: {

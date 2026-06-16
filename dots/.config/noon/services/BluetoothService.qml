@@ -4,6 +4,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
+import org.kde.bluezqt as BluezQt
+import qs.common
 
 Singleton {
     id: root
@@ -337,5 +339,97 @@ Singleton {
         id: discoverTimeout
         interval: 2000
         onTriggered: stopDiscovery()
+    }
+
+    // Approximity
+    property var _ignored: ({})
+    property var _popupDevice: null
+
+    function _isAudio(d) {
+        if (!d)
+            return false;
+        var s = ((d.icon || "") + " " + (d.name || d.remoteName || "")).toLowerCase();
+        const match = ["audio", "headset", "headphone", "airpod", "bud", "ear", "mic", "speaker"];
+        const exceptions = ["ble"];
+        return match.some(device => s.includes(device)) && exceptions.some(device => !s.includes(device));
+    }
+
+    function _showPopup(d) {
+        if (!d || d.paired || !_isAudio(d) || _popupDevice || _ignored[d.address])
+            return;
+        _popupDevice = d;
+        NoonUtils.requestDialog("ble", {
+            acceptText: "Connect",
+            device: d,
+            onAccepted: () => {
+                if (!d.connected)
+                    d.connectToDevice();
+                _popupDevice = null;
+            },
+            onDismiss: () => {
+                _ignored[d.address] = true;
+                _popupDevice = null;
+            }
+        });
+    }
+
+    Connections {
+        target: Globals.main.sysDialogs
+        function onModeChanged() {
+            if (Globals.main.sysDialogs.mode !== "ble" && _popupDevice) {
+                _ignored[_popupDevice.address] = true;
+                _popupDevice = null;
+            }
+        }
+    }
+
+    Timer {
+        interval: 500
+        repeat: true
+        running: true
+        onTriggered: {
+            var a = BluezQt.Manager.usableAdapter;
+            if (a && a.powered) {
+                running = false;
+                a.startDiscovery();
+            }
+        }
+    }
+
+    Connections {
+        target: BluezQt.Manager
+        function onDeviceAdded(d) {
+            _showPopup(d);
+        }
+        function onDeviceChanged(d) {
+            _showPopup(d);
+        }
+        function onUsableAdapterChanged() {
+            var a = BluezQt.Manager.usableAdapter;
+            if (a && a.powered)
+                a.startDiscovery();
+        }
+    }
+
+    Connections {
+        target: BluezQt.Manager.usableAdapter
+        enabled: BluezQt.Manager.usableAdapter !== null
+        function onRequestConfirmation(device, passkey) {
+            _popupDevice = device;
+            NoonUtils.requestDialog("ble", {
+                acceptText: "Confirm",
+                device: device,
+                auth: "confirm",
+                passkey: passkey,
+                onAccepted: () => {
+                    _popupDevice = null;
+                },
+                onDismiss: () => {
+                    device.cancelPairing();
+                    _ignored[device.address] = true;
+                    _popupDevice = null;
+                }
+            });
+        }
     }
 }

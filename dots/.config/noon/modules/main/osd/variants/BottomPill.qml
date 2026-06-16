@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
@@ -37,10 +36,12 @@ StyledPanel {
             panelRoot.screen = panelRoot.targetScreen;
         }
     }
+
     StyledRectangularShadow {
         target: bottomPill
     }
-    StyledRect {
+
+    ShaderRect {
         id: bottomPill
 
         anchors.bottom: parent.bottom
@@ -50,7 +51,6 @@ StyledPanel {
         implicitWidth: Sizes.osd.bottomPill.width
         implicitHeight: Sizes.osd.bottomPill.height
 
-        color: Colors.colLayer1
         radius: Rounding.full
 
         clip: true
@@ -58,6 +58,7 @@ StyledPanel {
         RowLayout {
             anchors.fill: parent
             anchors.margins: Padding.verylarge
+            anchors.rightMargin: Padding.massive
             spacing: Padding.veryhuge
 
             StyledRect {
@@ -80,18 +81,10 @@ StyledPanel {
                 id: valueProgressBar
                 Layout.alignment: Qt.AlignCenter
                 Layout.fillWidth: true
-                valueBarHeight: 15
+                valueBarHeight: 5
                 showProgressIndicator: false
-                valueBarGap: 7
+                valueBarGap: 4
                 value: panelRoot.value
-            }
-
-            StyledText {
-                rightPadding: Padding.large
-                color: Colors.colSecondary
-                horizontalAlignment: Text.AlignHCenter
-                text: Math.round(panelRoot.value * 100)
-                font.pixelSize: Fonts.sizes.normal
             }
         }
     }

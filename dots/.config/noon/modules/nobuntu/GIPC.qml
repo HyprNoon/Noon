@@ -10,16 +10,16 @@ Scope {
         id: ipc
         target: "nobuntu"
         function toggle_db() {
-            GlobalStates.nobuntu.db.show = !GlobalStates.nobuntu.db.show;
+            Globals.nobuntu.db.show = !Globals.nobuntu.db.show;
         }
         function toggle_overview() {
-            GlobalStates.nobuntu.overview.show = !GlobalStates.nobuntu.overview.show;
+            Globals.nobuntu.overview.show = !Globals.nobuntu.overview.show;
         }
         function toggle_notifs() {
-            GlobalStates.nobuntu.notifs.show = !GlobalStates.nobuntu.notifs.show;
+            Globals.nobuntu.notifs.show = !Globals.nobuntu.notifs.show;
         }
         function toggle_clipboard() {
-            GlobalStates.nobuntu.clipboard.show = !GlobalStates.nobuntu.clipboard.show;
+            Globals.nobuntu.clipboard.show = !Globals.nobuntu.clipboard.show;
         }
     }
 }

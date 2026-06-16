@@ -37,8 +37,8 @@ StyledRect {
                 keys: ["text/uri-list"]
                 onDropped: drop => {
                     let newPaths = drop.urls.map(url => url.toString());
-                    GlobalStates.applications.mediaplayer.queue = [...GlobalStates.applications.mediaplayer.queue, ...newPaths];
-                    Qt.callLater(() => root.play(GlobalStates.applications.mediaplayer.queue[0]));
+                    Globals.applications.mediaplayer.queue = [...Globals.applications.mediaplayer.queue, ...newPaths];
+                    Qt.callLater(() => root.play(Globals.applications.mediaplayer.queue[0]));
                     console.log("Dropped files:", newPaths);
                 }
             }

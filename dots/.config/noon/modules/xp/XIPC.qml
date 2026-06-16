@@ -9,12 +9,12 @@ IpcHandler {
     target: "xp"
 
     function toggle_run() {
-        GlobalStates.xp.showRun = !GlobalStates.xp.showRun;
+        Globals.xp.showRun = !Globals.xp.showRun;
     }
     function toggle_settings() {
-        GlobalStates.xp.showControlPanel = !GlobalStates.xp.showControlPanel;
+        Globals.xp.showControlPanel = !Globals.xp.showControlPanel;
     }
     function toggle_start_menu() {
-        GlobalStates.xp.showStartMenu = !GlobalStates.xp.showStartMenu;
+        Globals.xp.showStartMenu = !Globals.xp.showStartMenu;
     }
 }

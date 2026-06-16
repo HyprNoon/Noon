@@ -7,9 +7,8 @@ import "content"
 
 Scope {
     id: root
-    property string currentMode: GlobalStates.main.sysDialogs.mode
-    property bool canDismiss: GlobalStates.main.sysDialogs?.pendingData?.canDismiss ?? true
-
+    property string currentMode: Globals.main.sysDialogs.mode
+    property bool canDismiss: Globals.main.sysDialogs?.pendingData?.canDismiss ?? true
     Variants {
         model: MonitorsInfo.main
 
@@ -60,7 +59,8 @@ Scope {
                     implicitWidth: Math.min(Screen.width, currentSize.width)
                     implicitHeight: Math.min(Screen.height, currentSize.height)
 
-                    readonly property size currentSize: contentMap[root.currentMode]?.size ?? Qt.size(500, 120)
+                    property bool fullScreen: false
+                    readonly property size currentSize: fullScreen ? Qt.size(Screen.width, Screen.height) : contentMap[root.currentMode]?.size ?? Qt.size(500, 120)
                     readonly property var contentMap: {
                         "dlp": {
                             comp: "DlpContent",
@@ -85,6 +85,11 @@ Scope {
                             comp: "AssureContent",
                             preload: "content",
                             size: Qt.size(700, 220)
+                        },
+                        "ble": {
+                            comp: "BLEContent",
+                            preload: "content",
+                            size: Qt.size(700, 220)
                         }
                     }
                     StyledText {
@@ -107,8 +112,13 @@ Scope {
                         }
                         height: 8
                         width: 100
-                        color: Colors.colOutlineVariant
+                        color: bg.fullScreen ? Colors.colPrimary : Colors.colOutlineVariant
                         radius: Rounding.full
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onDoubleClicked: bg.fullScreen = !bg.fullScreen
+                        }
                     }
 
                     RippleButtonWithIcon {
@@ -133,8 +143,10 @@ Scope {
                         source: currentItem?.comp ? sanitizeSource("content/", currentItem.comp) : ""
                         onLoaded: {
                             if (currentItem.preload in _item)
-                                _item[currentItem?.preload] = GlobalStates.main.sysDialogs?.pendingData ?? null;
+                                _item[currentItem?.preload] = Globals.main.sysDialogs?.pendingData ?? null;
                             _item.dismiss.connect(() => panel.dismiss());
+                            if ("fullScreen" in _item)
+                                bg.fullScreen = Qt.binding(() => _item?.fullScreen ?? false);
                         }
                         readonly property var currentItem: bg.contentMap[root?.currentMode]
                     }
@@ -157,7 +169,7 @@ Scope {
 
             function dismiss() {
                 if (canDismiss)
-                    GlobalStates.main.sysDialogs.mode = "";
+                    Globals.main.sysDialogs.mode = "";
             }
         }
     }

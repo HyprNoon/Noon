@@ -19,14 +19,14 @@ StyledPanel {
         right: true
         bottom: true
     }
-    visible: GlobalStates.nobuntu.db.show
+    visible: Globals.nobuntu.db.show
     mask: Region {
         item: bg
     }
     FocusHandler {
         windows: [root]
         active: root.visible
-        onCleared: GlobalStates.nobuntu.db.show = false
+        onCleared: Globals.nobuntu.db.show = false
     }
 
     StyledRect {

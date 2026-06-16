@@ -26,11 +26,11 @@ Scope {
         OSDs {}
     }
     WidgetLoader {
-        enabled: GlobalStates.nobuntu.db.show
+        enabled: Globals.nobuntu.db.show
         DB {}
     }
     WidgetLoader {
-        enabled: GlobalStates.nobuntu.notifs.show
+        enabled: Globals.nobuntu.notifs.show
         GNotifs {}
     }
     GIPC {}

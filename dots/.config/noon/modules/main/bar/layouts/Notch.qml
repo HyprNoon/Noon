@@ -9,7 +9,7 @@ StyledPanel {
     id: bar
 
     readonly property string pos: Mem.options.bar.behavior.position
-    readonly property int barHeight: Mem.options.bar.appearance.height
+    readonly property int barHeight: Mem.options.bar.appearance.size
 
     name: "bar"
     shell: "noon"

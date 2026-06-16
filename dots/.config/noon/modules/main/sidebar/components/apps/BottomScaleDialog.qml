@@ -19,7 +19,6 @@ BottomDialog {
 
         PageHeader {
             title: "List Tweaks"
-            showCloseButton: false
         }
 
         StyledText {

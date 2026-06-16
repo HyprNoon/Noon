@@ -14,9 +14,14 @@ StyledRect {
     property string coverArt
     property bool isPlaylist
     property var action
+    property bool listMode: false
+    property int margins: listMode ? Padding.small : Padding.large
     clip: true
     color: Colors.colLayer2
-    radius: Rounding.huge
+
+    topRadius: listMode ? (index === 0 ? Rounding.large : Rounding.tiny) : Rounding.huge
+    bottomRadius: listMode ? (index === parent?.count - 1 ? Rounding.large : Rounding.tiny) : Rounding.huge
+
     signal preview(url: string, x: int, y: int)
 
     MouseArea {
@@ -33,39 +38,28 @@ StyledRect {
                 action();
         }
     }
-    SequentialAnimation {
-        id: feedAnim
-        running: false
-        NumberAnimation {
-            target: root
-            property: "scale"
-            to: 0.94
-            duration: 150
-        }
-        NumberAnimation {
-            target: root
-            property: "scale"
-            to: 1
-            duration: 200
-        }
-    }
+
     StyledRect {
         id: footer
         z: 999
         clip: true
-        anchors.bottom: parent.bottom
+
+        anchors.top: !root.listMode ? undefined : parent.top
         anchors.right: parent.right
-        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.left: root.listMode ? coverArt.right : parent.left
+
         color: Colors.m3.m3surfaceContainerHigh
+        width: parent.width - 50
         height: 45
         RowLayout {
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: Padding.veryhuge
             anchors.leftMargin: Padding.veryhuge
             spacing: Padding.huge
-            height: 45
+            implicitHeight: 45
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -96,17 +90,42 @@ StyledRect {
             }
         }
     }
-    Symbol {
-        text: "music_note"
-        visible: !modelData.thumbnail
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset: -Padding.huge
-        font.pixelSize: 54
-        color: Colors.colSecondary
+
+    Item {
+        id: coverArt
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        implicitWidth: height
+        Symbol {
+            text: "music_note"
+            visible: !modelData.thumbnail
+            anchors.centerIn: parent
+            font.pixelSize: root.listMode ? 28 : 54
+            color: Colors.colSecondary
+        }
+
+        StyledImage {
+            anchors.fill: parent
+            source: Qt.resolvedUrl(root?.coverArt ?? "") ?? ""
+            cache: true
+        }
     }
-    StyledImage {
-        anchors.fill: parent
-        source: Qt.resolvedUrl(root.coverArt) ?? ""
-        cache: true
+
+    SequentialAnimation {
+        id: feedAnim
+        running: false
+        NumberAnimation {
+            target: root
+            property: "scale"
+            to: 0.94
+            duration: 150
+        }
+        NumberAnimation {
+            target: root
+            property: "scale"
+            to: 1
+            duration: 200
+        }
     }
 }

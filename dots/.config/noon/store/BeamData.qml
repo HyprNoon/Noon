@@ -28,7 +28,7 @@ Singleton {
             return null;
         return config.subStates[activeSubState] || null;
     }
-    property string activeHint
+    property string activeHint: ""
 
     property var registry: rebuildRegistry()
     readonly property var pluginsContent: PluginsManager?.beamPlugins
@@ -87,7 +87,7 @@ Singleton {
             },
             executor: () => {
                 if (QalcService.result)
-                    ClipboardService.manager.copy(QalcService.result);
+                    ClipboardService.copy(QalcService.result);
             }
         },
         "install": {
@@ -249,7 +249,7 @@ Singleton {
                     shape: "Bun",
                     exec: query => {
                         BeatsHitsService.search(query);
-                        GlobalStates.main.sidebar.setTab(2);
+                        Globals.main.sidebar.setTab(2);
                         NoonUtils.callIpc("sidebar reveal Beats");
                     }
                 },
@@ -291,7 +291,7 @@ Singleton {
             },
             executor: () => {
                 if (TranslatorService.translatedText)
-                    ClipboardService.manager.copy(TranslatorService.translatedText);
+                    ClipboardService.copy(TranslatorService.translatedText);
             }
         },
         "download": {
@@ -303,29 +303,40 @@ Singleton {
             showOsrButton: false,
             hinter: () => "",
             executor: () => {
-                const params = subConfig?.parameters || "";
-                const searchQuery = subConfig ? cleanQuery.substring(subConfig.prefix.length).trim() : cleanQuery.trim();
-                const processedParams = params.replace(/%q/g, searchQuery);
-                const cmd = params.includes("%q") ? `yt-dlp -f ${processedParams}` : `yt-dlp -f ${processedParams} '${searchQuery}'`;
-                BeatsService.downloadByCommand(cmd);
+                const query = subConfig ? cleanQuery.substring(subConfig.prefix.length).trim() : cleanQuery.trim();
+                const info = subConfig?.isSearch ? {
+                    title: query
+                } : {
+                    url: query
+                };
+                if (subConfig?.audio)
+                    info.audio = true;
+                else if (subConfig?.video)
+                    info.video = true;
+                if (subConfig?.directory)
+                    info.directory = subConfig.directory;
+                DlpService.request(info);
             },
             subStates: {
                 "video": {
                     prefix: "v",
                     icon: "play_arrow",
-                    parameters: "bestvideo[height<=720]+bestaudio/best[height<=720]",
+                    video: true,
                     shape: "PixelCircle"
                 },
                 "audio": {
                     prefix: "m",
                     icon: "music_note",
-                    parameters: `bestaudio --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata -P "${Directories.beats.downloads}" `,
+                    audio: true,
+                    directory: BeatsService.tracksDir,
                     shape: "PixelCircle"
                 },
                 "audio_search": {
                     prefix: "?m",
                     icon: "music_note",
-                    parameters: `bestaudio --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata -P "${Directories.beats.downloads}" 'ytsearch1:%q'`,
+                    audio: true,
+                    directory: BeatsService.tracksDir,
+                    isSearch: true,
                     shape: "PixelCircle"
                 }
             }

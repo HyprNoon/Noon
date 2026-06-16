@@ -11,12 +11,12 @@ Item {
     id: root
     focus: true
     required property var window
-    property string currentFile: GlobalStates.applications.editor.currentFile
+    property string currentFile: Globals.applications.editor.currentFile
     property bool modified: false
     property int fontSizeOffset: 0
 
     function edit(filePath) {
-        GlobalStates.applications.editor.currentFile = filePath;
+        Globals.applications.editor.currentFile = filePath;
         loadFile(FileUtils.trimFileProtocol(filePath));
     }
 
@@ -286,7 +286,7 @@ Item {
     }
 
     Connections {
-        target: GlobalStates.applications.editor
+        target: Globals.applications.editor
         function onCurrentFileChanged() {
             edit(currentFile);
         }

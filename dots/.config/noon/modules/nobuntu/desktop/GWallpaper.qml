@@ -27,7 +27,7 @@ Scope {
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             color: "transparent"
             readonly property bool _overview_enabled: true
-            readonly property bool _overview: GlobalStates.nobuntu.overview.show
+            readonly property bool _overview: Globals.nobuntu.overview.show
             readonly property bool enableDepthMode: Mem.options.desktop.bg.depthMode // New config toggle for depth mode
             readonly property bool enableParallax: Mem.options.desktop.bg.parallax.enabled
             readonly property string wallpaper: WallpaperService.currentWallpaper
@@ -44,7 +44,7 @@ Scope {
                 windows: [backgroundPanel]
                 active: _overview
                 onActiveChanged: searchbar.searchInput.focus = active
-                onCleared: GlobalStates.nobuntu.overview.show = false
+                onCleared: Globals.nobuntu.overview.show = false
             }
             Item {
                 anchors.fill: parent
@@ -114,7 +114,7 @@ Scope {
 
                         property bool imageLoaded: status === Image.Ready
                         property bool verticalParallaxMode: Mem.options.desktop.bg.parallax.verticalParallax
-                        property int widgetMargin: Mem.options.desktop.bg.parallax.widgetParallax && enableParallax && GlobalStates.main.sidebar.expanded ? (Mem.options.bar.behavior.position === "left" ? -1 : 1) * Math.max(Mem.options.desktop.bg.parallax.parallaxStrength, 0.1) * 12 * (SidebarData.launcherWidth > 500 ? 20 : 50) : 0
+                        property int widgetMargin: Mem.options.desktop.bg.parallax.widgetParallax && enableParallax && Globals.main.sidebar.expanded ? (Mem.options.bar.behavior.position === "left" ? -1 : 1) * Math.max(Mem.options.desktop.bg.parallax.parallaxStrength, 0.1) * 12 * (SidebarData.launcherWidth > 500 ? 20 : 50) : 0
 
                         property real parallaxFactor: {
                             const firstId = workspaceList[0]?.id || 1;
